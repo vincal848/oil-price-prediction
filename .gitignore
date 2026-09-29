@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Cached price data, rebuilt by the first run.
+data/
+
+# Run outputs are regenerated, but metrics.json is the record the README quotes,
+# so it is tracked.
+results/*
+!results/metrics.json

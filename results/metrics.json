@@ -1,0 +1,67 @@
+{
+  "context": {
+    "window": 120,
+    "train_frac": 0.75,
+    "n_train": 4471,
+    "n_eval": 1371,
+    "eval_start": "2018-12-18",
+    "eval_end": "2024-05-30",
+    "n_roll_days_in_eval": 66,
+    "roll_diagnostics": {
+      "n_days": 5961,
+      "n_roll_days": 285,
+      "roll_share_of_days": 0.04781077000503271,
+      "mean_abs_change_roll": 1.3367370371232954,
+      "mean_abs_change_other": 1.074076817017193,
+      "volatility_ratio": 1.2445450976546846,
+      "roll_share_of_variance": 0.05258646014968812
+    },
+    "scaler_min_train_only": 17.450000762939453,
+    "price_min_overall": -37.630001068115234,
+    "price_min_date": "2020-04-20"
+  },
+  "models": {
+    "naive": {
+      "mse": 7.362326898242757,
+      "rmse": 2.7133608123953508,
+      "mae": 1.360167830986841,
+      "nrmse": 0.01681869984353586,
+      "mape": NaN,
+      "mase": 1.3505208196918603,
+      "directional_accuracy": NaN,
+      "seconds": 0.0,
+      "rmse_ex_roll": 2.7509659223158507,
+      "mae_ex_roll": 1.360390844381632
+    },
+    "esn": {
+      "mse": 49.01815902009887,
+      "rmse": 7.0012969527151805,
+      "mae": 5.1216638934529755,
+      "nrmse": 0.043397365888551684,
+      "mape": NaN,
+      "mase": 5.085338413388219,
+      "directional_accuracy": 0.49816581071166544,
+      "seconds": 0.053857400082051754,
+      "rmse_ex_roll": 6.954275686946357,
+      "mae_ex_roll": 5.09216112082866,
+      "skill_ex_roll_rmse": -1.5279395977002963,
+      "skill_vs_naive_rmse": -1.580304440430997,
+      "skill_vs_naive_mae": -2.765464655738153
+    },
+    "lstm": {
+      "mse": 16.47901106413042,
+      "rmse": 4.059434820776215,
+      "mae": 2.8244040368857135,
+      "nrmse": 0.025162306270930624,
+      "mape": NaN,
+      "mase": 2.8043719077434908,
+      "directional_accuracy": 0.4768892149669846,
+      "seconds": 94.33684000000358,
+      "rmse_ex_roll": 4.086125890984453,
+      "mae_ex_roll": 2.836037175774118,
+      "skill_ex_roll_rmse": -0.4853422420967768,
+      "skill_vs_naive_rmse": -0.49609104776321744,
+      "skill_vs_naive_mae": -1.0765114220033616
+    }
+  }
+}

@@ -1,3 +1,27 @@
+"""SUPERSEDED. Kept for reference; this is the original coursework script.
+
+It does not run against current dependencies - ReservoirPy 0.4 removed
+`reservoirpy.verbosity` and the `bias_scaling` / `fb_connectivity` arguments this
+file passes - and it has methodological problems that the rewrite documents:
+
+1. MinMaxScaler is fit on the full series before the train/validation split. The
+   fitted minimum is -37.63 from 2020-04-20, a date inside the validation set, so
+   every training row was normalized by a future value.
+2. The reservoir is scored from val[1:] and the LSTM from val[120:], so the two
+   models are evaluated over different periods and their error numbers were never
+   comparable.
+3. There is no naive benchmark. Both models lose to simple persistence, which the
+   comparison could not reveal.
+4. MAPE is reported on a window containing a negative price.
+5. NRMSE divides by the range of the actuals, which the -37.63 print sets.
+6. `epochs=6` with `EarlyStopping(patience=10)` can never trigger.
+7. The test set is passed as `validation_data` and then scored on.
+8. `fb_connectivity=1.1` is a density outside [0, 1], and the model has no
+   feedback path for it to apply to.
+
+The working version is data.py, models.py, metrics.py, roll.py and run.py.
+"""
+
 import tensorflow as tf
 from reservoirpy.nodes import Reservoir, Ridge, ESN
 import yfinance as yf
