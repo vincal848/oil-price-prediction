@@ -4,7 +4,6 @@ import os
 
 import numpy as np
 import pandas as pd
-import yfinance as yf
 from sklearn.preprocessing import MinMaxScaler
 
 TICKER = "CL=F"
@@ -23,6 +22,11 @@ def load_prices(start=START, end=END, use_cache=True):
     if use_cache and os.path.exists(CACHE):
         s = pd.read_csv(CACHE, index_col=0, parse_dates=True).iloc[:, 0]
         return s.loc[start:end]
+
+    # Imported here rather than at module scope so that splitting, scaling and
+    # windowing can be imported and tested without yfinance installed. The test
+    # suite runs on synthetic series and never downloads anything.
+    import yfinance as yf
 
     df = yf.download(TICKER, start=start, end=end, progress=False, auto_adjust=False)
     close = df["Close"]
