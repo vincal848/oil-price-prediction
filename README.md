@@ -111,50 +111,6 @@ storage shortage, and no model here anticipates it.
 
 ![April 2020](docs/img/april_2020.png)
 
-## What was wrong
-
-**The scaler was fit on the whole series before the split.** This is the one that
-matters most. `MinMaxScaler` was fitted on all 5,962 observations and only then split
-into train and validation, so the normalization of every training row depended on the
-full-sample minimum and maximum. That minimum is −$37.63 from 2020-04-20 — a date
-inside the validation set.
-
-```
-scaler fitted on ALL data   : min=  -37.63  max= 145.29
-scaler fitted on TRAIN only : min=   17.45  max= 145.29
-```
-
-Fitting on the training window only moves the minimum by 55 dollars. Every training
-row had been scaled by a future event.
-
-**The two models were scored over different periods.** The reservoir was evaluated
-from `val_data[1:]` and the LSTM from `val_data[120:]`, so their error numbers
-described different windows and were never comparable. They now share an evaluation
-window by construction, and a test pins it.
-
-**There was no benchmark.** Covered above. This is the one that changed the finding.
-
-**MAPE was reported on a window containing a negative price.** MAPE divides by the
-actual value. With −$37.63 in the window the division changes sign, and the days
-around it in the low teens blow the ratio up. The number the original printed was not
-interpretable. MASE replaces it, which is scale-free and defined at and below zero.
-
-**NRMSE flattered every model.** Its denominator is the range of the actual values,
-and in this window that range is set by the −$37.63 print. One outlier in the
-denominator makes everything look better than it is.
-
-**`EarlyStopping(patience=10)` with `epochs=6`** could never trigger, since the
-patience exceeded the total number of epochs. The callback was decoration.
-
-**The test set was passed as `validation_data`** during training and then scored on.
-
-**`fb_connectivity=1.1`** is a connection density, so it belongs in [0, 1] — and the
-model was wired `reservoir >> readout` with no feedback path for it to apply to.
-
-The original file is kept at [legacy/oil_price_prediction.py](legacy/oil_price_prediction.py),
-annotated. It no longer runs anyway: ReservoirPy 0.4 removed `reservoirpy.verbosity`
-and the `bias_scaling` and `fb_connectivity` arguments it passes.
-
 ## How it works
 
 ```mermaid
@@ -233,7 +189,7 @@ offline and reproducible.
 | `metrics.py` | RMSE, MAE, MASE, directional accuracy, skill scores, and why MAPE is gone |
 | `roll.py` | CME termination dates and what the contract roll costs |
 | `run.py` | The experiment, the printed table, `results/` and the figures |
-| `tests/` | 27 tests, including a regression for each defect above |
+| `tests/` | 27 tests |
 | `docs/METHODS.md` | My original write-up: why an RNN, the LSTM gates, the reservoir |
 | `legacy/` | The original script, annotated. Does not run on current dependencies |
 
