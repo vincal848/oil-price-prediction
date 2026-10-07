@@ -1,6 +1,6 @@
 # WTI Crude Forecasting: LSTM vs. Echo State Network
 
-[![tests](https://github.com/vincal848/oil_price_prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/vincal848/oil_price_prediction/actions/workflows/tests.yml)
+[![tests](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml)
 
 For this project I was working from my coursework series in mathematical computing,
 and I wanted to use neural networks on a price series. I took WTI Crude Oil Futures
