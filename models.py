@@ -8,6 +8,7 @@ import os
 import time
 
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 from data import make_sequences
 
@@ -25,7 +26,7 @@ def _quiet_tensorflow():
     return tf
 
 
-def fit_naive(val_scaled, window, scaler):
+def fit_naive(val_scaled: np.ndarray, window: int, scaler: MinMaxScaler) -> tuple[np.ndarray, float]:
     """Persistence: tomorrow's price is today's price.
 
     This is the benchmark the original did not have, and it is the one that
@@ -40,10 +41,10 @@ def fit_naive(val_scaled, window, scaler):
     return scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(-1), 0.0
 
 
-def fit_esn(train_scaled, val_scaled, window, scaler,
-            units=20, leak_rate=0.75, spectral_radius=1.025,
-            input_scaling=1.0, rc_connectivity=0.15, input_connectivity=0.2,
-            ridge=1e-8):
+def fit_esn(train_scaled: np.ndarray, val_scaled: np.ndarray, window: int, scaler: MinMaxScaler,
+            units: int = 20, leak_rate: float = 0.75, spectral_radius: float = 1.025,
+            input_scaling: float = 1.0, rc_connectivity: float = 0.15,
+            input_connectivity: float = 0.2, ridge: float = 1e-8) -> tuple[np.ndarray, float]:
     """Echo state network: a fixed random reservoir with a trained ridge readout.
 
     Hyperparameters follow Kumar K. (2023), as in the original. Two changes:
@@ -88,9 +89,9 @@ def fit_esn(train_scaled, val_scaled, window, scaler,
     return scaler.inverse_transform(predicted).reshape(-1), elapsed
 
 
-def fit_lstm(train_scaled, val_scaled, window, scaler,
-             units=50, dropout=0.2, epochs=20, batch_size=32, patience=5,
-             verbose=0):
+def fit_lstm(train_scaled: np.ndarray, val_scaled: np.ndarray, window: int, scaler: MinMaxScaler,
+             units: int = 50, dropout: float = 0.2, epochs: int = 20, batch_size: int = 32,
+             patience: int = 5, verbose: int = 0) -> tuple[np.ndarray, float]:
     """Two stacked LSTM layers with a dense head.
 
     Three changes from the original:

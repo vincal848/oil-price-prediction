@@ -21,7 +21,7 @@ from pandas.tseries.offsets import CustomBusinessDay
 BDAY = CustomBusinessDay(calendar=USFederalHolidayCalendar())
 
 
-def is_business_day(ts):
+def is_business_day(ts: pd.Timestamp | str) -> bool:
     """Business day on the NYMEX calendar, holidays included.
 
     A weekday check is not enough. The 25th of May 2020 was a Monday but also
@@ -32,7 +32,7 @@ def is_business_day(ts):
     return len(pd.bdate_range(ts, ts, freq=BDAY)) == 1
 
 
-def termination_date(year, month):
+def termination_date(year: int, month: int) -> pd.Timestamp:
     """Last trading day of the WTI contract delivering in (year, month).
 
     CME rule: trading terminates 3 business days before the 25th calendar day of
@@ -52,7 +52,7 @@ def termination_date(year, month):
     return (twenty_fifth - steps * BDAY).normalize()
 
 
-def termination_dates(start, end):
+def termination_dates(start: pd.Timestamp | str, end: pd.Timestamp | str) -> pd.DatetimeIndex:
     """Every WTI termination date in range, as a DatetimeIndex."""
     start, end = pd.Timestamp(start), pd.Timestamp(end)
     out = []
@@ -65,7 +65,7 @@ def termination_dates(start, end):
     return pd.DatetimeIndex(sorted(set(out)))
 
 
-def roll_mask(index):
+def roll_mask(index: pd.DatetimeIndex) -> pd.Series:
     """Boolean Series: True on the first trading day after each termination.
 
     That is the day whose change spans two different contracts, so it is the day the
@@ -83,7 +83,7 @@ def roll_mask(index):
     return pd.Series([i in flagged for i in index], index=index)
 
 
-def roll_diagnostics(prices):
+def roll_diagnostics(prices: pd.Series) -> dict[str, float]:
     """How much the roll actually distorts this series.
 
     Returns a dict. Written to answer the question with numbers rather than to
@@ -98,7 +98,7 @@ def roll_diagnostics(prices):
     total_sq = float((changes ** 2).sum())
 
     return {
-        "n_days": int(len(changes)),
+        "n_days": len(changes),
         "n_roll_days": int(mask.sum()),
         "roll_share_of_days": float(mask.mean()),
         "mean_abs_change_roll": float(on.abs().mean()),

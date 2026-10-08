@@ -1,8 +1,10 @@
 """Run the comparison and write results/ and docs/img/.
 
-    python run.py                # full run, window=120
-    python run.py --window 60    # the memory length originally tried
-    python run.py --no-lstm      # skip TensorFlow, for a quick check
+python run.py                # full run, window=120
+python run.py --window 60    # the memory length originally tried
+python run.py --no-lstm      # skip TensorFlow, for a quick check
+python run.py --holdout      # score the return models once (docs/PROTOCOL.md)
+python run.py --holdout2     # score docs/PROTOCOL-2.md once (downloads FRED data)
 """
 
 import argparse
@@ -10,21 +12,121 @@ import json
 import os
 
 import numpy as np
+import pandas as pd
 
+import forecast
 import metrics
 import roll
-from data import aligned_targets, load_prices, make_sequences, split_and_scale
+from data import aligned_targets, make_sequences, split_and_scale
 from models import fit_esn, fit_lstm, fit_naive
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(HERE, "results")
 IMG = os.path.join(HERE, "docs", "img")
 
+TICKER = "CL=F"
+START = "2000-08-30"
+END = "2024-05-31"
+CACHE = os.path.join(HERE, "data", "wti.csv")
+
 WINDOW = 120
 TRAIN_FRAC = 0.75
 
 
-def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
+def load_prices(
+    start: str = START, end: str = END, use_cache: bool = True
+) -> pd.Series:
+    """WTI front-month closes as a Series indexed by date, cached to CSV.
+
+    Cached so re-runs are offline and reproducible even if Yahoo revises history.
+    This is the only network/file access for prices; data.py stays pure.
+    """
+    if use_cache and os.path.exists(CACHE):
+        s = pd.read_csv(CACHE, index_col=0, parse_dates=True).iloc[:, 0]
+        return s.loc[start:end]
+
+    import yfinance as yf
+
+    df = yf.download(TICKER, start=start, end=end, progress=False, auto_adjust=False)
+    close = df["Close"]
+    # Recent yfinance returns MultiIndex columns, so this can be a one-column frame.
+    if isinstance(close, pd.DataFrame):
+        close = close.iloc[:, 0]
+    close = close.dropna()
+    close.name = "close"
+
+    if use_cache:
+        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+        close.to_csv(CACHE)
+    return close
+
+
+FRED = "https://fred.stlouisfed.org/graph/fredgraph.csv?id="
+
+
+def load_fred(series_id: str) -> pd.Series:
+    """Keyless FRED CSV for one series, cached to data/. Missing values dropped."""
+    path = os.path.join(HERE, "data", f"fred_{series_id}.csv")
+    if not os.path.exists(path):
+        df = pd.read_csv(FRED + series_id, na_values=".", index_col=0, parse_dates=True)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        df.to_csv(path)
+    return pd.read_csv(path, index_col=0, parse_dates=True).iloc[:, 0].dropna()
+
+
+def load_prices_extended() -> pd.Series:
+    """The cached history (to 2024-05-30, untouched) plus any later Yahoo rows."""
+    old = load_prices()
+    path = os.path.join(HERE, "data", "wti_new.csv")
+    if not os.path.exists(path):
+        import yfinance as yf
+
+        df = yf.download(TICKER, start="2024-05-31", progress=False, auto_adjust=False)
+        new = df["Close"]
+        if isinstance(new, pd.DataFrame):
+            new = new.iloc[:, 0]
+        new.dropna().rename("close").to_csv(path)
+    new = pd.read_csv(path, index_col=0, parse_dates=True).iloc[:, 0]
+    return pd.concat([old, new.loc[new.index > old.index[-1]]])
+
+
+def run_holdout2() -> None:
+    """Score docs/PROTOCOL-2.md once; write results/holdout2.json."""
+    front = load_prices_extended()
+    feats = forecast.exog_features(
+        front,
+        load_fred("DCOILBRENTEU"),
+        load_fred("DCOILWTICO"),
+        load_fred("DTWEXBGS"),
+    )
+    out = forecast.protocol2(front, feats, roll.roll_mask(front.index).to_numpy())
+    print(
+        f"holdout {out['holdout'][0]} to {out['holdout'][1]}; configs {out['n_configs']}"
+    )
+    print(
+        f"{'id':<12}{'n':>5}{'rmse':>8}{'skill':>9}{'dm_p':>8}{'dir':>7}{'binom_p':>9}{'w':>6}"
+    )
+    for name, s in {
+        "persistence": out["persistence"],
+        "drift": out["drift"],
+        **out["candidates"],
+    }.items():
+        print(
+            f"{name:<12}{s['n']:>5}{s['rmse']:>8.3f}{s['skill']:>+9.4f}{s['dm_p']:>8.3f}"
+            f"{s['dir_acc']:>7.3f}{s['binom_p']:>9.3f}{s.get('w', float('nan')):>6.2f}"
+        )
+    for name, s in out["candidates"].items():
+        print(
+            name, "sign pnl", s["sign_pnl"], "significant" if s["significant"] else ""
+        )
+    os.makedirs(RESULTS, exist_ok=True)
+    with open(os.path.join(RESULTS, "holdout2.json"), "w") as fh:
+        json.dump(out, fh, indent=2)
+
+
+def run(
+    window: int = WINDOW, train_frac: float = TRAIN_FRAC, include_lstm: bool = True
+) -> tuple[dict, dict]:
     """Fit every model and return (results, context) for reporting."""
     prices = load_prices()
     train_scaled, val_scaled, scaler, cut = split_and_scale(prices, train_frac)
@@ -37,10 +139,12 @@ def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
     previous = scaler.inverse_transform(X_val[:, -1].reshape(-1, 1)).reshape(-1)
 
     train_prices = np.asarray(prices, dtype=float)[:cut]
-    dates = prices.index[cut + window:]
+    dates = prices.index[cut + window :]
 
-    fitted = {"naive": fit_naive(val_scaled, window, scaler),
-              "esn": fit_esn(train_scaled, val_scaled, window, scaler)}
+    fitted = {
+        "naive": fit_naive(val_scaled, window, scaler),
+        "esn": fit_esn(train_scaled, val_scaled, window, scaler),
+    }
     if include_lstm:
         fitted["lstm"] = fit_lstm(train_scaled, val_scaled, window, scaler)
 
@@ -53,26 +157,30 @@ def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
         results[name] = metrics.evaluate(actual, predicted, train_prices, previous)
         results[name]["seconds"] = elapsed
         results[name]["predicted"] = predicted
-        ex = metrics.evaluate(actual[~is_roll], predicted[~is_roll],
-                              train_prices, previous[~is_roll])
+        ex = metrics.evaluate(
+            actual[~is_roll], predicted[~is_roll], train_prices, previous[~is_roll]
+        )
         results[name]["rmse_ex_roll"] = ex["rmse"]
         results[name]["mae_ex_roll"] = ex["mae"]
 
-    for name in results:
+    for name, row in results.items():
         if name != "naive":
-            results[name]["skill_ex_roll_rmse"] = metrics.skill_score(
-                {"rmse": results[name]["rmse_ex_roll"]},
-                {"rmse": results["naive"]["rmse_ex_roll"]}, "rmse")
-            results[name]["skill_vs_naive_rmse"] = metrics.skill_score(
-                results[name], results["naive"], "rmse")
-            results[name]["skill_vs_naive_mae"] = metrics.skill_score(
-                results[name], results["naive"], "mae")
+            row["skill_ex_roll_rmse"] = metrics.skill_score(
+                {"rmse": row["rmse_ex_roll"]},
+                {"rmse": results["naive"]["rmse_ex_roll"]},
+            )
+            row["skill_vs_naive_rmse"] = metrics.skill_score(
+                row, results["naive"], "rmse"
+            )
+            row["skill_vs_naive_mae"] = metrics.skill_score(
+                row, results["naive"], "mae"
+            )
 
     context = {
         "window": window,
         "train_frac": train_frac,
         "n_train": int(cut),
-        "n_eval": int(len(actual)),
+        "n_eval": len(actual),
         "eval_start": str(dates[0].date()),
         "eval_end": str(dates[-1].date()),
         "actual": actual,
@@ -88,11 +196,20 @@ def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
     return results, context
 
 
-def print_table(results, context):
-    cols = ["rmse", "rmse_ex_roll", "mae", "mae_ex_roll", "mase",
-            "directional_accuracy", "seconds"]
-    print(f"\nEvaluation window: {context['eval_start']} to {context['eval_end']}  "
-          f"({context['n_eval']} days, memory {context['window']})")
+def print_table(results: dict, context: dict) -> None:
+    cols = [
+        "rmse",
+        "rmse_ex_roll",
+        "mae",
+        "mae_ex_roll",
+        "mase",
+        "directional_accuracy",
+        "seconds",
+    ]
+    print(
+        f"\nEvaluation window: {context['eval_start']} to {context['eval_end']}  "
+        f"({context['n_eval']} days, memory {context['window']})"
+    )
     print(f"{'model':<8}" + "".join(f"{c:>22}" for c in cols))
     for name, row in results.items():
         cells = []
@@ -102,35 +219,47 @@ def print_table(results, context):
         print(f"{name:<8}" + "".join(cells))
 
     rd = context["roll_diagnostics"]
-    print(f"\nroll: {rd['n_roll_days']} of {rd['n_days']} days "
-          f"({rd['roll_share_of_days']*100:.1f}%), "
-          f"{rd['volatility_ratio']:.2f}x the mean absolute change of other days, "
-          f"{rd['roll_share_of_variance']*100:.1f}% of total variance. "
-          f"{context['n_roll_days_in_eval']} fall in the evaluation window.")
+    print(
+        f"\nroll: {rd['n_roll_days']} of {rd['n_days']} days "
+        f"({rd['roll_share_of_days'] * 100:.1f}%), "
+        f"{rd['volatility_ratio']:.2f}x the mean absolute change of other days, "
+        f"{rd['roll_share_of_variance'] * 100:.1f}% of total variance. "
+        f"{context['n_roll_days_in_eval']} fall in the evaluation window."
+    )
 
-    print("\nskill vs naive persistence (positive = better than repeating today's price)")
+    print(
+        "\nskill vs naive persistence (positive = better than repeating today's price)"
+    )
     for name, row in results.items():
         if "skill_vs_naive_rmse" in row:
-            print(f"  {name:<6} RMSE {row['skill_vs_naive_rmse']:+.4f}   "
-                  f"MAE {row['skill_vs_naive_mae']:+.4f}   "
-                  f"RMSE excluding roll days {row['skill_ex_roll_rmse']:+.4f}")
+            print(
+                f"  {name:<6} RMSE {row['skill_vs_naive_rmse']:+.4f}   "
+                f"MAE {row['skill_vs_naive_mae']:+.4f}   "
+                f"RMSE excluding roll days {row['skill_ex_roll_rmse']:+.4f}"
+            )
 
 
-def save(results, context):
+def save(results: dict, context: dict) -> None:
     os.makedirs(RESULTS, exist_ok=True)
     payload = {
-        "context": {k: v for k, v in context.items()
-                    if k not in ("actual", "previous", "dates", "is_roll")},
-        "models": {name: {k: v for k, v in row.items() if k != "predicted"}
-                   for name, row in results.items()},
+        "context": {
+            k: v
+            for k, v in context.items()
+            if k not in ("actual", "previous", "dates", "is_roll")
+        },
+        "models": {
+            name: {k: v for k, v in row.items() if k != "predicted"}
+            for name, row in results.items()
+        },
     }
     with open(os.path.join(RESULTS, "metrics.json"), "w") as fh:
         json.dump(payload, fh, indent=2)
     print(f"\nwrote {os.path.join(RESULTS, 'metrics.json')}")
 
 
-def figures(results, context):
+def figures(results: dict, context: dict) -> None:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
@@ -144,10 +273,19 @@ def figures(results, context):
     ax.plot(dates, actual, color="black", lw=1.2, label="actual")
     for name, color in (("naive", "0.6"), ("esn", "tab:red"), ("lstm", "tab:blue")):
         if name in results:
-            ax.plot(dates, results[name]["predicted"], color=color, lw=0.9,
-                    alpha=0.85, label=name)
-    ax.set(xlabel="", ylabel="WTI front-month close ($/bbl)",
-           title="One-step-ahead forecasts over the validation window")
+            ax.plot(
+                dates,
+                results[name]["predicted"],
+                color=color,
+                lw=0.9,
+                alpha=0.85,
+                label=name,
+            )
+    ax.set(
+        xlabel="",
+        ylabel="WTI front-month close ($/bbl)",
+        title="One-step-ahead forecasts over the validation window",
+    )
     ax.legend(loc="upper left")
     fig.savefig(os.path.join(IMG, "forecasts.png"))
     plt.close(fig)
@@ -156,11 +294,20 @@ def figures(results, context):
     fig, ax = plt.subplots(figsize=(10, 4))
     for name, color in (("naive", "0.6"), ("esn", "tab:red"), ("lstm", "tab:blue")):
         if name in results:
-            ax.plot(dates, actual - results[name]["predicted"], color=color, lw=0.7,
-                    alpha=0.8, label=f"{name} (RMSE {results[name]['rmse']:.2f})")
+            ax.plot(
+                dates,
+                actual - results[name]["predicted"],
+                color=color,
+                lw=0.7,
+                alpha=0.8,
+                label=f"{name} (RMSE {results[name]['rmse']:.2f})",
+            )
     ax.axhline(0, color="black", lw=0.8)
-    ax.set(xlabel="", ylabel="actual - predicted ($/bbl)",
-           title="Forecast errors: the models differ far less than the price moves")
+    ax.set(
+        xlabel="",
+        ylabel="actual - predicted ($/bbl)",
+        title="Forecast errors: the models differ far less than the price moves",
+    )
     ax.legend(loc="lower left")
     fig.savefig(os.path.join(IMG, "errors.png"))
     plt.close(fig)
@@ -172,11 +319,18 @@ def figures(results, context):
         ax.plot(dates[mask], actual[mask], color="black", lw=1.4, label="actual")
         for name, color in (("naive", "0.6"), ("esn", "tab:red"), ("lstm", "tab:blue")):
             if name in results:
-                ax.plot(dates[mask], results[name]["predicted"][mask], color=color,
-                        lw=1.0, label=name)
+                ax.plot(
+                    dates[mask],
+                    results[name]["predicted"][mask],
+                    color=color,
+                    lw=1.0,
+                    label=name,
+                )
         ax.axhline(0, color="0.4", lw=0.8, ls=":")
-        ax.set(ylabel="$/bbl",
-               title="April 2020: no model anticipates the negative settlement")
+        ax.set(
+            ylabel="$/bbl",
+            title="April 2020: no model anticipates the negative settlement",
+        )
         ax.legend()
         fig.savefig(os.path.join(IMG, "april_2020.png"))
         plt.close(fig)
@@ -184,14 +338,53 @@ def figures(results, context):
     print(f"wrote figures to {IMG}")
 
 
-def main():
+def run_holdout() -> None:
+    """Score docs/PROTOCOL.md once, print the table, write results/holdout.json."""
+    prices = load_prices()
+    out = forecast.protocol(
+        prices.to_numpy(float), prices.index, roll.roll_mask(prices.index).to_numpy()
+    )
+    print(f"configurations fitted: {out['n_configs']}")
+    print(
+        f"{'h':>3} {'model':<12}{'n':>5}{'rmse':>8}{'mae':>8}{'skill':>8}{'dm_p':>8}"
+        f"{'dir_acc':>9}{'binom_p':>9}"
+    )
+    for h, hz in out["horizons"].items():
+        print(f"h={h}: k={hz['k']} alpha={hz['alpha']} w={hz['w']:.3f}")
+        for name, s in hz["rows"].items():
+            print(
+                f"{h:>3} {name:<12}{s['n']:>5}{s['rmse']:>8.3f}{s['mae']:>8.3f}"
+                f"{s['skill']:>+8.4f}{s['dm_p']:>8.3f}{s['dir_acc']:>9.3f}{s['binom_p']:>9.3f}"
+            )
+    print("sign strategy h=1 (ridge):", out["horizons"][1]["sign_pnl"])
+    os.makedirs(RESULTS, exist_ok=True)
+    with open(os.path.join(RESULTS, "holdout.json"), "w") as fh:
+        json.dump(out, fh, indent=2)
+
+
+def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--window", type=int, default=WINDOW,
-                   help="memory length in trading days (default 120)")
+    p.add_argument(
+        "--window",
+        type=int,
+        default=WINDOW,
+        help="memory length in trading days (default 120)",
+    )
     p.add_argument("--train-frac", type=float, default=TRAIN_FRAC)
     p.add_argument("--no-lstm", action="store_true", help="skip the TensorFlow model")
     p.add_argument("--no-figures", action="store_true")
+    p.add_argument(
+        "--holdout", action="store_true", help="score the return models once"
+    )
+    p.add_argument("--holdout2", action="store_true", help="score protocol 2 once")
     args = p.parse_args()
+
+    if args.holdout:
+        run_holdout()
+        return
+    if args.holdout2:
+        run_holdout2()
+        return
 
     results, context = run(args.window, args.train_frac, include_lstm=not args.no_lstm)
     print_table(results, context)

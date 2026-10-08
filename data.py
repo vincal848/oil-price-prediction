@@ -1,49 +1,12 @@
-"""Loading, splitting and windowing the WTI front-month series."""
-
-import os
+"""Splitting, scaling and windowing the WTI front-month series. Pure: no I/O."""
 
 import numpy as np
-import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
-TICKER = "CL=F"
-START = "2000-08-30"
-END = "2024-05-31"
-CACHE = os.path.join(os.path.dirname(__file__), "data", "wti.csv")
 
-
-def load_prices(start=START, end=END, use_cache=True):
-    """WTI front-month closes as a pandas Series indexed by date.
-
-    Cached to CSV because every re-run otherwise re-downloads twenty-four years of
-    data, and because a cached copy makes the reported results reproducible even if
-    Yahoo revises its history.
-    """
-    if use_cache and os.path.exists(CACHE):
-        s = pd.read_csv(CACHE, index_col=0, parse_dates=True).iloc[:, 0]
-        return s.loc[start:end]
-
-    # Imported here rather than at module scope so that splitting, scaling and
-    # windowing can be imported and tested without yfinance installed. The test
-    # suite runs on synthetic series and never downloads anything.
-    import yfinance as yf
-
-    df = yf.download(TICKER, start=start, end=end, progress=False, auto_adjust=False)
-    close = df["Close"]
-    # yfinance returns MultiIndex columns for a single ticker in recent versions,
-    # so ['Close'] can come back as a one-column frame rather than a Series.
-    if isinstance(close, pd.DataFrame):
-        close = close.iloc[:, 0]
-    close = close.dropna()
-    close.name = "close"
-
-    if use_cache:
-        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        close.to_csv(CACHE)
-    return close
-
-
-def split_and_scale(prices, train_frac=0.75):
+def split_and_scale(
+    prices: np.ndarray, train_frac: float = 0.75
+) -> tuple[np.ndarray, np.ndarray, MinMaxScaler, int]:
     """Chronological split, scaler fitted on the training window only.
 
     Returns (train_scaled, val_scaled, scaler, cut).
@@ -63,7 +26,7 @@ def split_and_scale(prices, train_frac=0.75):
     return train, val, scaler, cut
 
 
-def make_sequences(series, window):
+def make_sequences(series: np.ndarray, window: int) -> tuple[np.ndarray, np.ndarray]:
     """Turn a 1-column array into (X, y) for one-step-ahead prediction.
 
     X[i] is the `window` observations ending at i-1, y[i] is observation i. Kept as
@@ -76,12 +39,14 @@ def make_sequences(series, window):
 
     X, y = [], []
     for i in range(window, len(series)):
-        X.append(series[i - window:i])
+        X.append(series[i - window : i])
         y.append(series[i])
     return np.array(X), np.array(y)
 
 
-def aligned_targets(val_scaled, window, scaler):
+def aligned_targets(
+    val_scaled: np.ndarray, window: int, scaler: MinMaxScaler
+) -> np.ndarray:
     """Actual prices for the evaluation window, in dollars.
 
     Every model is scored on exactly these targets. The original evaluated the
