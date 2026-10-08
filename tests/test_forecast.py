@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from forecast import (
     Origins,
     evaluate,
+    exog_features,
     newey_west_dm,
     protocol,
     sign_pnl,
@@ -118,3 +119,50 @@ def test_protocol_counts_configs():
     assert out["n_configs"] == 3 * (15 + 1)
     assert set(out["horizons"]) == {1, 5, 20}
     assert "sign_pnl" in out["horizons"][1]
+
+
+def exog_prices(n: int, beta: float, seed: int, permute: bool = False):
+    """Returns r_t = beta * x_{t-1} + noise, with x a noise feature (observed at t-1)."""
+    rng = np.random.default_rng(seed)
+    x = rng.normal(0, 1, n)
+    r = np.zeros(n)
+    r[1:] = beta * x[:-1] + rng.normal(0, 0.01, n - 1)
+    if permute:
+        r = rng.permutation(r)
+    return (
+        50 * np.exp(np.cumsum(r)),
+        pd.bdate_range("2000-01-03", periods=n),
+        x[:, None],
+    )
+
+
+def exog_skill(p, d, x, start) -> float:
+    # x[t] is known at close t; the feature for origin i is x[i], as built by exog_features.
+    o = walk_forward(p, d, 1, start, len(p) - 1, k=0, alpha=1000.0, extra=x)
+    return evaluate(o, o.r_hat)["skill"]
+
+
+def test_exog_null_has_no_skill():
+    skills = []
+    for seed in range(10):
+        p, d, x = exog_prices(4000, 0.01, seed, permute=True)
+        skills.append(exog_skill(p, d, x, 2000))
+    assert np.mean(skills) <= 0
+
+
+def test_exog_planted_signal_is_found():
+    p, d, x = exog_prices(8000, 0.004, 0)
+    assert exog_skill(p, d, x, 2000) > 0
+
+
+def test_exog_features_use_yesterdays_data():
+    ix = pd.bdate_range("2015-01-01", periods=400)
+    rng = np.random.default_rng(0)
+    front, brent, wti, usd = (
+        pd.Series(70 + rng.normal(0, 1, 400), index=ix) for _ in range(4)
+    )
+    f = exog_features(front, brent, wti, usd)
+    raw = np.log(front / wti)
+    assert f["basis"].iloc[0] == 0
+    assert np.corrcoef(f["basis"].iloc[5:], raw.shift(1).iloc[5:])[0, 1] > 0.999
+    assert np.corrcoef(f["basis"].iloc[5:], raw.iloc[5:])[0, 1] < 0.99

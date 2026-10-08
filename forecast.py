@@ -63,16 +63,21 @@ def walk_forward(
     k: int = 5,
     alpha: float = 1.0,
     model: str = "ridge",
+    extra: np.ndarray | None = None,
 ) -> Origins:
     """Expanding-window forecasts for origins in [start, end - h], refit each quarter.
 
     A refit at the first origin f of a quarter uses only rows j with j + h <= f, whose
     targets were realised by then. Origins are every h-th day (non-overlapping targets).
     model is "ridge" or "drift" (mean daily log return so far, times h).
+    extra: optional (n, m) exogenous features, already lagged by the caller, appended
+    to the k return lags (k may be 0).
     """
     p = np.asarray(prices, dtype=float)
     r = log_returns(p)
     X, y = _features(r, k), _horizon_target(p, h)
+    if extra is not None:
+        X = np.hstack([X, extra])
     idx = np.arange(start, end - h + 1, h)
     quarter = dates[idx].to_period("Q")
     r_hat = np.zeros(len(idx))
@@ -198,4 +203,78 @@ def protocol(
         out["n_configs"] += grid + 1  # grid on validation, drift baseline
         if h == 1:
             out["horizons"][h]["sign_pnl"] = sign_pnl(ho, roll_mask[ho.idx + 1])
+    return out
+
+
+EXOG_FIT_END = "2018-12-31"
+NEW_START = "2024-06-01"
+CANDIDATES = {
+    "C1": ("spread",),
+    "C2": ("basis",),
+    "C3": ("usd",),
+    "C4": ("spread", "basis"),
+    "C5": ("spread", "basis", "usd"),
+    "C6": ("spread", "basis", "usd", "ret1"),
+}
+ALPHA2 = 1000.0
+BONFERRONI = 0.05 / len(CANDIDATES)
+
+
+def exog_features(
+    front: pd.Series, brent: pd.Series, wti: pd.Series, usd: pd.Series
+) -> pd.DataFrame:
+    """PROTOCOL-2 features on the front-month index, each lagged one day, standardised.
+
+    brent/wti/usd are reindexed onto front's dates (forward-filled at most 5 days).
+    Standardised with the std over the fit segment; missing values are 0.
+    """
+    ix = front.index
+    brent, wti, usd = (
+        s.reindex(ix, method="ffill", limit=5) for s in (brent, wti, usd)
+    )
+
+    def logratio(a: pd.Series, b: pd.Series) -> pd.Series:
+        return np.log(a.where(a > 0) / b.where(b > 0))
+
+    spread = logratio(brent, wti)
+    raw = pd.DataFrame(
+        {
+            "spread": spread - spread.rolling(252, min_periods=60).mean(),
+            "basis": logratio(front, wti),
+            "usd": np.log(usd).diff(5),
+            "ret1": pd.Series(log_returns(front.to_numpy(float)), index=ix),
+        }
+    ).shift(1)
+    return (raw / raw.loc[:EXOG_FIT_END].std()).fillna(0.0)
+
+
+def protocol2(front: pd.Series, feats: pd.DataFrame, roll_mask: np.ndarray) -> dict:
+    """Run docs/PROTOCOL-2.md once: weight on validation, score the new holdout."""
+    p, dates = front.to_numpy(float), front.index
+    v0 = int(dates.searchsorted(pd.Timestamp(EXOG_FIT_END), side="right"))
+    v1 = int(dates.searchsorted(pd.Timestamp("2024-05-31"), side="right")) - 1
+    h0, h1 = v1 + 1, len(dates) - 1
+    assert dates[h0] >= pd.Timestamp(NEW_START)
+    out: dict = {
+        "holdout": [str(dates[h0].date()), str(dates[h1].date())],
+        "n_configs": len(CANDIDATES),
+    }
+    base = walk_forward(p, dates, 1, h0, h1)
+    drift = walk_forward(p, dates, 1, h0, h1, model="drift")
+    out["persistence"] = evaluate(base, np.zeros_like(base.r_hat))
+    out["drift"] = evaluate(base, drift.r_hat)
+    out["candidates"] = {}
+    for name, cols in CANDIDATES.items():
+        extra = feats[list(cols)].to_numpy(float)
+        val = walk_forward(p, dates, 1, v0, v1, k=0, alpha=ALPHA2, extra=extra)
+        w = fit_weight(val.r_hat, val.y)
+        ho = walk_forward(p, dates, 1, h0, h1, k=0, alpha=ALPHA2, extra=extra)
+        row = evaluate(ho, w * ho.r_hat)
+        row["w"] = w
+        row["significant"] = bool(row["skill"] > 0 and row["dm_p"] < BONFERRONI)
+        row["sign_pnl"] = sign_pnl(
+            Origins(ho.idx, ho.last, ho.actual, ho.y, w * ho.r_hat),
+            roll_mask[ho.idx + 1],
+        )
+        out["candidates"][name] = row
     return out
