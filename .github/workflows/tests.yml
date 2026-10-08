@@ -20,6 +20,21 @@ jobs:
       # The tests run on synthetic series and never hit the network, so the heavy
       # model dependencies (TensorFlow, ReservoirPy) are not installed here.
       - name: Install
-        run: pip install numpy pandas scikit-learn pytest
+        run: pip install numpy pandas scikit-learn scipy pytest
+      - name: Test
+        run: pytest tests -q
+
+  # Full requirements, so fit_esn / fit_lstm get their smoke tests (they importorskip
+  # locally when the libraries are missing).
+  models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -r requirements-dev.txt
       - name: Test
         run: pytest tests -q

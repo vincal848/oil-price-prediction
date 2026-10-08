@@ -3,6 +3,7 @@
     python run.py                # full run, window=120
     python run.py --window 60    # the memory length originally tried
     python run.py --no-lstm      # skip TensorFlow, for a quick check
+    python run.py --holdout      # score the return models once (docs/PROTOCOL.md)
 """
 
 import argparse
@@ -10,21 +11,56 @@ import json
 import os
 
 import numpy as np
+import pandas as pd
 
+import forecast
 import metrics
 import roll
-from data import aligned_targets, load_prices, make_sequences, split_and_scale
+from data import aligned_targets, make_sequences, split_and_scale
 from models import fit_esn, fit_lstm, fit_naive
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(HERE, "results")
 IMG = os.path.join(HERE, "docs", "img")
 
+TICKER = "CL=F"
+START = "2000-08-30"
+END = "2024-05-31"
+CACHE = os.path.join(HERE, "data", "wti.csv")
+
 WINDOW = 120
 TRAIN_FRAC = 0.75
 
 
-def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
+def load_prices(start: str = START, end: str = END, use_cache: bool = True) -> pd.Series:
+    """WTI front-month closes as a Series indexed by date, cached to CSV.
+
+    Cached so re-runs are offline and reproducible even if Yahoo revises history.
+    This is the only network/file access for prices; data.py stays pure.
+    """
+    if use_cache and os.path.exists(CACHE):
+        s = pd.read_csv(CACHE, index_col=0, parse_dates=True).iloc[:, 0]
+        return s.loc[start:end]
+
+    import yfinance as yf
+
+    df = yf.download(TICKER, start=start, end=end, progress=False, auto_adjust=False)
+    close = df["Close"]
+    # Recent yfinance returns MultiIndex columns, so this can be a one-column frame.
+    if isinstance(close, pd.DataFrame):
+        close = close.iloc[:, 0]
+    close = close.dropna()
+    close.name = "close"
+
+    if use_cache:
+        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+        close.to_csv(CACHE)
+    return close
+
+
+def run(
+    window: int = WINDOW, train_frac: float = TRAIN_FRAC, include_lstm: bool = True
+) -> tuple[dict, dict]:
     """Fit every model and return (results, context) for reporting."""
     prices = load_prices()
     train_scaled, val_scaled, scaler, cut = split_and_scale(prices, train_frac)
@@ -58,21 +94,19 @@ def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
         results[name]["rmse_ex_roll"] = ex["rmse"]
         results[name]["mae_ex_roll"] = ex["mae"]
 
-    for name in results:
+    for name, row in results.items():
         if name != "naive":
-            results[name]["skill_ex_roll_rmse"] = metrics.skill_score(
-                {"rmse": results[name]["rmse_ex_roll"]},
-                {"rmse": results["naive"]["rmse_ex_roll"]}, "rmse")
-            results[name]["skill_vs_naive_rmse"] = metrics.skill_score(
-                results[name], results["naive"], "rmse")
-            results[name]["skill_vs_naive_mae"] = metrics.skill_score(
-                results[name], results["naive"], "mae")
+            row["skill_ex_roll_rmse"] = metrics.skill_score(
+                {"rmse": row["rmse_ex_roll"]}, {"rmse": results["naive"]["rmse_ex_roll"]}
+            )
+            row["skill_vs_naive_rmse"] = metrics.skill_score(row, results["naive"], "rmse")
+            row["skill_vs_naive_mae"] = metrics.skill_score(row, results["naive"], "mae")
 
     context = {
         "window": window,
         "train_frac": train_frac,
         "n_train": int(cut),
-        "n_eval": int(len(actual)),
+        "n_eval": len(actual),
         "eval_start": str(dates[0].date()),
         "eval_end": str(dates[-1].date()),
         "actual": actual,
@@ -88,7 +122,7 @@ def run(window=WINDOW, train_frac=TRAIN_FRAC, include_lstm=True):
     return results, context
 
 
-def print_table(results, context):
+def print_table(results: dict, context: dict) -> None:
     cols = ["rmse", "rmse_ex_roll", "mae", "mae_ex_roll", "mase",
             "directional_accuracy", "seconds"]
     print(f"\nEvaluation window: {context['eval_start']} to {context['eval_end']}  "
@@ -116,7 +150,7 @@ def print_table(results, context):
                   f"RMSE excluding roll days {row['skill_ex_roll_rmse']:+.4f}")
 
 
-def save(results, context):
+def save(results: dict, context: dict) -> None:
     os.makedirs(RESULTS, exist_ok=True)
     payload = {
         "context": {k: v for k, v in context.items()
@@ -129,7 +163,7 @@ def save(results, context):
     print(f"\nwrote {os.path.join(RESULTS, 'metrics.json')}")
 
 
-def figures(results, context):
+def figures(results: dict, context: dict) -> None:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -184,14 +218,38 @@ def figures(results, context):
     print(f"wrote figures to {IMG}")
 
 
-def main():
+def run_holdout() -> None:
+    """Score docs/PROTOCOL.md once, print the table, write results/holdout.json."""
+    prices = load_prices()
+    out = forecast.protocol(
+        prices.to_numpy(float), prices.index, roll.roll_mask(prices.index).to_numpy())
+    print(f"configurations fitted: {out['n_configs']}")
+    print(f"{'h':>3} {'model':<12}{'n':>5}{'rmse':>8}{'mae':>8}{'skill':>8}{'dm_p':>8}"
+          f"{'dir_acc':>9}{'binom_p':>9}")
+    for h, hz in out["horizons"].items():
+        print(f"h={h}: k={hz['k']} alpha={hz['alpha']} w={hz['w']:.3f}")
+        for name, s in hz["rows"].items():
+            print(f"{h:>3} {name:<12}{s['n']:>5}{s['rmse']:>8.3f}{s['mae']:>8.3f}"
+                  f"{s['skill']:>+8.4f}{s['dm_p']:>8.3f}{s['dir_acc']:>9.3f}{s['binom_p']:>9.3f}")
+    print("sign strategy h=1 (ridge):", out["horizons"][1]["sign_pnl"])
+    os.makedirs(RESULTS, exist_ok=True)
+    with open(os.path.join(RESULTS, "holdout.json"), "w") as fh:
+        json.dump(out, fh, indent=2)
+
+
+def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--window", type=int, default=WINDOW,
                    help="memory length in trading days (default 120)")
     p.add_argument("--train-frac", type=float, default=TRAIN_FRAC)
     p.add_argument("--no-lstm", action="store_true", help="skip the TensorFlow model")
     p.add_argument("--no-figures", action="store_true")
+    p.add_argument("--holdout", action="store_true", help="score the return models once")
     args = p.parse_args()
+
+    if args.holdout:
+        run_holdout()
+        return
 
     results, context = run(args.window, args.train_frac, include_lstm=not args.no_lstm)
     print_table(results, context)

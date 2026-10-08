@@ -12,7 +12,7 @@ import numpy as np
 MAPE_FLOOR = 5.0
 
 
-def mape(actual, predicted):
+def mape(actual: np.ndarray, predicted: np.ndarray) -> float:
     """Mean absolute percentage error, or nan when the series makes it meaningless.
 
     MAPE divides by the actual value. This validation window contains 2020-04-20 at
@@ -33,7 +33,7 @@ def mape(actual, predicted):
     return float(np.mean(np.abs((actual - predicted) / actual)))
 
 
-def mase(actual, predicted, train_series):
+def mase(actual: np.ndarray, predicted: np.ndarray, train_series: np.ndarray) -> float:
     """Mean absolute scaled error (Hyndman & Koehler 2006).
 
     Replaces MAPE as the scale-free metric. The denominator is the in-sample mean
@@ -51,7 +51,7 @@ def mase(actual, predicted, train_series):
     return float(np.mean(np.abs(actual - predicted)) / scale)
 
 
-def directional_accuracy(actual, predicted, previous):
+def directional_accuracy(actual: np.ndarray, predicted: np.ndarray, previous: np.ndarray) -> float:
     """Share of days the forecast got the direction of the move right.
 
     Added because level accuracy on a near-random-walk is easy and close to
@@ -82,7 +82,12 @@ def directional_accuracy(actual, predicted, previous):
     return float(np.mean(actual_move[scored] == predicted_move[scored]))
 
 
-def evaluate(actual, predicted, train_series=None, previous=None):
+def evaluate(
+    actual: np.ndarray,
+    predicted: np.ndarray,
+    train_series: np.ndarray | None = None,
+    previous: np.ndarray | None = None,
+) -> dict[str, float]:
     """All metrics for one model, as a dict.
 
     NRMSE is kept for continuity with the original write-up but is flagged here:
@@ -112,7 +117,9 @@ def evaluate(actual, predicted, train_series=None, previous=None):
     return out
 
 
-def skill_score(model_metrics, benchmark_metrics, key="rmse"):
+def skill_score(
+    model_metrics: dict[str, float], benchmark_metrics: dict[str, float], key: str = "rmse"
+) -> float:
     """Fractional improvement over the benchmark. Positive means better.
 
     Reported because an absolute RMSE on a price series is unreadable on its own -

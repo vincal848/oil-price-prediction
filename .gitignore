@@ -10,4 +10,5 @@ data/
 # Run outputs are regenerated, but metrics.json is the record the README quotes,
 # so it is tracked.
 results/*
+!results/holdout.json
 !results/metrics.json
