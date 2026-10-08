@@ -111,6 +111,69 @@ storage shortage, and no model here anticipates it.
 
 ![April 2020](docs/img/april_2020.png)
 
+## Returns, scored once out of sample
+
+The results above frame the task as predicting the price level, which cannot beat
+persistence. [docs/PROTOCOL.md](docs/PROTOCOL.md) fixes an honest test **before** any
+return model was fitted: train to 2014, choose hyperparameters and the shrinkage weight
+on 2015-2018, score 2019-01-02 to 2024-05-30 once, with expanding-window refits every
+calendar quarter. Models predict the h-day log return and price = last * exp(r_hat), so
+r_hat = 0 is persistence exactly. Horizons h = 1, 5, 20; for h > 1 only non-overlapping
+targets are scored. Skill is `1 - RMSE/RMSE_persistence`; DM is a Diebold-Mariano test on
+squared dollar error vs persistence with a Newey-West (HAC) variance; the direction
+columns count the days the model calls a non-zero move, with a two-sided binomial test
+against 0.5.
+
+| h | model | n | RMSE | MAE | skill | DM p | dir. acc. | binomial p |
+|---|---|---|---|---|---|---|---|---|
+| 1 | persistence | 1359 | 1.851 | 1.284 | 0 | | | |
+| 1 | random walk + drift | 1359 | 1.851 | 1.283 | -0.0002 | 0.570 | 0.536 | 0.009 |
+| 1 | ridge (k=1, alpha=0.01) | 1359 | 1.852 | 1.286 | -0.0008 | 0.261 | 0.500 | 1.000 |
+| 1 | w * ridge (w=1.00) | 1359 | 1.852 | 1.286 | -0.0008 | 0.261 | 0.500 | 1.000 |
+| 5 | persistence | 272 | 4.055 | 2.907 | 0 | | | |
+| 5 | random walk + drift | 272 | 4.058 | 2.906 | -0.0007 | 0.625 | 0.529 | 0.363 |
+| 5 | ridge (k=20, alpha=100) | 272 | 4.055 | 2.906 | +0.0002 | 0.388 | 0.559 | 0.060 |
+| 5 | w * ridge (w=1.00) | 272 | 4.055 | 2.906 | +0.0002 | 0.388 | 0.559 | 0.060 |
+| 20 | persistence | 68 | 7.793 | 5.924 | 0 | | | |
+| 20 | random walk + drift | 68 | 7.812 | 5.967 | -0.0025 | 0.673 | 0.485 | 0.904 |
+| 20 | ridge (k=1, alpha=0.01) | 68 | 7.832 | 5.983 | -0.0049 | 0.060 | 0.471 | 0.716 |
+| 20 | w * ridge (w=1.00) | 68 | 7.832 | 5.983 | -0.0049 | 0.060 | 0.471 | 0.716 |
+
+**Nothing beats persistence significantly.** The largest skill is +0.02% (h=5), with
+DM p = 0.39. The only small p-value in the directional columns is the drift baseline at
+h=1 (binomial p = 0.009): it always calls "up", so it is scoring the share of up days
+(53.6%), not forecasting skill, and it does not improve RMSE. The validation weight came out at w = 1.0 for every horizon (the clip at 1; the raw
+least-squares weight was at or above 1), so the combination is identical to the ridge. The
+ridge did show a tiny edge on validation (skill +0.26% at h=1, about 0 at h=5, +0.03% at
+h=20) and it did not carry over to the holdout.
+
+Sign strategy, h = 1, long/short by the sign of the ridge forecast, 2bp per side plus a
+close-and-reopen on contract-roll days: gross -3.2% a year, net -8.7% a year, net Sharpe
+-0.17. No edge.
+
+Notes on the numbers:
+
+- **Configurations tried: 48.** 15 ridge configurations (3 lag lengths x 5 alphas)
+  x 3 horizons chosen on validation, plus the drift baseline at each horizon. The
+  holdout was run once. Persistence and the weight fit are not counted as
+  configurations. Before that single run I tried nothing on the holdout; the exploratory
+  runs were on synthetic data in the tests.
+- **2020-04-20** closes at -$37.63, so it has no log return. The two origins touching it
+  (and lagged returns that involve it, set to 0) are skipped for every model alike.
+- The h = 20 sample is 68 non-overlapping targets, so it has little power; the 5%-level
+  statement is "cannot reject", not "equal".
+- The continuous `CL=F` series splices contracts, so daily returns on roll days include
+  a contract-spread jump no model can predict (see the roll section above).
+- The LSTM and ESN were **not** reframed to returns. The ESN readout is already a ridge
+  regression, the linear model above is the shrinkage-friendly version of the same idea,
+  and it found nothing; an LSTM on the same returns is a bigger search for the same
+  signal-free target. Add them only if a linear model ever shows skill.
+- Evaluation checks (in `tests/test_forecast.py`): permuted returns give mean skill
+  <= 0 across 10 seeds; planted AR(1) returns with phi = 0.1 give skill > 0 and DM
+  p < 0.05; forecasts made at or before a date do not change when later prices change.
+
+Reproduce with `python run.py --holdout` (writes `results/holdout.json`).
+
 ## How it works
 
 ```mermaid
@@ -174,7 +237,8 @@ Other options:
 ```bash
 python run.py --window 60    # the memory length I tried first
 python run.py --no-lstm      # skip TensorFlow, runs in about a second
-pytest tests -q              # 27 tests, no network and no TensorFlow needed
+python run.py --holdout      # the return-model holdout table above
+pytest tests -q              # 38 tests, no network; the ESN/LSTM smoke tests need requirements.txt
 ```
 
 The first run downloads from Yahoo and caches to `data/wti.csv`, so later runs are
@@ -184,20 +248,22 @@ offline and reproducible.
 
 | Path | Contents |
 |---|---|
-| `data.py` | Download and cache, chronological split, leak-free scaling, windowing |
+| `data.py` | Chronological split, leak-free scaling, windowing (pure, no I/O) |
+| `forecast.py` | Walk-forward ridge on returns, DM and binomial tests, sign P&L (pure) |
 | `models.py` | The three forecasters, each returning predictions in dollars |
 | `metrics.py` | RMSE, MAE, MASE, directional accuracy, skill scores, and why MAPE is gone |
 | `roll.py` | CME termination dates and what the contract roll costs |
-| `run.py` | The experiment, the printed table, `results/` and the figures |
-| `tests/` | 27 tests |
+| `run.py` | Download and cache, the experiment, the printed tables, `results/` and the figures |
+| `docs/PROTOCOL.md` | The evaluation protocol, written before the return models were fitted |
+| `tests/` | 38 tests |
 | `docs/METHODS.md` | My original write-up: why an RNN, the LSTM gates, the reservoir |
 | `legacy/` | The original script, annotated. Does not run on current dependencies |
 
 ## Future interests
 
-- **Forecast returns, not levels.** Predicting the level of a near-random-walk is a
-  task where the benchmark is nearly unbeatable by construction. Returns are the
-  honest framing and would make the comparison mean something.
+- **Forecast returns, not levels.** Done for a linear model (see above): no skill over
+  persistence. Next hypothesis: features beyond own-price returns (term structure,
+  inventories), which a price-only model cannot see.
 - **A horizon longer than one day**, where persistence weakens and a model has room to
   add value.
 - **Exogenous inputs** — inventories, the term structure, the dollar — since a
