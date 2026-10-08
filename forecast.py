@@ -271,6 +271,9 @@ def protocol2(front: pd.Series, feats: pd.DataFrame, roll_mask: np.ndarray) -> d
         ho = walk_forward(p, dates, 1, h0, h1, k=0, alpha=ALPHA2, extra=extra)
         row = evaluate(ho, w * ho.r_hat)
         row["w"] = w
+        # Diagnostic added after w came out 0 everywhere: the unshrunk w = 1 forecast.
+        row["unshrunk"] = evaluate(ho, ho.r_hat)
+        row["unshrunk"]["sign_pnl"] = sign_pnl(ho, roll_mask[ho.idx + 1])
         row["significant"] = bool(row["skill"] > 0 and row["dm_p"] < BONFERRONI)
         row["sign_pnl"] = sign_pnl(
             Origins(ho.idx, ho.last, ho.actual, ho.y, w * ho.r_hat),

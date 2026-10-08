@@ -174,6 +174,57 @@ Notes on the numbers:
 
 Reproduce with `python run.py --holdout` (writes `results/holdout.json`).
 
+## Second attempt: public spread, basis and dollar information
+
+[docs/PROTOCOL-2.md](docs/PROTOCOL-2.md) was committed before any post-May-2024 data was
+downloaded. It declares a fresh holdout (2024-06-03 to 2026-10-08, 591 one-day targets,
+scored once), six candidates chosen from economics (Brent-WTI spread, spot-vs-front
+basis, dollar index, and combinations; FRED keyless CSVs `DCOILBRENTEU`, `DCOILWTICO`,
+`DTWEXBGS`, all lagged one day), strong ridge shrinkage (alpha = 1000), a weight `w`
+fit on 2019-2024 (already seen, so validation), quarterly expanding refits, and a
+Bonferroni threshold of 0.05 / 6 = 0.0083.
+
+**The validation weight was 0 for all six candidates**: on 2019-2024 every candidate's
+forecast was uncorrelated or slightly anti-correlated with the next return (corr between
+-0.056 and -0.003). The pre-declared shrunk forecasts are therefore persistence exactly:
+skill 0.0000, nothing to test. To still look for signal, the table below shows the
+unshrunk (w = 1) forecasts, a diagnostic I added after seeing w = 0; the same six
+candidates, so the same Bonferroni threshold.
+
+| model | RMSE | skill | DM p | dir. acc. | binomial p | sign strategy net / yr, Sharpe |
+|---|---|---|---|---|---|---|
+| persistence | 2.311 | 0 | | | | |
+| random walk + drift | 2.311 | -0.0001 | 0.653 | 0.519 | 0.387 | |
+| C1 spread | 2.311 | +0.0000 | 0.982 | 0.503 | 0.902 | -6.6%, -0.15 |
+| C2 basis | 2.312 | -0.0003 | 0.127 | 0.473 | 0.202 | -46.8%, -1.07 |
+| C3 dollar | 2.311 | +0.0003 | 0.431 | 0.554 | 0.0094 | +56.7%, +1.30 |
+| C4 spread + basis | 2.312 | -0.0005 | 0.781 | 0.507 | 0.773 | +6.4%, +0.14 |
+| C5 spread + basis + dollar | 2.312 | -0.0002 | 0.900 | 0.536 | 0.091 | +38.0%, +0.87 |
+| C6 all + last return | 2.309 | +0.0008 | 0.685 | 0.524 | 0.266 | -3.4%, -0.08 |
+
+**No candidate is significant.** No DM p-value is below 0.0083; RMSE differs from
+persistence in the fourth decimal. The one tempting row is the dollar index: 55.4%
+direction hits (binomial p = 0.0094, just above the 0.0083 threshold) and a sign
+strategy Sharpe of 1.3. But its RMSE skill is +0.03% with DM p = 0.43, its validation
+weight was 0, its Sharpe has a standard error near 0.65 over 2.4 years, and it is the
+best of six sign strategies plus six direction tests. I read it as a lead for a future
+untouched sample, not a result, and I did not tune anything around it.
+
+Configurations tried in this protocol: 6 (plus the unshrunk diagnostic of the same
+six). The earlier protocol used 48; together 54. The holdout of each protocol was read
+once. Checks: `tests/test_forecast.py` has an exogenous null (permuted returns, skill
+<= 0), a planted exogenous signal (skill > 0) and a one-day-lag test of the feature
+builder (broken by removing the shift).
+
+**Conclusion.** Against own-price returns (2019-2024) and against Brent-WTI spread, the
+spot basis and the dollar (2024-2026), one-step WTI front-month forecasts do not beat
+persistence in dollar error, and no directional edge survives the multiple-testing
+correction. This is evidence that the one-day-ahead WTI front-month price is efficient
+against public price, spread and dollar information; it is not proof, since the
+samples are short (591 targets) and only linear models and these features were tried.
+The work stops here. Reproduce with `python run.py --holdout2` (downloads FRED CSVs
+and the Yahoo rows after 2024-05-30 once, then caches).
+
 ## How it works
 
 ```mermaid
@@ -238,7 +289,7 @@ Other options:
 python run.py --window 60    # the memory length I tried first
 python run.py --no-lstm      # skip TensorFlow, runs in about a second
 python run.py --holdout      # the return-model holdout table above
-pytest tests -q              # 38 tests, no network; the ESN/LSTM smoke tests need requirements.txt
+pytest tests -q              # 41 tests, no network; the ESN/LSTM smoke tests need requirements.txt
 ```
 
 The first run downloads from Yahoo and caches to `data/wti.csv`, so later runs are
@@ -254,8 +305,9 @@ offline and reproducible.
 | `metrics.py` | RMSE, MAE, MASE, directional accuracy, skill scores, and why MAPE is gone |
 | `roll.py` | CME termination dates and what the contract roll costs |
 | `run.py` | Download and cache, the experiment, the printed tables, `results/` and the figures |
+| `docs/PROTOCOL-2.md` | The second protocol (public spread/basis/dollar features, new holdout) |
 | `docs/PROTOCOL.md` | The evaluation protocol, written before the return models were fitted |
-| `tests/` | 38 tests |
+| `tests/` | 41 tests |
 | `docs/METHODS.md` | My original write-up: why an RNN, the LSTM gates, the reservoir |
 | `legacy/` | The original script, annotated. Does not run on current dependencies |
 
