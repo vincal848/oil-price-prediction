@@ -45,3 +45,27 @@ entries 1-6 were written.
 
 6. **2026-10-15, before results. COT history starts 2006-06.** The disaggregated
    report begins in 2006, so the mechanism test covers 2006-06 to 2026-04.
+
+7. **2026-10-15, after the H1 results were seen. H2 is put through the same seven
+   kill criteria.** The protocol says what to conclude "if H1 fails but H2 passes"
+   but defines the 24-variant PBO grid only for H1. H2 is evaluated on K1-K7 with
+   the same grid applied to the outright instrument. Those 24 outright variants
+   are logged to the trial ledger before their results are computed and raise the
+   trial count used in every deflated Sharpe. Nothing about H1 changes.
+
+8. **2026-10-15, after results, from an independent code audit.** None of these
+   changes a deployment verdict; each is reported with its before and after value
+   in the research note.
+   - Novelty factors are built gross of costs, as AQR's published factor is. They
+     had been built net, which lowers their means and flatters the strategy's
+     alpha (H2 alpha t 2.06 net, 1.95 gross).
+   - The calendar-spread cost is $23 per spread, not $18: the protocol's fees and
+     TAS premium are "per contract per side", and a spread is two contracts.
+   - Three Datastream holiday rows with stale or missing curves (2006-11-24,
+     2009-11-26, 2026-04-03) are dropped: dates with fewer than five listed
+     contracts.
+   - The mechanism regression stops at the last curve date (2026-04-02) instead of
+     forward-filling carry into 26 later COT weeks.
+   - Capacity is measured from 1990-01-01, the study start, not from the 1988
+     warm-up.
+   - Turnover is reported including rolls.

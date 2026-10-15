@@ -1,0 +1,367 @@
+{
+  "run_time": "2026-10-15T23:17:50.390531+00:00",
+  "H1": {
+    "full": {
+      "sharpe": -0.05546297698434056,
+      "ann_return": -0.008905916352326262,
+      "ann_vol": 0.1605740772775461,
+      "max_drawdown": -0.8160868104244745,
+      "days": 9112
+    },
+    "seen": {
+      "sharpe": 0.10437234055942851,
+      "ann_return": 0.016512717773938798,
+      "ann_vol": 0.1582097104025049,
+      "max_drawdown": -0.470072980886697,
+      "days": 4098
+    },
+    "unseen": {
+      "sharpe": -0.18268209317628087,
+      "ann_return": -0.029686055942548986,
+      "ann_vol": 0.16250118129478153,
+      "max_drawdown": -0.8037623114335274,
+      "days": 5013
+    },
+    "unseen_1990_2007": {
+      "sharpe": -0.2724284430976663,
+      "ann_return": -0.0427261041524483,
+      "ann_vol": 0.1568342265096412,
+      "max_drawdown": -0.753046872978552,
+      "days": 4513
+    },
+    "unseen_2024_2026": {
+      "sharpe": 0.4256205955099955,
+      "ann_return": 0.08801341920000236,
+      "ann_vol": 0.20678844052304657,
+      "max_drawdown": -0.2969229030644618,
+      "days": 500
+    },
+    "bootstrap_90ci": [
+      -0.37416685899723284,
+      0.2521966497859772
+    ],
+    "deflated_sharpe": 2.8190641719480786e-05,
+    "novelty": {
+      "alpha_annual": -0.02619883895474369,
+      "t_stat": -0.9806295313912129,
+      "loadings": {
+        "tsmom_wti": 0.09073134317102859,
+        "carry_wti": 0.25803822942313115,
+        "basis_mom_wti": 0.0935231241679805,
+        "tsmom_cm_aqr": 0.01922448362756852
+      },
+      "r_squared": 0.0847637256164746,
+      "n_months": 436,
+      "nw_lags": 5
+    },
+    "costs_doubled": {
+      "sharpe": -0.4735210240182301,
+      "ann_return": -0.07672031108454751,
+      "ann_vol": 0.16202091817066577,
+      "max_drawdown": -0.9811711515561263,
+      "days": 9112
+    },
+    "capacity": {
+      "capacity": 51475.009394964305,
+      "trade_over_adv": 9.713451359737178,
+      "position_over_oi": 0.5841836734693877,
+      "days_untradeable": 0
+    },
+    "capacity_q95": {
+      "capacity": 1007492.5673644834,
+      "trade_over_adv": 0.4962815768536718,
+      "position_over_oi": 0.10350106765445446,
+      "days_untradeable": 0
+    },
+    "capacity_since_2010": {
+      "capacity": 1634309.7913322633,
+      "trade_over_adv": 0.3059395487023351,
+      "position_over_oi": 0.03242108536774996,
+      "days_untradeable": 0
+    },
+    "decomposition": {
+      "gross_ann_return": 0.05890847837989498,
+      "spot_ann_return": 0.0,
+      "roll_and_curve_ann_return": 0.05890847837989498
+    },
+    "turnover_units_per_year": 26693.96839332748,
+    "zero_cost": {
+      "sharpe": 0.36880251892127663,
+      "ann_return": 0.05890847837989499,
+      "ann_vol": 0.15972905649396987,
+      "max_drawdown": -0.4719107200152328,
+      "days": 9112
+    }
+  },
+  "H2": {
+    "full": {
+      "sharpe": 0.44586846387940904,
+      "ann_return": 0.0695347131042143,
+      "ann_vol": 0.15595342289788156,
+      "max_drawdown": -0.46007409430019586,
+      "days": 9112
+    },
+    "seen": {
+      "sharpe": 0.5377909194971182,
+      "ann_return": 0.08243425413733535,
+      "ann_vol": 0.1532830904144284,
+      "max_drawdown": -0.2851689186580012,
+      "days": 4098
+    },
+    "unseen": {
+      "sharpe": 0.3731328361962603,
+      "ann_return": 0.05900362021759434,
+      "ann_vol": 0.15813033454541545,
+      "max_drawdown": -0.41108032575628184,
+      "days": 5013
+    },
+    "novelty": {
+      "alpha_annual": 0.05218973727316677,
+      "t_stat": 2.059283273527465,
+      "loadings": {
+        "tsmom_wti": 0.022551431705676542,
+        "carry_wti": 0.25744913992200935,
+        "basis_mom_wti": 0.06598852089828655,
+        "tsmom_cm_aqr": -0.00018091550444009432
+      },
+      "r_squared": 0.07994951257060967,
+      "n_months": 436,
+      "nw_lags": 5
+    },
+    "capacity": {
+      "capacity": 3742940.4900816805,
+      "trade_over_adv": 0.13358481154721452,
+      "position_over_oi": 0.015452244571733048,
+      "days_untradeable": 0
+    },
+    "decomposition": {
+      "gross_ann_return": 0.08515713533863045,
+      "spot_ann_return": 0.06758612793922436,
+      "roll_and_curve_ann_return": 0.0175710073994061
+    },
+    "bootstrap_90ci": [
+      0.16431938864061732,
+      0.7267340384759731
+    ],
+    "deflated_sharpe": 0.3997417524226606,
+    "costs_doubled": {
+      "sharpe": 0.3454330640369671,
+      "ann_return": 0.05391229086979816,
+      "ann_vol": 0.1560715996313215,
+      "max_drawdown": -0.4904198689639586,
+      "days": 9112
+    },
+    "capacity_q95": {
+      "capacity": 24635086.3901457,
+      "trade_over_adv": 0.01645106387658487,
+      "position_over_oi": 0.008118502075966014,
+      "days_untradeable": 0
+    },
+    "capacity_since_2010": {
+      "capacity": 87444240.19607845,
+      "trade_over_adv": 0.005717929492884121,
+      "position_over_oi": 0.00092938292178762,
+      "days_untradeable": 0
+    },
+    "turnover_units_per_year": 7701.017120280948,
+    "by_window": {
+      "unseen_1990_2007": {
+        "sharpe": 0.442743694175832,
+        "ann_return": 0.0693795750389542,
+        "ann_vol": 0.15670370002243483,
+        "max_drawdown": -0.41108032575628184,
+        "days": 4513
+      },
+      "unseen_2024_2026": {
+        "sharpe": -0.20319775282613825,
+        "ann_return": -0.03464974799999973,
+        "ann_vol": 0.17052229917939615,
+        "max_drawdown": -0.3612272524870638,
+        "days": 500
+      }
+    },
+    "zero_cost": {
+      "sharpe": 0.5462696767689108,
+      "ann_return": 0.08515713533863047,
+      "ann_vol": 0.15588845392685893,
+      "max_drawdown": -0.44512329162006825,
+      "days": 9112
+    }
+  },
+  "n_trials": 198,
+  "pbo": {
+    "pbo": 0.1717171717171717,
+    "degradation_slope": -0.884709415219763
+  },
+  "variants": {
+    "H1 spread s=1 l=10 1m-13m": -0.5623628711228635,
+    "H1 spread s=1 l=10 2m-7m": -0.5068988344545169,
+    "H1 spread s=1 l=10 1m-4m": -0.5375781113764723,
+    "H1 spread s=1 l=21 1m-13m": -0.05546297698434056,
+    "H1 spread s=1 l=21 2m-7m": -0.14553201953138756,
+    "H1 spread s=1 l=21 1m-4m": -0.16662013375780693,
+    "H1 spread s=1 l=42 1m-13m": -0.1374312166894795,
+    "H1 spread s=1 l=42 2m-7m": -0.07555254853666805,
+    "H1 spread s=1 l=42 1m-4m": 0.03551982586872355,
+    "H1 spread s=1 l=63 1m-13m": -0.1426410780936385,
+    "H1 spread s=1 l=63 2m-7m": -0.17418453952945123,
+    "H1 spread s=1 l=63 1m-4m": 0.010029918637890321,
+    "H1 spread s=5 l=10 1m-13m": -0.6171007864245327,
+    "H1 spread s=5 l=10 2m-7m": -0.6540239422944812,
+    "H1 spread s=5 l=10 1m-4m": -0.5130946028300335,
+    "H1 spread s=5 l=21 1m-13m": 0.14685876392258895,
+    "H1 spread s=5 l=21 2m-7m": 0.06935954811906528,
+    "H1 spread s=5 l=21 1m-4m": 0.07878774558844755,
+    "H1 spread s=5 l=42 1m-13m": 0.0031472510586534816,
+    "H1 spread s=5 l=42 2m-7m": 0.06699714469642834,
+    "H1 spread s=5 l=42 1m-4m": 0.19246760582067485,
+    "H1 spread s=5 l=63 1m-13m": -0.09217458155399604,
+    "H1 spread s=5 l=63 2m-7m": -0.08784312001369446,
+    "H1 spread s=5 l=63 1m-4m": 0.1544196199773983
+  },
+  "mechanism": {
+    "coef": 0.04080797236709102,
+    "t_stat": 0.23523910564557393,
+    "n_weeks": 1059,
+    "predicted_sign": "negative"
+  },
+  "mechanism_conditional_H1": {
+    "agree_ann_return": -0.01969933054085626,
+    "disagree_ann_return": 0.03774582166133383,
+    "agree_weeks": 439,
+    "disagree_weeks": 579
+  },
+  "live_expectation_63d": {
+    "p5": -0.1363701064749424,
+    "p25": -0.062232990022376894,
+    "p50": -0.007404133358154041,
+    "p75": 0.04995266032282847,
+    "p95": 0.15756648865992584
+  },
+  "pbo_H2": {
+    "pbo": 0.4696969696969697
+  },
+  "variants_H2": {
+    "H2 outright s=1 l=10 1m-13m": 0.12576421515072314,
+    "H2 outright s=1 l=10 2m-7m": 0.12265702638012452,
+    "H2 outright s=1 l=10 1m-4m": -0.006811527699796385,
+    "H2 outright s=1 l=21 1m-13m": 0.44586846387940904,
+    "H2 outright s=1 l=21 2m-7m": 0.37030884051157287,
+    "H2 outright s=1 l=21 1m-4m": 0.2521453019200274,
+    "H2 outright s=1 l=42 1m-13m": 0.30822518244611735,
+    "H2 outright s=1 l=42 2m-7m": 0.3850132389408795,
+    "H2 outright s=1 l=42 1m-4m": 0.34785277922257823,
+    "H2 outright s=1 l=63 1m-13m": 0.3675201088259647,
+    "H2 outright s=1 l=63 2m-7m": 0.27772381495226384,
+    "H2 outright s=1 l=63 1m-4m": 0.3351834160302536,
+    "H2 outright s=5 l=10 1m-13m": -0.17555017912971985,
+    "H2 outright s=5 l=10 2m-7m": -0.132169714649168,
+    "H2 outright s=5 l=10 1m-4m": -0.03357451600688882,
+    "H2 outright s=5 l=21 1m-13m": 0.47985319793780484,
+    "H2 outright s=5 l=21 2m-7m": 0.4632002523093965,
+    "H2 outright s=5 l=21 1m-4m": 0.3171110920212188,
+    "H2 outright s=5 l=42 1m-13m": 0.32056592728487865,
+    "H2 outright s=5 l=42 2m-7m": 0.3431837946626028,
+    "H2 outright s=5 l=42 1m-4m": 0.3473313061510123,
+    "H2 outright s=5 l=63 1m-13m": 0.348345984317798,
+    "H2 outright s=5 l=63 2m-7m": 0.33037460784013556,
+    "H2 outright s=5 l=63 1m-4m": 0.24295039652386072
+  },
+  "live_expectation_63d_H2": {
+    "p5": -0.10775946101054786,
+    "p25": -0.03737595730504334,
+    "p50": 0.01341483822332279,
+    "p75": 0.06774342329821165,
+    "p95": 0.15730152386102558
+  },
+  "kill_criteria": {
+    "K1": {
+      "criterion": "H1 net Sharpe, unseen windows",
+      "value": -0.18268209317628087,
+      "threshold": "< 0.2",
+      "killed": true
+    },
+    "K2": {
+      "criterion": "H1 90% bootstrap lower bound, full sample",
+      "value": -0.37416685899723284,
+      "threshold": "< 0.0",
+      "killed": true
+    },
+    "K3": {
+      "criterion": "H1 deflated Sharpe probability",
+      "value": 2.8190641719480786e-05,
+      "threshold": "< 0.9",
+      "killed": true
+    },
+    "K4": {
+      "criterion": "PBO across 24 variants",
+      "value": 0.1717171717171717,
+      "threshold": "> 0.5",
+      "killed": false
+    },
+    "K5": {
+      "criterion": "H1 alpha t-stat after factors",
+      "value": -0.9806295313912129,
+      "threshold": "< 2.0",
+      "killed": true
+    },
+    "K6": {
+      "criterion": "H1 net Sharpe, costs doubled",
+      "value": -0.4735210240182301,
+      "threshold": "< 0.2",
+      "killed": true
+    },
+    "K7": {
+      "criterion": "Capacity at 5% ADV / 2% OI ($)",
+      "value": 51475.009394964305,
+      "threshold": "< 10000000.0",
+      "killed": true
+    }
+  },
+  "deploy": false,
+  "kill_criteria_H2": {
+    "K1": {
+      "criterion": "H2 net Sharpe, unseen windows",
+      "value": 0.3731328361962603,
+      "threshold": "< 0.2",
+      "killed": false
+    },
+    "K2": {
+      "criterion": "H2 90% bootstrap lower bound, full sample",
+      "value": 0.16431938864061732,
+      "threshold": "< 0.0",
+      "killed": false
+    },
+    "K3": {
+      "criterion": "H2 deflated Sharpe probability",
+      "value": 0.3997417524226606,
+      "threshold": "< 0.9",
+      "killed": true
+    },
+    "K4": {
+      "criterion": "PBO across 24 variants",
+      "value": 0.4696969696969697,
+      "threshold": "> 0.5",
+      "killed": false
+    },
+    "K5": {
+      "criterion": "H2 alpha t-stat after factors",
+      "value": 2.059283273527465,
+      "threshold": "< 2.0",
+      "killed": false
+    },
+    "K6": {
+      "criterion": "H2 net Sharpe, costs doubled",
+      "value": 0.3454330640369671,
+      "threshold": "< 0.2",
+      "killed": false
+    },
+    "K7": {
+      "criterion": "Capacity at 5% ADV / 2% OI ($)",
+      "value": 3742940.4900816805,
+      "threshold": "< 10000000.0",
+      "killed": true
+    }
+  },
+  "deploy_H2": false
+}

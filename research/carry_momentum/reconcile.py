@@ -9,10 +9,9 @@ Run: python reconcile.py   (writes results/reconciliation.json)
 import json
 import os
 
+import curve
 import numpy as np
 import pandas as pd
-
-import curve
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
@@ -22,7 +21,10 @@ def contracts() -> pd.DataFrame:
     path = os.path.join(DATA, "contracts.parquet")
     if os.path.exists(path):
         return pd.read_parquet(path)
-    raw = [pd.read_csv(os.path.join(DATA, f), compression="gzip") for f in ("ncl_1983_2005.csv.gz", "ncl_2006_2028.csv.gz")]
+    raw = [
+        pd.read_csv(os.path.join(DATA, f), compression="gzip")
+        for f in ("ncl_1983_2005.csv.gz", "ncl_2006_2028.csv.gz")
+    ]
     p = curve.load_contracts(raw)
     p.to_parquet(path)
     return p
@@ -30,7 +32,12 @@ def contracts() -> pd.DataFrame:
 
 def eia_contracts() -> pd.DataFrame:
     return pd.concat(
-        {k: pd.read_csv(os.path.join(DATA, f"F{k}.csv"), index_col=0, parse_dates=True).iloc[:, 0] for k in range(1, 5)},
+        {
+            k: pd.read_csv(
+                os.path.join(DATA, f"F{k}.csv"), index_col=0, parse_dates=True
+            ).iloc[:, 0]
+            for k in range(1, 5)
+        },
         axis=1,
         sort=True,
     )
@@ -43,7 +50,7 @@ def rank_match(panel: pd.DataFrame, eia: pd.DataFrame) -> dict:
         a, b = w[k].align(eia[k], join="inner")
         diff = (a - b).abs().dropna()
         out[f"C{k}"] = {
-            "days": int(len(diff)),
+            "days": len(diff),
             "share_to_the_cent": float((diff < 0.005).mean()),
             "share_within_2c": float((diff < 0.02).mean()),
             "max_abs_diff": float(diff.max()),
@@ -72,7 +79,9 @@ def gsci() -> pd.Series:
     start = x.index[x[0].astype(str).str.startswith("Effective date")][0] + 1
     s = x.iloc[start:].dropna()
     s = s[pd.to_datetime(s[0], errors="coerce").notna()]
-    return pd.Series(s[1].astype(float).values, index=pd.to_datetime(s[0]), name="gsci").sort_index()
+    return pd.Series(
+        s[1].astype(float).values, index=pd.to_datetime(s[0]), name="gsci"
+    ).sort_index()
 
 
 def index_match(panel: pd.DataFrame, index: pd.Series) -> dict:

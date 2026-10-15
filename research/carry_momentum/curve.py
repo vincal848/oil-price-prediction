@@ -17,7 +17,16 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-TENORS_DAYS = {"1m": 30, "2m": 61, "3m": 91, "6m": 182, "12m": 365, "13m": 395}
+TENORS_DAYS = {
+    "1m": 30,
+    "2m": 61,
+    "3m": 91,
+    "4m": 122,
+    "6m": 182,
+    "7m": 213,
+    "12m": 365,
+    "13m": 395,
+}
 
 
 def rule_expiry(contract: str) -> pd.Timestamp:
@@ -29,7 +38,9 @@ def rule_expiry(contract: str) -> pd.Timestamp:
     import os
     import sys
 
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+    sys.path.insert(
+        0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    )
     from roll import termination_date
 
     mm, yy = int(contract[3:5]), int(contract[5:7])
@@ -75,12 +86,16 @@ def ranked(panel: pd.DataFrame, max_rank: int = 13) -> pd.DataFrame:
     return p[p["rank"] <= max_rank]
 
 
-def by_rank(panel: pd.DataFrame, field: str = "settle", max_rank: int = 13) -> pd.DataFrame:
+def by_rank(
+    panel: pd.DataFrame, field: str = "settle", max_rank: int = 13
+) -> pd.DataFrame:
     """Wide table: dates x rank 1..max_rank of `field`."""
     return ranked(panel, max_rank).pivot(index="date", columns="rank", values=field)
 
 
-def constant_maturity(panel: pd.DataFrame, tenors: dict[str, int] = TENORS_DAYS) -> pd.DataFrame:
+def constant_maturity(
+    panel: pd.DataFrame, tenors: dict[str, int] = TENORS_DAYS
+) -> pd.DataFrame:
     """Log-linear interpolation of settlements at fixed days to expiry.
 
     For each date and tenor T, take the two listed contracts whose days to
@@ -106,7 +121,9 @@ def constant_maturity(panel: pd.DataFrame, tenors: dict[str, int] = TENORS_DAYS)
     return pd.DataFrame.from_dict(out, orient="index")[list(tenors)]
 
 
-def gsci_roll_weights(dates: pd.DatetimeIndex, first_bd: int = 5, last_bd: int = 9) -> pd.Series:
+def gsci_roll_weights(
+    dates: pd.DatetimeIndex, first_bd: int = 5, last_bd: int = 9
+) -> pd.Series:
     """Share of the position already rolled into the next contract, per date.
 
     Rolls in equal fifths on business days `first_bd`..`last_bd` of each month
@@ -184,4 +201,6 @@ def decompose(excess: pd.Series, spot: pd.Series) -> pd.DataFrame:
     """
     s = spot.reindex(excess.index)
     spot_ret = (s / s.shift(1) - 1).where((s > 0) & (s.shift(1) > 0))
-    return pd.DataFrame({"excess": excess, "spot": spot_ret, "roll_yield": excess - spot_ret})
+    return pd.DataFrame(
+        {"excess": excess, "spot": spot_ret, "roll_yield": excess - spot_ret}
+    )
