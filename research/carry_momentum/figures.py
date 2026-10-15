@@ -21,7 +21,8 @@ def main() -> None:
     h1 = study.strategy(d, *study.PRIMARY)
     h2 = study.strategy(d, *study.PRIMARY, spread=False)
     h1g = study.strategy(d, *study.PRIMARY, costs=engine.Costs(0, 0))
-    res = json.load(open(os.path.join(OUT, "study.json")))
+    with open(os.path.join(OUT, "study.json")) as fh:
+        res = json.load(fh)
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.6))
     ax = axes[0]

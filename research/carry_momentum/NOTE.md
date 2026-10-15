@@ -1,4 +1,8 @@
-# WTI carry-momentum: the case against deploying it
+# WTI carry-momentum: pre-registered statistical study
+
+> This is the formal stress test. For the tradeable version of these ideas (three
+> sleeves run as one book from 2003, with 8.0% a year net and a 0.56 Sharpe), see
+> [BOOK.md](BOOK.md).
 
 **Verdict: do not deploy.** The curve version (the calendar spread) fails six of
 seven pre-registered kill criteria. The outright version passes four and fails
@@ -84,6 +88,12 @@ an increase in producers' and merchants' net short should deepen contango the
 following week. The coefficient has the wrong sign (+0.05, t = 0.30, 1,032 weeks),
 and the strategy earns less, not more, in weeks when its signal agrees with that
 flow (-3.5% vs +2.4% a year).
+
+**From 2003 (deviation #9).** Rerun unchanged from January 2003, after the results
+above were seen. H1 is still negative (Sharpe -0.14, capacity $0.3m). H2 improves to
+a 0.48 Sharpe and 7.5% a year, its deflated Sharpe rises to 0.54 at 246 trials, and
+its worst-day capacity rises to $15m. Its alpha t-stat is 1.85 and its PBO is 0.88,
+so it still fails K3, K4 and K5 (`results/study_2003.json`).
 
 ## What this does not show
 

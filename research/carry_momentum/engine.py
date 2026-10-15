@@ -56,6 +56,49 @@ def carry_momentum(c: pd.Series, short: int = 1, long: int = 21) -> pd.Series:
     return np.sign(fast - slow).fillna(0.0)
 
 
+def hysteresis(z: pd.Series, band: float) -> pd.Series:
+    """+1/-1 position that flips only when z crosses +band / -band; holds otherwise."""
+    out = np.zeros(len(z))
+    pos = 0.0
+    for i, v in enumerate(z.to_numpy()):
+        if np.isnan(v):
+            out[i] = pos
+            continue
+        if v > band:
+            pos = 1.0
+        elif v < -band:
+            pos = -1.0
+        out[i] = pos
+    return pd.Series(out, index=z.index)
+
+
+def carry_momentum_band(
+    c: pd.Series, short: int = 5, long: int = 63, band: float = 0.5, zwin: int = 252
+) -> pd.Series:
+    """Carry-momentum with a no-trade band: the gap MA_short - MA_long, scaled by its
+    trailing std, must move past +/-band to flip the position."""
+    gap = (
+        c.rolling(short, min_periods=short).mean()
+        - c.rolling(long, min_periods=long).mean()
+    )
+    z = gap / gap.rolling(zwin, min_periods=63).std()
+    return hysteresis(z, band)
+
+
+def buffered(target: pd.Series, buffer: float) -> pd.Series:
+    """Whole-contract holdings that rebalance only when the target drifts more than
+    `buffer` (a fraction of the current holding) or changes sign. buffer=0 -> round."""
+    if buffer <= 0:
+        return target.round()
+    out = np.zeros(len(target))
+    held = 0.0
+    for i, t in enumerate(target.to_numpy()):
+        if np.sign(t) != np.sign(held) or abs(t - held) > buffer * abs(held):
+            held = float(np.round(t))
+        out[i] = held
+    return pd.Series(out, index=target.index)
+
+
 # ---------------------------------------------------------------------------
 # Legs: which contracts make up one unit of a leg, per day
 # ---------------------------------------------------------------------------
@@ -110,8 +153,9 @@ def run(
     capital: float = 10e6,
     target_vol: float = 0.15,
     vol_com: float = 60.0,
-    costs: Costs = Costs(),
+    costs: Costs | None = None,
     spread_trade: bool = True,
+    buffer: float = 0.0,
 ) -> Book:
     """Simulate the strategy on whole contracts.
 
@@ -120,12 +164,13 @@ def run(
     spread_trade: changes in units are executed as exchange calendar spreads
     (cost `costs.spread` per unit) rather than outright legs.
     """
+    costs = costs or Costs()
     idx = prices.index
     unit_pnl = sum(sign * unit_dollar_pnl(prices, w) for sign, w in legs.values())
     # Ex-ante $ vol of one unit, from P&L through day t.
     vol = np.sqrt((unit_pnl**2).ewm(com=vol_com, min_periods=20).mean() * 252)
     size = (target_vol * capital / vol).replace([np.inf, -np.inf], np.nan)
-    target = (signal.reindex(idx).fillna(0.0) * size).round().fillna(0.0)
+    target = buffered((signal.reindex(idx).fillna(0.0) * size).fillna(0.0), buffer)
     units = target.shift(1).fillna(0.0)  # traded at the next settlement
 
     # Contract holdings: split each leg's units across its from/to contracts.

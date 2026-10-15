@@ -104,7 +104,8 @@ def log_trial(name: str, params: dict) -> None:
 def trial_count() -> int:
     if not os.path.exists(LEDGER):
         return PRIOR_TRIALS
-    names = {json.loads(line)["name"] for line in open(LEDGER)}
+    with open(LEDGER) as f:
+        names = {json.loads(line)["name"] for line in f}
     return PRIOR_TRIALS + len(names)
 
 
@@ -163,7 +164,7 @@ def strategy(
     long: int,
     tenors: tuple[str, str],
     spread: bool = True,
-    costs: engine.Costs = engine.Costs(),
+    costs: engine.Costs | None = None,
 ) -> engine.Book:
     sig = engine.carry_momentum(engine.carry(d["cm"], *tenors), short, long)
     legs = (
@@ -220,7 +221,7 @@ def novelty(h: pd.Series, d: dict) -> dict:
     f = ts_factors(d)
     fm = pd.concat([f.apply(monthly), aqr_factor()], axis=1)
     y = monthly(h)
-    fm, y = fm.loc[y.index.min() :], y
+    fm = fm.loc[y.index.min() :]
     fm.index = fm.index.to_timestamp("M")
     y.index = y.index.to_timestamp("M")
     res = spanning_test(y.loc[START:], fm.dropna())

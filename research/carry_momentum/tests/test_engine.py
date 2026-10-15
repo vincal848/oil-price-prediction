@@ -155,3 +155,24 @@ def test_capacity_scales_with_limits():
     c1 = engine.capacity(b, vol, oi)
     c2 = engine.capacity(b, vol, oi, adv_limit=0.10, oi_limit=0.04)
     assert c2["capacity"] == pytest.approx(2 * c1["capacity"])
+
+
+def test_hysteresis_holds_inside_band_and_flips_outside():
+    z = pd.Series([0.0, 0.6, 0.2, -0.3, -0.7, 0.1, np.nan, 0.8])
+    assert engine.hysteresis(z, 0.5).tolist() == [0, 1, 1, 1, -1, -1, -1, 1]
+
+
+def test_buffer_skips_small_rebalances_but_not_flips():
+    t = pd.Series([10.0, 11.0, 12.0, 14.0, -3.0])
+    assert engine.buffered(t, 0.25).tolist() == [10, 10, 10, 14, -3]
+    assert engine.buffered(t, 0.0).tolist() == [10, 11, 12, 14, -3]
+
+
+def test_buffer_cuts_turnover_on_a_real_book():
+    p, _ = synthetic_panel(n_days=400)
+    px = p.pivot(index="date", columns="contract", values="settle")
+    w = engine.leg_weights(p, 1)
+    sig = pd.Series(1.0, index=px.index)
+    plain = engine.run(sig, {"leg": (1.0, w)}, px, spread_trade=False)
+    buf = engine.run(sig, {"leg": (1.0, w)}, px, spread_trade=False, buffer=0.25)
+    assert buf.units.diff().abs().sum() < plain.units.diff().abs().sum()
