@@ -105,7 +105,7 @@ fail. No correction changed a deployment verdict.
 
 ## Live test
 
-The rules are frozen at tag `carry-momentum-frozen-v1`. A three-month paper trade
+The rules are frozen at commit `dd460df` (to tag it: `git tag carry-momentum-frozen-v1 dd460df && git push origin carry-momentum-frozen-v1`). A three-month paper trade
 cannot rescue a strategy that failed on 36 years of data. What it can still test is
 whether fills at TAS land within two ticks of settlement, which the backtest
 assumes. Expected 63-day return of H2 from the stationary bootstrap: median +1.3%,
