@@ -106,3 +106,39 @@ def roll_diagnostics(prices: pd.Series) -> dict[str, float]:
         "volatility_ratio": float(on.abs().mean() / off.abs().mean()),
         "roll_share_of_variance": float((on ** 2).sum() / total_sq) if total_sq else np.nan,
     }
+
+
+def month_start_roll_mask(index: pd.DatetimeIndex) -> pd.Series:
+    """True on the first trading day of each month.
+
+    NYMEX RBOB and heating oil terminate on the last business day of the month
+    before delivery, so a continuous front-month series splices on the first
+    trading day of the next month. Checked against the data in run_strategies.py:
+    the largest futures-minus-spot basis jump of each month lands on day 1-3 far
+    more often than anywhere else.
+    """
+    index = pd.DatetimeIndex(index)
+    first = pd.Series(index, index=index).groupby(index.to_period("M")).transform("min")
+    return pd.Series(index == first.values, index=index)
+
+
+def brent_roll_mask(index: pd.DatetimeIndex) -> pd.Series:
+    """Splice days for ICE Brent, under its two expiry rules.
+
+    From the March 2016 contract (expiring end of December 2015) Brent terminates
+    on the last business day of the second month before delivery, so the series
+    splices on the first trading day of a month. Before that it terminated on the
+    business day before the 15th calendar day prior to the first day of the
+    delivery month, i.e. mid-month in the month before delivery.
+    """
+    index = pd.DatetimeIndex(index)
+    new = month_start_roll_mask(index) & (index >= pd.Timestamp("2016-01-01"))
+    flagged = set(index[new.values])
+    for period in pd.period_range(index.min(), "2015-12", freq="M"):
+        delivery_first = (period + 1).to_timestamp()  # contract for the next month
+        anchor = delivery_first - pd.Timedelta(days=15)
+        term = anchor - BDAY
+        after = index[index > term]
+        if len(after):
+            flagged.add(after[0])
+    return pd.Series([i in flagged for i in index], index=index)
