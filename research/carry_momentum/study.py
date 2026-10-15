@@ -35,9 +35,12 @@ from capstone.validation.sharpe import (
 )
 from capstone.validation.spanning import spanning_test
 
-START = "1990-01-01"
+# CM_START reruns the frozen study on a later start date (DEVIATIONS.md #9);
+# outputs then go to results/study_<year>.json and trials are logged under that tag.
+START = os.environ.get("CM_START", "1990-01-01")
+TAG = "" if START == "1990-01-01" else f"_{START[:4]}"
 SEEN = ("2008-01-01", "2024-04-05")
-UNSEEN = [("1990-01-01", "2007-12-31"), ("2024-04-08", "2026-04-02")]
+UNSEEN = [(START, "2007-12-31"), ("2024-04-08", "2026-04-02")]
 PRIOR_TRIALS = 150  # every WTI configuration run in this repository before the protocol
 LEDGER = os.path.join(RESULTS, "trials.jsonl")
 
@@ -82,6 +85,8 @@ def window(r: pd.Series, *spans) -> pd.Series:
 
 
 def log_trial(name: str, params: dict) -> None:
+    if TAG:
+        name, params = f"{name} start={START}", {**params, "start": START}
     os.makedirs(RESULTS, exist_ok=True)
     with open(LEDGER, "a") as f:
         f.write(
@@ -326,7 +331,7 @@ def main() -> None:
         "full": stats(r1),
         "seen": stats(r1.loc[SEEN[0] : SEEN[1]]),
         "unseen": stats(window(r1, *UNSEEN)),
-        "unseen_1990_2007": stats(r1.loc[UNSEEN[0][0] : UNSEEN[0][1]]),
+        "unseen_pre_2008": stats(r1.loc[UNSEEN[0][0] : UNSEEN[0][1]]),
         "unseen_2024_2026": stats(r1.loc[UNSEEN[1][0] : UNSEEN[1][1]]),
     }
     out["H2"] = {
@@ -437,7 +442,7 @@ def main() -> None:
     )
     out["H2"]["cost_ann"] = float(h2.cost.loc[START:].mean() * 252 / 10e6)
     out["H2"]["by_window"] = {
-        "unseen_1990_2007": stats(r2.loc[UNSEEN[0][0] : UNSEEN[0][1]]),
+        "unseen_pre_2008": stats(r2.loc[UNSEEN[0][0] : UNSEEN[0][1]]),
         "unseen_2024_2026": stats(r2.loc[UNSEEN[1][0] : UNSEEN[1][1]]),
     }
     out["H1"]["zero_cost"] = stats(
@@ -459,7 +464,7 @@ def main() -> None:
     }
     out["live_expectation_63d_H2"] = bootstrap_63d(r2)
     np.save(
-        os.path.join(RESULTS, "_h2.npy"),
+        os.path.join(RESULTS, f"_h2{TAG}.npy"),
         np.c_[r2.index.values.astype("int64"), r2.values],
     )
 
@@ -498,10 +503,10 @@ def main() -> None:
     out["deploy_H2"] = not any(v["killed"] for v in verdict2.values())
 
     os.makedirs(RESULTS, exist_ok=True)
-    with open(os.path.join(RESULTS, "study.json"), "w") as f:
+    with open(os.path.join(RESULTS, f"study{TAG}.json"), "w") as f:
         json.dump(out, f, indent=2, default=float)
     np.save(
-        os.path.join(RESULTS, "_h1.npy"),
+        os.path.join(RESULTS, f"_h1{TAG}.npy"),
         np.c_[r1.index.values.astype("int64"), r1.values],
     )
     for k, v in verdict.items():

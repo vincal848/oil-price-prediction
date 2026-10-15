@@ -69,3 +69,13 @@ entries 1-6 were written.
    - Capacity is measured from 1990-01-01, the study start, not from the 1988
      warm-up.
    - Turnover is reported including rolls.
+
+9. **2026-10-15, after results, at the researcher's request. A second cut from
+   2003-01-02.** Pre-2003 NYMEX crude was a thinner, pit-only market (Globex side-by-side
+   trading began in 2006, and back-month volume and open interest were a fraction of
+   today's), so the 1990s dominate the capacity test and weigh on the early unseen
+   window. The study is re-run unchanged from 2003 (`CM_START=2003-01-02 python
+   study.py` -> `results/study_2003.json`). This choice was made after seeing the
+   1990-2026 results, so it is reported beside them, not instead of them, and its
+   49 runs are logged to the trial ledger as new trials before their results are
+   computed. The 1990 study stays the pre-registered result.
