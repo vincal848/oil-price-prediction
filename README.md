@@ -225,6 +225,223 @@ samples are short (591 targets) and only linear models and these features were t
 The work stops here. Reproduce with `python run.py --holdout2` (downloads FRED CSVs
 and the Yahoo rows after 2024-05-30 once, then caches).
 
+## Changing the question: what position to hold
+
+Everything above asks what tomorrow's price will be, and the answer is today's price.
+Systematic futures traders mostly ask a different question: what position to hold,
+given what the market is already showing. That does not need a next-day forecast. So I
+tried the three rules that make up most of a CTA book, on WTI, Brent, RBOB and heating
+oil from 2001 to October 2026, monthly rebalance, net of 2bp per side plus a
+close-and-reopen on every contract roll:
+
+- **Trend:** long or short on the sign of the trailing 1-, 3- or 12-month return
+  (time-series momentum, Moskowitz, Ooi and Pedersen 2012).
+- **Carry:** long in backwardation, short in contango.
+- **Volatility targeting:** scale any position to 20% annualised ex-ante volatility
+  (EWMA, centre of mass 60 days).
+
+WTI, 2001-08 to 2026-10, all vol-targeted except the first row:
+
+| rule | Sharpe | ann. return | max drawdown |
+|---|---|---|---|
+| buy and hold | 0.34 | 13.7% (40% vol) | -94% |
+| buy and hold, vol-targeted | 0.26 | 5.3% | -72% |
+| trend 1m | 0.35 | 7.1% | -41% |
+| trend 12m | 0.21 | 4.2% | -66% |
+| carry, front vs spot | -0.22 | -4.5% | -92% |
+| **carry, next contract vs front** | **0.49** | **9.9%** | **-41%** |
+| trend 12m + carry | 0.48 | 7.2% (15% vol) | -31% |
+
+![WTI equity curves](docs/img/strat_equity.png)
+
+What I learned from it:
+
+**You can forecast the size of tomorrow's move, not its direction.** The daily return
+autocorrelation is about -0.02 at every lag, on all four contracts. The autocorrelation
+of the absolute return is 0.17 to 0.25 at one day and still 0.13 to 0.16 at a month.
+That is the whole case for volatility targeting, and the reason a price-level model had
+nothing to find.
+
+**Carry works, but only once it is measured properly.** My first version used the
+futures-minus-spot basis, the same feature that failed in protocol 2, and it lost money
+on every contract. The front month sits almost on top of spot for most of its life, so
+that basis is mostly noise. The slope that matters is next contract vs front, and a
+continuous front-month series does contain it: on each roll day the futures-minus-spot
+basis jumps by roughly log(next/front), because the series switches contracts while
+spot does not. Read that way, WTI carry has a Sharpe of 0.49, is positive in every
+regime I split out, and its best year is 2020, when it was short through the super
+contango. It is also negatively correlated with buy and hold (-0.21).
+
+![Carry](docs/img/strat_carry.png)
+
+**Single-contract trend is weak and unstable.** 12-month trend on WTI is 0.21, and the
+lookback grid has no smooth ridge: neighbouring lookbacks swing from 0.38 to -0.07. The
+Sharpe that the trend literature reports comes from diversifying across dozens of
+futures, not from any one of them. Where trend does earn is the big directional
+regimes, 2014-2016 especially (0.95), which is the "crisis alpha" pattern.
+
+![Lookbacks](docs/img/strat_lookbacks.png)
+
+**Volatility targeting halves the drawdown but does not raise the Sharpe of a long
+position in oil.** It cuts exposure after a volatility spike, and in oil the spike comes
+with the crash and with the rebound. In 2020 it was underweight for the recovery. On
+trend and carry, whose returns do not depend on the market going up, it is what keeps
+the position sizes comparable through time.
+
+**Combining the two lowers risk more than it adds return.** Trend 12m and carry are
+correlated 0.11, so the blend runs at 15% volatility against a 20% target, with a
+-31% drawdown against -94% for buy and hold.
+
+**Gasoline is different.** RBOB's curve is seasonal, because the summer and winter
+specifications differ, so its contango and backwardation mostly reflect the calendar
+rather than inventories. Carry is flat there (-0.04) and 12-month trend loses (-0.18).
+A seasonally adjusted carry signal would be the next thing to try.
+
+Notes:
+
+- Rolls: the WTI splice days come from the CME rule in `roll.py`. RBOB and heating oil
+  splice on the first trading day of each month (they expire on the last business day
+  of the month before delivery); Brent follows ICE's two expiry rules, before and after
+  2016. Each calendar is checked against the data: the futures-minus-spot basis moves
+  2.1-3.0x more on its splice days than on other days for WTI, RBOB and heating oil.
+  For Brent it is only 1.3x, because FRED's Brent spot is Dated Brent rather than the
+  ICE future's underlying, so the Brent rows (in `results/strategies.json`) are rough.
+- Returns on splice days are set to zero, since part of that day's change is the
+  spread between two contracts, not a return. 2020-04-20, when the May WTI contract
+  settled negative, is also set to zero.
+- Sharpe ratios over 25 years carry a standard error of roughly 0.2, and I ran about a
+  dozen rules on four contracts, so differences of 0.1-0.2 between rows are noise. The
+  gap between the two carry measures (0.7) is not.
+- Data: Yahoo continuous front-month closes (`CL=F`, `BZ=F`, `RB=F`, `HO=F`) and FRED
+  spot prices (`DCOILWTICO`, `DCOILBRENTEU`, `DGASNYH`, `DHOILNYH`), cached in
+  `data/futures/`. Tests in `tests/test_strategies.py` check that no rule sees the
+  future, that trend finds planted regimes and finds nothing in a random walk, and
+  that the splice spread reads a known contract spread.
+
+Reproduce with `python run_strategies.py`.
+
+## Virtual barrels: trading the financial footprints in oil
+
+The rules above use only prices. Ilia Bouchouev's *Virtual Barrels* (2023) argues
+that oil is now priced as much by financial barrels as physical ones: storage
+hedgers, trend followers, slow inflation-hedging money and option sellers each
+leave a footprint in the curve, the positioning data or the volatility surface. I
+built one strategy family per footprint, from the book's chapter structure and the
+rules he spells out in his public *Energy Quantamentals* comments for the Oxford
+Institute for Energy Studies.
+
+That needed more data than a front-month price: EIA's daily Cushing futures
+contracts 1-4 (the curve, 2000 to April 2024, when EIA stopped publishing it), EIA
+weekly crude stocks, CFTC disaggregated positions for NYMEX WTI, and the CBOE OVX
+index. With four contracts the roll is exact rather than zeroed out: on the day after
+an expiry, yesterday's second contract is today's first, so the held return is
+C1(t)/C2(t-1).
+
+WTI, 2008 to April 2024, every strategy scaled to 15% volatility, net of costs:
+
+| family | rule | Sharpe | max drawdown |
+|---|---|---|---|
+| benchmark | buy and hold (contract 2, rolled) | -0.12 | -71% |
+| curve | carry: long backwardation, short contango | 0.45 | -28% |
+| curve | **carry-momentum**: carry vs its 1-month average | **0.61** | -28% |
+| price | momentum M(1,20) | 0.15 | -48% |
+| price | multi-horizon M(1,5)+M(5,20)+M(20,250) | 0.20 | -41% |
+| price | M(1,20) sized by the reaction function | 0.25 | -26% |
+| positioning | **follow the flow** (managed money MA crossover) | **0.40** | -29% |
+| positioning | fade the crowd (range extremes) | -0.04 | -21% |
+| positioning | hedging pressure (Keynes premium) | -0.28 | -69% |
+| inventories | **inventory cycle** (stocks vs 5-year seasonal norm) | **0.60** | -38% |
+| inventories | squeeze spread: C2-C3 on Cushing fill | 0.16 | -28% |
+| quantamental | WTI-Brent convergence | -0.49 | -72% |
+| volatility | short one-month variance at OVX | 0.42 | -80% |
+| book | all twelve, equal risk | 0.53 | -32% |
+| book | simple: M(1,20) + carry | 0.40 | -44% |
+| book | core four (bold rows, chosen after seeing this table) | 0.90 | -25% |
+
+![Strategy families](docs/img/vb_families.png)
+
+**The curve carries most of the information, and its change carries more than its
+level.** Carry-momentum buys when backwardation is steepening or contango flattening.
+Bouchouev reports Sharpe 0.48 for carry and 0.63 for carry-momentum on WTI over
+1994-2023; I get 0.45 and 0.61 on a different window, and every one of seven
+lookback pairs I tried is between 0.51 and 0.70. Inventory flows show up in the
+curve before they show up in the outright price, which is why trend followers
+watch it.
+
+**Price momentum on its own is the weakest of the systematic rules (0.15).** The
+reaction function, which builds the position up to one standard deviation of the
+signal and then cuts it, does not change the Sharpe much (0.25) but halves the
+drawdown, because it stops adding to a move that is already stretched.
+
+**In positioning, the information is in the flow, not the level.** Following the
+managed-money crossover earns 0.40, and all sixteen parameter pairs are positive.
+Fading the crowd at range extremes is a coin flip across its twenty parameter sets,
+and Bouchouev finds the same until about 2022. The classic hedging-pressure premium
+(long when producers and swap dealers are unusually net short) loses: in WTI those
+shorts are mostly swap dealers hedging shale producers' OTC trades, and their level
+moves slowly against a market the funds are already trading.
+
+**Inventories work through the seasonal surplus, not the level.** Going long when
+US crude stocks are drawing relative to the five-year same-week average earns 0.60,
+and is positive in every period except 2020, when stocks built faster than ever and
+prices recovered anyway. The squeeze-model spread trade on Cushing (short the C2-C3
+spread when Cushing fills near its recent maximum, long when it drains toward
+empty) is weak at 0.16: the extremes it is built for, like April 2020, are rare.
+
+**WTI-Brent does not mean-revert on a three-month horizon.** The spread trended
+through every structural change in the period: the Cushing glut of 2011-13, the end
+of the US export ban in 2015, the pipeline build-out after it.
+
+**The volatility premium is real but dangerous.** OVX averaged 39 against 35%
+realised front-month volatility. Sold as one-month variance swaps, marked to market
+every day, the premium earns 0.42 with an -80% drawdown, nearly all of it in 2020.
+The first version of this (Sharpe 1.22) booked only the daily accrual, which hides
+the swings in implied volatility, so the risk looked half as large and the sizing
+ran at the leverage cap; an independent review of the code caught it.
+
+**The book is better than its parts because the parts are nearly uncorrelated.**
+The average pairwise correlation across the twelve strategies is 0.07; carry,
+carry-momentum, the inventory cycle and following the flow are correlated 0.10 to
+0.22 with each other. An equal-risk book of all twelve has a Sharpe of 0.53 and a
+-32% drawdown against -71% for buy and hold. Keeping only the four strong families
+gives 0.90 and is positive in every period, but that book was chosen by looking at
+this table, so 0.90 is an upper bound, not an estimate.
+
+![Correlations](docs/img/vb_correlation.png)
+
+Notes:
+
+- Timing: a signal from data known at the close of day t sets the position for day
+  t+1. COT reports (as of Tuesday) are released Friday at 3:30pm ET, after the oil
+  settlement, so they are first used at Monday's close, Tuesday's in holiday weeks,
+  and after the catch-up in the 2013 and 2018-19 shutdowns. EIA weekly stocks are
+  first used at Thursday's close. A truncation test (rerun everything with all data
+  cut at a date, compare every strategy's returns before that date) finds no
+  differences at three cut dates.
+- Costs: 2bp per side on outright trades plus a full roll each month, 4bp on spreads,
+  1 vol point of bid-ask per variance swap, and 2bp on each monthly re-sizing of
+  the books.
+- Limits: OVX is implied volatility on USO options, a proxy for options on the WTI
+  future, and a variance swap at OVX is not something you can trade at that level.
+  Cushing utilisation uses stocks over their trailing three-year maximum, because
+  EIA's capacity survey is semi-annual and capacity roughly doubled after 2010. The
+  ensembles average each rule over its parameter grid rather than drawing parameters
+  at random as Bouchouev does, which is the deterministic version of the same idea.
+- Tests in `tests/test_virtual_barrels.py`: the roll mapping, carry sign and scale,
+  the reaction function's peak, COT and EIA release timing, Good Friday rolls, that
+  a variance swap settles to strike minus realised and marks implied-vol moves, that
+  moving P&L between calendars loses none of it, and that carry and carry-momentum
+  find nothing on a random-walk curve.
+
+Sources: Bouchouev, *Virtual Barrels: Quantitative Trading in the Oil Market*
+(Springer, 2023); *Energy Quantamentals* comments, Oxford Institute for Energy
+Studies: "Myths and Realities about CTAs" (2024), "Who is who in Financial
+Barrels" (2024), "The Revival of the Volatility Risk Premium" (2025), "A Tale of Two
+Algorithms and OPEC+" (2025), "To Follow the Crowd or to Fade the Extremes?" (2025);
+"A Lesson from Physics on Oil Prices" (OIES, 2021).
+
+Reproduce with `python run_virtual_barrels.py` (data in `data/vb/`).
+
 ## How it works
 
 ```mermaid
@@ -289,7 +506,9 @@ Other options:
 python run.py --window 60    # the memory length I tried first
 python run.py --no-lstm      # skip TensorFlow, runs in about a second
 python run.py --holdout      # the return-model holdout table above
-pytest tests -q              # 41 tests, no network; the ESN/LSTM smoke tests need requirements.txt
+python run_strategies.py     # trend, carry and vol targeting on four energy contracts
+python run_virtual_barrels.py  # the Virtual Barrels strategy families and books
+pytest tests -q              # 73 tests, no network; the ESN/LSTM smoke tests need requirements.txt
 ```
 
 The first run downloads from Yahoo and caches to `data/wti.csv`, so later runs are
@@ -305,6 +524,10 @@ offline and reproducible.
 | `metrics.py` | RMSE, MAE, MASE, directional accuracy, skill scores, and why MAPE is gone |
 | `roll.py` | CME termination dates and what the contract roll costs |
 | `run.py` | Download and cache, the experiment, the printed tables, `results/` and the figures |
+| `strategies.py` | Trend, carry (including the splice spread) and volatility targeting, P&L with costs (pure) |
+| `run_strategies.py` | Runs the rules on WTI, Brent, RBOB and heating oil; tables, `results/strategies.json`, figures |
+| `virtual_barrels.py` | Curve, positioning, inventory, convergence and volatility strategies from *Virtual Barrels* (pure) |
+| `run_virtual_barrels.py` | Runs them on WTI 2008-2024, the books, parameter robustness, `results/virtual_barrels.json`, figures |
 | `docs/PROTOCOL-2.md` | The second protocol (public spread/basis/dollar features, new holdout) |
 | `docs/PROTOCOL.md` | The evaluation protocol, written before the return models were fitted |
 | `tests/` | 41 tests |
