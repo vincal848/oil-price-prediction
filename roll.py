@@ -13,12 +13,25 @@ jump.
 
 import numpy as np
 import pandas as pd
-from pandas.tseries.holiday import USFederalHolidayCalendar
+from pandas.tseries.holiday import (
+    AbstractHolidayCalendar,
+    GoodFriday,
+    USFederalHolidayCalendar,
+)
 from pandas.tseries.offsets import CustomBusinessDay
 
-# NYMEX observes the US federal holiday calendar for this purpose. Close enough:
-# the rule only needs to count three business days back.
-BDAY = CustomBusinessDay(calendar=USFederalHolidayCalendar())
+
+class NymexCalendar(AbstractHolidayCalendar):
+    """US federal holidays plus Good Friday, when NYMEX is also closed.
+
+    Without Good Friday, terminations that count back across it (2011-04-21,
+    2016-03-23 in the data) land a day late.
+    """
+
+    rules = USFederalHolidayCalendar.rules + [GoodFriday]
+
+
+BDAY = CustomBusinessDay(calendar=NymexCalendar())
 
 
 def is_business_day(ts: pd.Timestamp | str) -> bool:

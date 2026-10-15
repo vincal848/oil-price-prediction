@@ -1,0 +1,480 @@
+{
+  "window": [
+    "2008-01-01",
+    "2024-04-05"
+  ],
+  "target_vol": 0.15,
+  "table": {
+    "buy and hold": {
+      "ann_ret": -0.01893899173784713,
+      "ann_vol": 0.15333090276417688,
+      "sharpe": -0.12351712144404005,
+      "max_dd": -0.7088522280094558,
+      "hit": 0.516486220472441
+    },
+    "carry": {
+      "ann_ret": 0.0694114565002899,
+      "ann_vol": 0.15299163122872242,
+      "sharpe": 0.4536944664412383,
+      "max_dd": -0.27736000359548574,
+      "hit": 0.5126753630322421
+    },
+    "carry-momentum": {
+      "ann_ret": 0.09381980702008022,
+      "ann_vol": 0.15321315207115055,
+      "sharpe": 0.6123482596096667,
+      "max_dd": -0.27827785020009976,
+      "hit": 0.5255905511811023
+    },
+    "momentum M(1,20)": {
+      "ann_ret": 0.023239426151419527,
+      "ann_vol": 0.153364067020531,
+      "sharpe": 0.15153110244727955,
+      "max_dd": -0.4763559337126537,
+      "hit": 0.5100885826771654
+    },
+    "momentum, multi-horizon": {
+      "ann_ret": 0.021315517171979683,
+      "ann_vol": 0.10478501471565949,
+      "sharpe": 0.20342142652573592,
+      "max_dd": -0.4115918400659352,
+      "hit": 0.5065190651906519
+    },
+    "momentum, reaction-sized": {
+      "ann_ret": 0.02630832817855673,
+      "ann_vol": 0.10344084423765346,
+      "sharpe": 0.2543321100329946,
+      "max_dd": -0.26055208096085136,
+      "hit": 0.505203171456888
+    },
+    "follow the flow": {
+      "ann_ret": 0.05103957128944618,
+      "ann_vol": 0.1261338058732441,
+      "sharpe": 0.4046462479752453,
+      "max_dd": -0.29401622348396994,
+      "hit": 0.5039230574538092
+    },
+    "fade the crowd": {
+      "ann_ret": -0.002137367390523723,
+      "ann_vol": 0.052575237561271256,
+      "sharpe": -0.040653499435600884,
+      "max_dd": -0.2099339338430667,
+      "hit": 0.4797191887675507
+    },
+    "hedging pressure": {
+      "ann_ret": -0.042753709637340126,
+      "ann_vol": 0.15332077147107973,
+      "sharpe": -0.27885138606548554,
+      "max_dd": -0.6928922916348423,
+      "hit": 0.49618508491262614
+    },
+    "inventory cycle": {
+      "ann_ret": 0.09182457534726023,
+      "ann_vol": 0.15322800162741285,
+      "sharpe": 0.5992675905970479,
+      "max_dd": -0.3768949074072988,
+      "hit": 0.5223917322834646
+    },
+    "squeeze spread (C2-C3)": {
+      "ann_ret": 0.012753201372804364,
+      "ann_vol": 0.0786678579524587,
+      "sharpe": 0.16211451162826246,
+      "max_dd": -0.2820883893406887,
+      "hit": 0.4854004821859095
+    },
+    "WTI-Brent convergence": {
+      "ann_ret": -0.06294794784755349,
+      "ann_vol": 0.12805409958370131,
+      "sharpe": -0.49157307772413944,
+      "max_dd": -0.7165148619866606,
+      "hit": 0.45701242708597517
+    },
+    "short variance (VRP)": {
+      "ann_ret": 0.10289095577083764,
+      "ann_vol": 0.24679514189740187,
+      "sharpe": 0.41690835151695027,
+      "max_dd": -0.8017508379327196,
+      "hit": 0.6997787066633883
+    },
+    "simple: M(1,20) + carry": {
+      "ann_ret": 0.06642453877880855,
+      "ann_vol": 0.16568390372556363,
+      "sharpe": 0.400911236910697,
+      "max_dd": -0.43825493159006945,
+      "hit": 0.4449056603773585
+    },
+    "Virtual Barrels book": {
+      "ann_ret": 0.0873666174029717,
+      "ann_vol": 0.16399187154687594,
+      "sharpe": 0.5327496819133415,
+      "max_dd": -0.3172231891606614,
+      "hit": 0.577037037037037
+    },
+    "VB book ex-VRP": {
+      "ann_ret": 0.06818125611991507,
+      "ann_vol": 0.17045553982163147,
+      "sharpe": 0.3999943691549215,
+      "max_dd": -0.3601678138244301,
+      "hit": 0.5008652657601977
+    },
+    "core four (chosen in-sample)": {
+      "ann_ret": 0.15305705637835718,
+      "ann_vol": 0.17036328487456084,
+      "sharpe": 0.8984157384089753,
+      "max_dd": -0.2510152666782234,
+      "hit": 0.5088018171493469
+    }
+  },
+  "periods": {
+    "buy and hold": {
+      "2008-09 crisis": -0.13056081482750148,
+      "2010-13 range": 0.0017990999239827247,
+      "2014-16 glut": -1.0206514499414567,
+      "2017-19": 0.1596417742078654,
+      "2020 Covid": -1.4301416435781942,
+      "2021-24": 0.8840820120797824
+    },
+    "carry": {
+      "2008-09 crisis": 0.9383168326818652,
+      "2010-13 range": 0.28821970739524655,
+      "2014-16 glut": 0.381813253600777,
+      "2017-19": 0.2842949433656013,
+      "2020 Covid": 0.5262826649824478,
+      "2021-24": 0.5525279413727675
+    },
+    "carry-momentum": {
+      "2008-09 crisis": -0.14149143517936533,
+      "2010-13 range": 0.9660138970422363,
+      "2014-16 glut": 0.8849219612083428,
+      "2017-19": 0.05725600133758776,
+      "2020 Covid": 0.4800275104166623,
+      "2021-24": 0.9834061830772685
+    },
+    "momentum M(1,20)": {
+      "2008-09 crisis": -0.3270743672637609,
+      "2010-13 range": -0.17561990397058386,
+      "2014-16 glut": 0.5729014075881835,
+      "2017-19": -0.1627951589754212,
+      "2020 Covid": 1.4801541624992252,
+      "2021-24": 0.22478927728797712
+    },
+    "momentum, multi-horizon": {
+      "2008-09 crisis": 0.8778806348296598,
+      "2010-13 range": -1.1597382924828683,
+      "2014-16 glut": 1.0181060674733604,
+      "2017-19": -0.11170211591914046,
+      "2020 Covid": 0.9685579140227476,
+      "2021-24": 0.21680505983353723
+    },
+    "momentum, reaction-sized": {
+      "2008-09 crisis": 0.26018240623898575,
+      "2010-13 range": -0.24175135343114845,
+      "2014-16 glut": 0.9735719507350997,
+      "2017-19": 0.05500856180450331,
+      "2020 Covid": 1.2348136037461621,
+      "2021-24": 0.08213309438009733
+    },
+    "follow the flow": {
+      "2008-09 crisis": 0.6241034329223806,
+      "2010-13 range": 0.0416587006311683,
+      "2014-16 glut": 1.1801983379167655,
+      "2017-19": 0.24439410649226112,
+      "2020 Covid": 1.2337386493420675,
+      "2021-24": -0.27013387695068475
+    },
+    "fade the crowd": {
+      "2008-09 crisis": 0.01211763240523091,
+      "2010-13 range": 0.020125581349495342,
+      "2014-16 glut": -0.27754050544877407,
+      "2017-19": -0.08345109909473623,
+      "2020 Covid": -1.6564488084708797,
+      "2021-24": 0.6457763825611847
+    },
+    "hedging pressure": {
+      "2008-09 crisis": 0.6877305802397646,
+      "2010-13 range": -0.3447418308181425,
+      "2014-16 glut": -0.7818663711318813,
+      "2017-19": -0.2518433559883166,
+      "2020 Covid": 1.2770860166412563,
+      "2021-24": -0.9454269633186078
+    },
+    "inventory cycle": {
+      "2008-09 crisis": 0.8584895411468356,
+      "2010-13 range": 0.6365927722768697,
+      "2014-16 glut": 0.4407171937484956,
+      "2017-19": 1.3819429580843232,
+      "2020 Covid": -1.6349912375770173,
+      "2021-24": 0.6671381899654201
+    },
+    "squeeze spread (C2-C3)": {
+      "2008-09 crisis": 0.7684696870984166,
+      "2010-13 range": 0.16281542859514447,
+      "2014-16 glut": -0.1662429138951558,
+      "2017-19": -0.19983378389354922,
+      "2020 Covid": 0.8230971150940873,
+      "2021-24": -0.12601451984874137
+    },
+    "WTI-Brent convergence": {
+      "2008-09 crisis": -0.7107069374979842,
+      "2010-13 range": -1.6039072518809232,
+      "2014-16 glut": 0.7713315130414854,
+      "2017-19": 0.10930778708627528,
+      "2020 Covid": 0.23558880110409589,
+      "2021-24": -1.0312319966400814
+    },
+    "short variance (VRP)": {
+      "2008-09 crisis": 0.004759148771981937,
+      "2010-13 range": 2.3168336432433025,
+      "2014-16 glut": 0.17635418000778144,
+      "2017-19": 0.7644432601833744,
+      "2020 Covid": -1.4385148329442334,
+      "2021-24": 1.0295279758053462
+    },
+    "simple: M(1,20) + carry": {
+      "2008-09 crisis": 0.24631169012640847,
+      "2010-13 range": 0.10127362502018625,
+      "2014-16 glut": 0.5859983650609705,
+      "2017-19": 0.04492830176721371,
+      "2020 Covid": 1.2057338413159369,
+      "2021-24": 0.6732750848663724
+    },
+    "Virtual Barrels book": {
+      "2008-09 crisis": 0.42768601877820406,
+      "2010-13 range": 0.4007275284711836,
+      "2014-16 glut": 0.98396644070953,
+      "2017-19": 0.5865712923085337,
+      "2020 Covid": -0.31712494515853284,
+      "2021-24": 0.5458591693135401
+    },
+    "VB book ex-VRP": {
+      "2008-09 crisis": 0.5334012093470166,
+      "2010-13 range": -0.188955546132786,
+      "2014-16 glut": 1.0045903224295176,
+      "2017-19": 0.3329402612008043,
+      "2020 Covid": 0.9639643900890621,
+      "2021-24": 0.3193273453475276
+    },
+    "core four (chosen in-sample)": {
+      "2008-09 crisis": 0.6384693177153976,
+      "2010-13 range": 0.9623252872002359,
+      "2014-16 glut": 0.9875580836025443,
+      "2017-19": 0.9028933032825004,
+      "2020 Covid": 0.11588050261296594,
+      "2021-24": 1.1060222950644685
+    }
+  },
+  "correlation": {
+    "carry": {
+      "carry": 1.0,
+      "carry-momentum": 0.1986,
+      "momentum M(1,20)": 0.2775,
+      "momentum, multi-horizon": 0.458,
+      "momentum, reaction-sized": 0.19,
+      "follow the flow": 0.1727,
+      "fade the crowd": -0.1244,
+      "hedging pressure": 0.037,
+      "inventory cycle": 0.221,
+      "squeeze spread (C2-C3)": 0.166,
+      "WTI-Brent convergence": -0.0424,
+      "short variance (VRP)": -0.204
+    },
+    "carry-momentum": {
+      "carry": 0.1986,
+      "carry-momentum": 1.0,
+      "momentum M(1,20)": 0.446,
+      "momentum, multi-horizon": 0.3762,
+      "momentum, reaction-sized": 0.4016,
+      "follow the flow": 0.1609,
+      "fade the crowd": -0.0876,
+      "hedging pressure": 0.013,
+      "inventory cycle": 0.126,
+      "squeeze spread (C2-C3)": 0.085,
+      "WTI-Brent convergence": -0.052,
+      "short variance (VRP)": -0.163
+    },
+    "momentum M(1,20)": {
+      "carry": 0.2775,
+      "carry-momentum": 0.446,
+      "momentum M(1,20)": 1.0,
+      "momentum, multi-horizon": 0.7108,
+      "momentum, reaction-sized": 0.8738,
+      "follow the flow": 0.2377,
+      "fade the crowd": -0.1234,
+      "hedging pressure": 0.0108,
+      "inventory cycle": 0.1642,
+      "squeeze spread (C2-C3)": 0.0638,
+      "WTI-Brent convergence": 0.0082,
+      "short variance (VRP)": -0.2133
+    },
+    "momentum, multi-horizon": {
+      "carry": 0.458,
+      "carry-momentum": 0.3762,
+      "momentum M(1,20)": 0.7108,
+      "momentum, multi-horizon": 1.0,
+      "momentum, reaction-sized": 0.6361,
+      "follow the flow": 0.3508,
+      "fade the crowd": -0.3193,
+      "hedging pressure": 0.1492,
+      "inventory cycle": 0.1719,
+      "squeeze spread (C2-C3)": 0.1117,
+      "WTI-Brent convergence": 0.0466,
+      "short variance (VRP)": -0.3061
+    },
+    "momentum, reaction-sized": {
+      "carry": 0.19,
+      "carry-momentum": 0.4016,
+      "momentum M(1,20)": 0.8738,
+      "momentum, multi-horizon": 0.6361,
+      "momentum, reaction-sized": 1.0,
+      "follow the flow": 0.178,
+      "fade the crowd": -0.1119,
+      "hedging pressure": -0.0236,
+      "inventory cycle": 0.1586,
+      "squeeze spread (C2-C3)": 0.0481,
+      "WTI-Brent convergence": -0.0062,
+      "short variance (VRP)": -0.0852
+    },
+    "follow the flow": {
+      "carry": 0.1727,
+      "carry-momentum": 0.1609,
+      "momentum M(1,20)": 0.2377,
+      "momentum, multi-horizon": 0.3508,
+      "momentum, reaction-sized": 0.178,
+      "follow the flow": 1.0,
+      "fade the crowd": -0.4822,
+      "hedging pressure": 0.4652,
+      "inventory cycle": 0.0964,
+      "squeeze spread (C2-C3)": 0.0136,
+      "WTI-Brent convergence": 0.0443,
+      "short variance (VRP)": -0.1767
+    },
+    "fade the crowd": {
+      "carry": -0.1244,
+      "carry-momentum": -0.0876,
+      "momentum M(1,20)": -0.1234,
+      "momentum, multi-horizon": -0.3193,
+      "momentum, reaction-sized": -0.1119,
+      "follow the flow": -0.4822,
+      "fade the crowd": 1.0,
+      "hedging pressure": -0.4663,
+      "inventory cycle": -0.1008,
+      "squeeze spread (C2-C3)": -0.0402,
+      "WTI-Brent convergence": -0.0116,
+      "short variance (VRP)": 0.037
+    },
+    "hedging pressure": {
+      "carry": 0.037,
+      "carry-momentum": 0.013,
+      "momentum M(1,20)": 0.0108,
+      "momentum, multi-horizon": 0.1492,
+      "momentum, reaction-sized": -0.0236,
+      "follow the flow": 0.4652,
+      "fade the crowd": -0.4663,
+      "hedging pressure": 1.0,
+      "inventory cycle": -0.0268,
+      "squeeze spread (C2-C3)": -0.0209,
+      "WTI-Brent convergence": 0.0598,
+      "short variance (VRP)": 0.0012
+    },
+    "inventory cycle": {
+      "carry": 0.221,
+      "carry-momentum": 0.126,
+      "momentum M(1,20)": 0.1642,
+      "momentum, multi-horizon": 0.1719,
+      "momentum, reaction-sized": 0.1586,
+      "follow the flow": 0.0964,
+      "fade the crowd": -0.1008,
+      "hedging pressure": -0.0268,
+      "inventory cycle": 1.0,
+      "squeeze spread (C2-C3)": 0.1118,
+      "WTI-Brent convergence": -0.0833,
+      "short variance (VRP)": 0.0141
+    },
+    "squeeze spread (C2-C3)": {
+      "carry": 0.166,
+      "carry-momentum": 0.085,
+      "momentum M(1,20)": 0.0638,
+      "momentum, multi-horizon": 0.1117,
+      "momentum, reaction-sized": 0.0481,
+      "follow the flow": 0.0136,
+      "fade the crowd": -0.0402,
+      "hedging pressure": -0.0209,
+      "inventory cycle": 0.1118,
+      "squeeze spread (C2-C3)": 1.0,
+      "WTI-Brent convergence": -0.1143,
+      "short variance (VRP)": -0.0423
+    },
+    "WTI-Brent convergence": {
+      "carry": -0.0424,
+      "carry-momentum": -0.052,
+      "momentum M(1,20)": 0.0082,
+      "momentum, multi-horizon": 0.0466,
+      "momentum, reaction-sized": -0.0062,
+      "follow the flow": 0.0443,
+      "fade the crowd": -0.0116,
+      "hedging pressure": 0.0598,
+      "inventory cycle": -0.0833,
+      "squeeze spread (C2-C3)": -0.1143,
+      "WTI-Brent convergence": 1.0,
+      "short variance (VRP)": -0.0455
+    },
+    "short variance (VRP)": {
+      "carry": -0.204,
+      "carry-momentum": -0.163,
+      "momentum M(1,20)": -0.2133,
+      "momentum, multi-horizon": -0.3061,
+      "momentum, reaction-sized": -0.0852,
+      "follow the flow": -0.1767,
+      "fade the crowd": 0.037,
+      "hedging pressure": 0.0012,
+      "inventory cycle": 0.0141,
+      "squeeze spread (C2-C3)": -0.0423,
+      "WTI-Brent convergence": -0.0455,
+      "short variance (VRP)": 1.0
+    }
+  },
+  "robustness": {
+    "momentum": {
+      "n": 6,
+      "median": 0.16751657477444915,
+      "p10": 0.13536713029863007,
+      "p90": 0.27789062045465895,
+      "share_positive": 1.0
+    },
+    "carry-momentum": {
+      "n": 7,
+      "median": 0.5958780500012947,
+      "p10": 0.5204586064654463,
+      "p90": 0.7014306490213826,
+      "share_positive": 1.0
+    },
+    "follow the flow": {
+      "n": 16,
+      "median": 0.3277351695642775,
+      "p10": 0.21444181498209636,
+      "p90": 0.46787962245704207,
+      "share_positive": 1.0
+    },
+    "fade the crowd": {
+      "n": 20,
+      "median": -0.026313295493613633,
+      "p10": -0.19170667375639722,
+      "p90": 0.20802175215777458,
+      "share_positive": 0.35
+    }
+  },
+  "turnover": {
+    "buy and hold": 0.0,
+    "carry": 8.529801324503312,
+    "carry-momentum": 57.11258278145696,
+    "momentum M(1,20)": 59.33774834437086,
+    "momentum, multi-horizon": 52.909492273730685,
+    "momentum, reaction-sized": 64.36429204837523,
+    "follow the flow": 11.705298013245033,
+    "fade the crowd": 3.5108167770419425,
+    "hedging pressure": 8.653421633554084,
+    "inventory cycle": 17.924944812362032,
+    "squeeze spread (C2-C3)": 10.3841059602649,
+    "WTI-Brent convergence": 69.42557410340417
+  }
+}

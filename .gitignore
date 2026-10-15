@@ -13,3 +13,4 @@ results/*
 !results/holdout.json
 !results/metrics.json
 !results/strategies.json
+!results/virtual_barrels.json

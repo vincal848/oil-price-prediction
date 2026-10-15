@@ -167,7 +167,7 @@ def summary(r: pd.Series) -> dict[str, float]:
         }
     equity = (1 + r).cumprod()
     dd = equity / equity.cummax() - 1
-    active = r[r != 0]
+    active = r[r.abs() > 1e-5]  # ignore days flat but for costs (< 0.1bp)
     return {
         "ann_ret": float(r.mean() * TRADING_DAYS),
         "ann_vol": float(r.std() * np.sqrt(TRADING_DAYS)),
