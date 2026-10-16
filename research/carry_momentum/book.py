@@ -28,6 +28,8 @@ START = "2003-01-02"
 OUT = os.path.join(RESULTS, "book")
 BUFFER = 0.25
 IN_BOOK = ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"]
+# Fixes tried for the 2022-25 grind (BOOK.md "When oil falls"); neither went in.
+FIXES = ["Curve carry gated by slow trend (outright)", "Slow trend 3/6/12m (outright)"]
 
 CRISES = {
     "2008 crash (Jul-Dec 2008)": ("2008-07-01", "2008-12-31"),
@@ -35,6 +37,17 @@ CRISES = {
     "COVID / negative WTI (Feb-May 2020)": ("2020-02-01", "2020-05-31"),
     "Ukraine spike (Feb-Jun 2022)": ("2022-02-01", "2022-06-30"),
     "2026 supply shock (Mar 2026)": ("2026-03-01", "2026-04-02"),
+}
+
+# Oil price declines since 2003, peak to trough of the rolled 2nd contract.
+DROPS = {
+    "2008 crash": ("2008-07-03", "2008-12-31"),
+    "2014-16 collapse": ("2014-06-20", "2016-02-11"),
+    "Q4 2018": ("2018-10-03", "2018-12-24"),
+    "2020 COVID": ("2020-01-06", "2020-04-28"),
+    "2022-23 slide": ("2022-06-08", "2023-03-17"),
+    "Late 2023": ("2023-09-27", "2023-12-12"),
+    "2024-25 slide": ("2024-04-05", "2025-05-05"),
 }
 
 
@@ -53,6 +66,9 @@ def sleeves(d: dict) -> dict[str, tuple[str, dict, engine.Book]]:
     near = curve.held_excess_return(panel, curve.gsci_targets(panel))
     logp = np.log1p(near.fillna(0.0)).cumsum()
     trend = sum(np.sign(logp - logp.shift(n)) for n in (21, 63, 252)) / 3
+    slow_trend = sum(np.sign(logp - logp.shift(n)) for n in (63, 126, 252)) / 3
+    carry_sig = engine.hysteresis(c13 / c13.rolling(252, min_periods=63).std(), 0.5)
+    gated = carry_sig.where(np.sign(carry_sig) == np.sign(slow_trend), 0.0)
 
     specs = {
         "Carry-momentum (outright)": (
@@ -71,7 +87,7 @@ def sleeves(d: dict) -> dict[str, tuple[str, dict, engine.Book]]:
                 "carry, with a 0.5-sigma band around zero so it flips rarely)"
             ),
             {"signal": "carry_band", "band": 0.5},
-            engine.hysteresis(c13 / c13.rolling(252, min_periods=63).std(), 0.5),
+            carry_sig,
             out_leg,
             False,
         ),
@@ -97,6 +113,20 @@ def sleeves(d: dict) -> dict[str, tuple[str, dict, engine.Book]]:
             engine.carry_momentum_band(c7, 5, 63, 0.5),
             spread_leg,
             True,
+        ),
+        FIXES[0]: (
+            "Curve carry, but flat whenever the 3/6/12-month trend disagrees",
+            {"signal": "carry_band if sign==sign(trend 3/6/12m) else flat"},
+            gated,
+            out_leg,
+            False,
+        ),
+        FIXES[1]: (
+            "Trend without the 1-month component: 3, 6 and 12-month signs",
+            {"signal": "trend_3_6_12"},
+            slow_trend,
+            out_leg,
+            False,
         ),
     }
     books = {}
@@ -197,6 +227,28 @@ def trading(book: engine.Book, d: dict) -> dict:
     }
 
 
+def oil_drops(rets: pd.DataFrame, oil: pd.Series) -> dict:
+    """Return of each sleeve over each oil decline, and by size of the monthly oil move."""
+    eq = (1 + oil.fillna(0.0)).cumprod()
+    episodes = {
+        name: {
+            "oil": float(eq.loc[b] / eq.loc[a] - 1),
+            **{k: float((1 + rets[k].loc[a:b]).prod() - 1) for k in rets},
+        }
+        for name, (a, b) in DROPS.items()
+    }
+    m = rets.apply(lambda r: (1 + r).groupby(r.index.to_period("M")).prod() - 1)
+    mo = (1 + oil).groupby(oil.index.to_period("M")).prod().reindex(m.index) - 1
+    buckets = pd.cut(
+        mo,
+        [-1, -0.10, -0.03, 0.03, 0.10, 5],
+        labels=["oil < -10%", "-10% to -3%", "-3% to +3%", "+3% to +10%", "> +10%"],
+    )
+    by_move = m.groupby(buckets, observed=True).mean()
+    by_move["months"] = mo.groupby(buckets, observed=True).size()
+    return {"episodes": episodes, "avg_month_by_oil_move": by_move.to_dict("index")}
+
+
 # ---------------------------------------------------------------------------
 # Figures
 # ---------------------------------------------------------------------------
@@ -291,6 +343,35 @@ def figures(rets: pd.DataFrame, oil_px: pd.Series, pos: pd.Series) -> None:
     plt.close(fig)
 
 
+def drops_figure(episodes: dict) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    names = list(episodes)
+    oil = np.array([episodes[n]["oil"] for n in names]) * 100
+    bk = np.array([episodes[n]["Combined book"] for n in names]) * 100
+    x = np.arange(len(names))
+    fig, ax = plt.subplots(figsize=(11, 3.8))
+    ax.bar(x - 0.2, oil, 0.4, color="#999999", label="WTI")
+    ax.bar(x + 0.2, bk, 0.4, color=np.where(bk > 0, "#548235", "#c00000"), label="Book")
+    for xi, v in zip(x, bk):
+        ax.text(
+            xi + 0.2, v + (2 if v > 0 else -6), f"{v:+.0f}%", ha="center", fontsize=9
+        )
+    ax.axhline(0, color="black", lw=0.6)
+    ax.set_xticks(x, names)
+    ax.set_ylabel("%")
+    ax.set_title("Major oil declines since 2003: WTI vs the book")
+    ax.legend(frameon=False)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "oil_drops.png"), dpi=150)
+    plt.close(fig)
+
+
 # ---------------------------------------------------------------------------
 
 
@@ -321,6 +402,22 @@ def main() -> None:
         .round(2)
         .to_dict(),
     }
+    log_trial(
+        "book Combined book v2",
+        {
+            "sleeves": ["cm", "gated carry", "slow trend"],
+            "weights": "equal",
+            "vol_target": 0.15,
+            "start": START,
+        },
+    )
+    v2 = combine(rets[[IN_BOOK[0], *FIXES]])
+    res["combined_with_fixes"] = {
+        "sleeves": [IN_BOOK[0], *FIXES],
+        "performance": tearsheet(v2, oil),
+    }
+    res["oil_drops"] = oil_drops(rets[IN_BOOK + ["Combined book"]], oil.loc[START:])
+    drops_figure(res["oil_drops"]["episodes"])
     p10 = tearsheet(combine(rets[IN_BOOK], 0.10), oil)
     res["combined"]["at_10pct_vol"] = {
         k: v for k, v in p10.items() if k not in ("annual", "crises")
@@ -336,7 +433,7 @@ def main() -> None:
     for k in rets:
         p = res["sleeves"].get(k, res.get("combined"))["performance"]
         print(
-            f"{k:34s} CAGR {p['cagr']:6.1%} vol {p['ann_vol']:5.1%} "
+            f"{k:44s} CAGR {p['cagr']:6.1%} vol {p['ann_vol']:5.1%} "
             f"SR {p['sharpe']:5.2f} MDD {p['max_drawdown']:6.1%} "
             f"yrs+ {p['positive_years']}"
         )

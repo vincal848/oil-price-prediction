@@ -272,6 +272,138 @@
         "capacity_worst_day": 334782.6086956522,
         "capacity_q95": 3230160.432825349
       }
+    },
+    "Curve carry gated by slow trend (outright)": {
+      "description": "Curve carry, but flat whenever the 3/6/12-month trend disagrees",
+      "params": {
+        "signal": "carry_band if sign==sign(trend 3/6/12m) else flat"
+      },
+      "performance": {
+        "cagr": 0.04406014767503086,
+        "ann_vol": 0.13667806213002773,
+        "sharpe": 0.38380621295116996,
+        "sortino": 0.4746609132264617,
+        "max_drawdown": -0.41927183208401286,
+        "calmar": 0.1050873068577671,
+        "longest_drawdown_days": 1715,
+        "hit_rate_months": 0.44285714285714284,
+        "positive_years": "13/24",
+        "best_month": 0.2386126918391176,
+        "worst_month": -0.09595436990566164,
+        "profit_factor": 1.0818073186117736,
+        "corr_to_wti": 0.014025016630282343,
+        "total_return_multiple": 2.7198874243638915,
+        "annual": {
+          "2003": 0.1855840974201124,
+          "2004": 0.2368506739758518,
+          "2005": -0.010840774380749596,
+          "2006": 0.04235252056543248,
+          "2007": 0.20379552149892843,
+          "2008": 0.46317991972939465,
+          "2009": -0.06933870219387084,
+          "2010": -0.04589113591655447,
+          "2011": -0.005156745755162562,
+          "2012": -0.039097705313731135,
+          "2013": 0.01466183213949046,
+          "2014": 0.06340094709619448,
+          "2015": 0.16587551291324787,
+          "2016": -0.14563206615845659,
+          "2017": 0.0728767716919243,
+          "2018": 0.2480096915955412,
+          "2019": -0.18253757315416286,
+          "2020": -0.04517420279252793,
+          "2021": 0.10389515630905533,
+          "2022": 0.11017405558077753,
+          "2023": -0.10707589929933237,
+          "2024": -0.07732223771475333,
+          "2025": -0.18463608342107585,
+          "2026": 0.3011768129221446
+        },
+        "crises": {
+          "2008 crash (Jul-Dec 2008)": 0.13389735392324975,
+          "2014-16 collapse (Jul 2014-Feb 2016)": 0.20025461357254715,
+          "COVID / negative WTI (Feb-May 2020)": 0.07805626205118155,
+          "Ukraine spike (Feb-Jun 2022)": 0.12081685077373283,
+          "2026 supply shock (Mar 2026)": 0.26011058705539347
+        }
+      },
+      "trading": {
+        "gross_ann_return": 0.05537490145793435,
+        "cost_ann": 0.002917012038303693,
+        "contracts_per_year": 2159.236662106703,
+        "position_flips_per_year": 5.731190150478796,
+        "time_long": 0.38406292749658005,
+        "time_short": 0.30523255813953487,
+        "avg_contracts_held": 56.83584131326949,
+        "capacity_worst_day": 45693827.16049383,
+        "capacity_q95": 95369668.75816889
+      }
+    },
+    "Slow trend 3/6/12m (outright)": {
+      "description": "Trend without the 1-month component: 3, 6 and 12-month signs",
+      "params": {
+        "signal": "trend_3_6_12"
+      },
+      "performance": {
+        "cagr": 0.02784799488450007,
+        "ann_vol": 0.13594316628317576,
+        "sharpe": 0.269934233431622,
+        "sortino": 0.3683160153336811,
+        "max_drawdown": -0.5450185535148349,
+        "calmar": 0.05109549886863086,
+        "longest_drawdown_days": 1465,
+        "hit_rate_months": 0.48214285714285715,
+        "positive_years": "15/24",
+        "best_month": 0.23570887159899923,
+        "worst_month": -0.0970664299070425,
+        "profit_factor": 1.0528163038402973,
+        "corr_to_wti": 0.010707674474395319,
+        "total_return_multiple": 1.8915858501050702,
+        "annual": {
+          "2003": 0.0924768731226493,
+          "2004": 0.22198598000593361,
+          "2005": -0.0339975829628727,
+          "2006": 0.025258450501197682,
+          "2007": 0.145317737942674,
+          "2008": 0.2438998637901637,
+          "2009": -0.025109099897850595,
+          "2010": -0.09906538594610559,
+          "2011": -0.08882662302041433,
+          "2012": 0.01041280273824996,
+          "2013": 0.012099649930360501,
+          "2014": 0.3439460760501367,
+          "2015": 0.15476048072607607,
+          "2016": -0.12991279952519785,
+          "2017": 0.006390542240113373,
+          "2018": 0.21677227431265012,
+          "2019": -0.1355292151962061,
+          "2020": 0.07971611240039334,
+          "2021": 0.05976591538515841,
+          "2022": 0.14257226696531777,
+          "2023": -0.16976414904821047,
+          "2024": -0.16739367463924848,
+          "2025": -0.22031139040548964,
+          "2026": 0.21821482826673688
+        },
+        "crises": {
+          "2008 crash (Jul-Dec 2008)": -0.018852227757078288,
+          "2014-16 collapse (Jul 2014-Feb 2016)": 0.5602903517698372,
+          "COVID / negative WTI (Feb-May 2020)": 0.17051998147816838,
+          "Ukraine spike (Feb-Jun 2022)": 0.13163595612297097,
+          "2026 supply shock (Mar 2026)": 0.2571563668608259
+        }
+      },
+      "trading": {
+        "gross_ann_return": 0.04078823445615595,
+        "cost_ann": 0.004092520075239399,
+        "contracts_per_year": 2863.5697674418607,
+        "position_flips_per_year": 10.729822161422709,
+        "time_long": 0.5383036935704515,
+        "time_short": 0.46169630642954856,
+        "avg_contracts_held": 58.31344049247606,
+        "capacity_worst_day": 43037209.30232558,
+        "capacity_q95": 146411418.8550414
+      }
     }
   },
   "combined": {
@@ -334,25 +466,49 @@
         "Carry-momentum (outright)": 1.0,
         "Curve carry (outright)": 0.03,
         "Trend (outright)": 0.29,
-        "Carry-momentum (2nd-7th spread)": 0.19
+        "Carry-momentum (2nd-7th spread)": 0.19,
+        "Curve carry gated by slow trend (outright)": 0.08,
+        "Slow trend 3/6/12m (outright)": 0.13
       },
       "Curve carry (outright)": {
         "Carry-momentum (outright)": 0.03,
         "Curve carry (outright)": 1.0,
         "Trend (outright)": 0.44,
-        "Carry-momentum (2nd-7th spread)": 0.17
+        "Carry-momentum (2nd-7th spread)": 0.17,
+        "Curve carry gated by slow trend (outright)": 0.85,
+        "Slow trend 3/6/12m (outright)": 0.49
       },
       "Trend (outright)": {
         "Carry-momentum (outright)": 0.29,
         "Curve carry (outright)": 0.44,
         "Trend (outright)": 1.0,
-        "Carry-momentum (2nd-7th spread)": 0.35
+        "Carry-momentum (2nd-7th spread)": 0.35,
+        "Curve carry gated by slow trend (outright)": 0.73,
+        "Slow trend 3/6/12m (outright)": 0.89
       },
       "Carry-momentum (2nd-7th spread)": {
         "Carry-momentum (outright)": 0.19,
         "Curve carry (outright)": 0.17,
         "Trend (outright)": 0.35,
-        "Carry-momentum (2nd-7th spread)": 1.0
+        "Carry-momentum (2nd-7th spread)": 1.0,
+        "Curve carry gated by slow trend (outright)": 0.24,
+        "Slow trend 3/6/12m (outright)": 0.28
+      },
+      "Curve carry gated by slow trend (outright)": {
+        "Carry-momentum (outright)": 0.08,
+        "Curve carry (outright)": 0.85,
+        "Trend (outright)": 0.73,
+        "Carry-momentum (2nd-7th spread)": 0.24,
+        "Curve carry gated by slow trend (outright)": 1.0,
+        "Slow trend 3/6/12m (outright)": 0.83
+      },
+      "Slow trend 3/6/12m (outright)": {
+        "Carry-momentum (outright)": 0.13,
+        "Curve carry (outright)": 0.49,
+        "Trend (outright)": 0.89,
+        "Carry-momentum (2nd-7th spread)": 0.28,
+        "Curve carry gated by slow trend (outright)": 0.83,
+        "Slow trend 3/6/12m (outright)": 1.0
       }
     },
     "at_10pct_vol": {
@@ -370,6 +526,152 @@
       "profit_factor": 1.1255908470728941,
       "corr_to_wti": -0.06158893638435189,
       "total_return_multiple": 3.6334148938129927
+    }
+  },
+  "combined_with_fixes": {
+    "sleeves": [
+      "Carry-momentum (outright)",
+      "Curve carry gated by slow trend (outright)",
+      "Slow trend 3/6/12m (outright)"
+    ],
+    "performance": {
+      "cagr": 0.06910684888283258,
+      "ann_vol": 0.16250060101980712,
+      "sharpe": 0.4920955986948641,
+      "sortino": 0.6631949979736907,
+      "max_drawdown": -0.6308493798845511,
+      "calmar": 0.10954571897253748,
+      "longest_drawdown_days": 1023,
+      "hit_rate_months": 0.5071428571428571,
+      "positive_years": "17/24",
+      "best_month": 0.31738400268129174,
+      "worst_month": -0.13788586909742184,
+      "profit_factor": 1.1065636752299888,
+      "corr_to_wti": -0.04838539191804881,
+      "total_return_multiple": 4.714917010839283,
+      "annual": {
+        "2003": 0.0803193774189741,
+        "2004": 0.24555217696777953,
+        "2005": -0.06340307476978368,
+        "2006": 0.18309318683981113,
+        "2007": 0.3232870631582949,
+        "2008": 0.22934613482584942,
+        "2009": -0.019528521708995772,
+        "2010": 0.0907363927539131,
+        "2011": 0.016786726392484796,
+        "2012": 0.03903745034931916,
+        "2013": 0.07331017106789539,
+        "2014": 0.39653019802049827,
+        "2015": 0.1536101159227823,
+        "2016": 0.013975461560779001,
+        "2017": -0.03204374466863902,
+        "2018": 0.2951190719815304,
+        "2019": -0.22165479176235603,
+        "2020": 0.15127264031125964,
+        "2021": 0.21839678116552363,
+        "2022": 0.20217026111052872,
+        "2023": -0.22066334622562822,
+        "2024": -0.20246723542623724,
+        "2025": -0.30800781117543974,
+        "2026": 0.38655371187594856
+      },
+      "crises": {
+        "2008 crash (Jul-Dec 2008)": 0.12062455831859764,
+        "2014-16 collapse (Jul 2014-Feb 2016)": 0.6339482114511787,
+        "COVID / negative WTI (Feb-May 2020)": 0.2612126188093604,
+        "Ukraine spike (Feb-Jun 2022)": 0.17147288553901374,
+        "2026 supply shock (Mar 2026)": 0.3383392918392474
+      }
+    }
+  },
+  "oil_drops": {
+    "episodes": {
+      "2008 crash": {
+        "oil": -0.7151538965090096,
+        "Carry-momentum (outright)": 0.22625529115713272,
+        "Curve carry (outright)": 0.3318147704410179,
+        "Trend (outright)": 0.050510518034814655,
+        "Combined book": 0.2189427545664886
+      },
+      "2014-16 collapse": {
+        "oil": -0.8029743791354746,
+        "Carry-momentum (outright)": 0.48276690731283467,
+        "Curve carry (outright)": -0.031744228875296376,
+        "Trend (outright)": 0.5581122364685838,
+        "Combined book": 0.5352180060961758
+      },
+      "Q4 2018": {
+        "oil": -0.4461643195302143,
+        "Carry-momentum (outright)": 0.35122174365138426,
+        "Curve carry (outright)": 0.02944316611201314,
+        "Trend (outright)": 0.07093432609533523,
+        "Combined book": 0.18223733534626296
+      },
+      "2020 COVID": {
+        "oil": -0.8484091960051634,
+        "Carry-momentum (outright)": 0.15976377005082298,
+        "Curve carry (outright)": -0.007960585417850385,
+        "Trend (outright)": 0.22956366543560436,
+        "Combined book": 0.16473034695641475
+      },
+      "2022-23 slide": {
+        "oil": -0.40765498482989193,
+        "Carry-momentum (outright)": -0.13825415696441368,
+        "Curve carry (outright)": -0.1458068023121072,
+        "Trend (outright)": -0.08962258710491633,
+        "Combined book": -0.14134840374906388
+      },
+      "Late 2023": {
+        "oil": -0.25349751279149946,
+        "Carry-momentum (outright)": -0.015714575718921875,
+        "Curve carry (outright)": -0.11289283910402459,
+        "Trend (outright)": -0.09314374160775307,
+        "Combined book": -0.16308296532706157
+      },
+      "2024-25 slide": {
+        "oil": -0.27007035172298954,
+        "Carry-momentum (outright)": -0.14540865830532013,
+        "Curve carry (outright)": -0.16246331781686985,
+        "Trend (outright)": -0.163136570741796,
+        "Combined book": -0.28310427184802556
+      }
+    },
+    "avg_month_by_oil_move": {
+      "oil < -10%": {
+        "Carry-momentum (outright)": 0.03813174440094169,
+        "Curve carry (outright)": 0.012322993190648732,
+        "Trend (outright)": 0.020033297144929112,
+        "Combined book": 0.035264050451528674,
+        "months": 38
+      },
+      "-10% to -3%": {
+        "Carry-momentum (outright)": -0.0017789265270794145,
+        "Curve carry (outright)": -0.003660890811807031,
+        "Trend (outright)": -0.010472950481349828,
+        "Combined book": -0.00775043226421634,
+        "months": 60
+      },
+      "-3% to +3%": {
+        "Carry-momentum (outright)": -0.011349946758635912,
+        "Curve carry (outright)": -0.00293149850316063,
+        "Trend (outright)": -0.011797867388111309,
+        "Combined book": -0.013549988468887933,
+        "months": 63
+      },
+      "+3% to +10%": {
+        "Carry-momentum (outright)": 0.0013643424226893036,
+        "Curve carry (outright)": 0.005670345226401388,
+        "Trend (outright)": 0.005611892261923223,
+        "Combined book": 0.007100215904104637,
+        "months": 83
+      },
+      "> +10%": {
+        "Carry-momentum (outright)": 0.0292552173301786,
+        "Curve carry (outright)": 0.03189895362229787,
+        "Trend (outright)": 0.025637335790940973,
+        "Combined book": 0.042445159055682545,
+        "months": 36
+      }
     }
   }
 }

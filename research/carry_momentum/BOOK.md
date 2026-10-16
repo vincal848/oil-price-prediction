@@ -14,7 +14,7 @@ costs, traded in whole contracts at the next day's settlement, January 2003 to A
 | Max drawdown | -53% | -39% |
 | Best / worst month | +31% / -16% | +20% / -11% |
 
-**The book made money in every major oil dislocation since 2003:**
+**The book made money in every major oil shock since 2003, up or down:**
 
 | Episode | Book | Carry-momentum | Curve carry | Trend |
 |---|---|---|---|---|
@@ -25,7 +25,9 @@ costs, traded in whole contracts at the next day's settlement, January 2003 to A
 | 2026 supply shock (Mar 2026) | **+33%** | +26% | +25% | +26% |
 
 It is long or short about half the time each and has essentially no correlation with the
-oil price, so it adds a return stream that isn't a bet on oil going up.
+oil price, so it adds a return stream that isn't a bet on oil going up. It loses money
+when oil grinds lower in small steps, as in 2022-25; see
+[When oil falls](#when-oil-falls-crashes-vs-grinds).
 
 ![equity](results/book/equity.png)
 
@@ -73,27 +75,78 @@ Sharpe from 0.46-0.49 per sleeve to 0.56, and turns 13-16 positive years into 17
 
 ![positioning](results/book/positioning.png)
 
-## Risk: what a bad stretch looks like
+## When oil falls: crashes vs grinds
+
+The book makes money when oil crashes and loses when it grinds lower.
+
+![drops](results/book/oil_drops.png)
+
+| Oil decline | WTI | Book | Carry-momentum | Curve carry | Trend |
+|---|---|---|---|---|---|
+| 2008 crash | -72% | **+22%** | +23% | +33% | +5% |
+| 2014-16 collapse | -80% | **+54%** | +48% | -3% | +56% |
+| Q4 2018 | -45% | **+18%** | +35% | +3% | +7% |
+| 2020 COVID | -85% | **+16%** | +16% | -1% | +23% |
+| 2022-23 slide | -41% | -14% | -14% | -15% | -9% |
+| Late 2023 | -25% | -16% | -2% | -11% | -9% |
+| 2024-25 slide | -27% | -28% | -15% | -16% | -16% |
+
+**In a crash, the curve flips to contango fast.** Carry-momentum turns short within
+days, trend follows, and the book is short for most of the move.
+
+**The 2022-25 declines were different in two ways:**
+
+- **The curve stayed backwardated the whole way down.** OPEC+ cuts kept prompt barrels
+  tight as WTI fell from $120 to $60, so curve carry was long 99% of the time and kept
+  collecting roll yield while losing more on price.
+- **The fall came in steps with sharp rebounds.** OPEC+ announcements and geopolitical
+  scares caused the bounces. Trend and carry-momentum were short more than half the time
+  and still lost, because each rebound stopped them out.
+
+By the size of the monthly oil move, the book earns at the extremes and pays in between:
+
+| Monthly WTI move | Months | Book, average month |
+|---|---|---|
+| Down more than 10% | 38 | **+3.5%** |
+| Down 3-10% | 60 | -0.8% |
+| Within 3% | 63 | -1.4% |
+| Up 3-10% | 83 | +0.7% |
+| Up more than 10% | 36 | **+4.2%** |
+
+This is a long-volatility payoff: the book wins big when oil moves violently either way
+and loses a little at a time while oil drifts. That shape is why it diversifies a
+portfolio that is hurt by oil shocks, and it is also why 2022-25 hurt.
+
+**Two fixes were tried for the grind. Neither worked:**
+
+| Change | Sleeve CAGR / Sharpe | Sleeve 2022-25 | Book CAGR / Sharpe | Book max DD |
+|---|---|---|---|---|
+| Current book | carry 6.2% / 0.46, trend 2.6% / 0.27 | carry -22%, trend -42% | **8.0% / 0.56** | -53% |
+| Carry goes flat when the 3/6/12-month trend disagrees | 4.4% / 0.38 | -40% | 6.9% / 0.49 (with slower trend) | -63% |
+| Trend without its 1-month part (3/6/12 months) | 2.8% / 0.27 | -51% | | |
+
+The whipsaw hit every trend horizon, not just the fastest one. And gating carry by trend
+mostly dropped carry out of the good periods while keeping it in the bad ones. The book
+stays as it is.
+
+## Risk: sizing for the bad stretch
 
 The deepest drawdown ran from March 2022 to December 2025: -53% at a 15% vol target,
-or -39% at 10%. After the Ukraine spike, WTI chopped between $60 and $90 for three years
-while the curve flipped between backwardation and contango, so trend and carry-momentum
-kept getting whipsawed:
-
-- Over 2023-25, carry-momentum lost 38%, trend lost 37% and curve carry lost 15%.
-- The book recovered 42% in the first three months of 2026 as the supply shock brought
-  back a clean trend.
-- The longest stretch under water was 1,023 trading days, about four years.
+or -39% at 10%. Over 2023-25, carry-momentum lost 38%, trend lost 37% and curve carry
+lost 15%. The book then recovered 42% in the first three months of 2026, when the supply
+shock brought back a violent move. The longest stretch under water was 1,023 trading
+days, about four years.
 
 That episode argues for:
 
 - **Running the book at 10% vol as one sleeve of a broader book, not at 15% on its own.**
   Returns and drawdowns scale with the target, and the Sharpe ratio does not change.
 - **A drawdown rule.** Halve the size once the book is down more than twice its annual
-  vol target, and restore it at a new high.
-- **More markets for more breadth.** The same three signals on Brent, heating oil,
-  gasoline and natural gas would diversify the single-market risk. This is the obvious
-  next build.
+  vol target, and restore it at a new high. This rule has not been backtested here.
+- **More markets for more breadth.** The fix for the 2022-25 grind is probably not a
+  better WTI signal but other curves. Brent spreads and the product cracks (heating oil,
+  gasoline) did not all stay backwardated through 2023-25, so the same three signals there
+  should lose at different times. This is the next build.
 
 ![rolling](results/book/rolling_sharpe.png)
 
@@ -122,8 +175,9 @@ survives on the outright, where the same view costs under a third as much.
 ## Fine print
 
 - **Parameters.** Each sleeve uses textbook parameters; none were optimised. The choice
-  of these three sleeves for the book was made after seeing the four results above.
-- **Trial ledger.** Including everything tried in this repository, 251 configurations are
+  of these three sleeves for the book was made after seeing the results above, and the two
+  fixes for the 2022-25 grind were tried after seeing it.
+- **Trial ledger.** Including everything tried in this repository, 254 configurations are
   logged in [`results/trials.jsonl`](results/trials.jsonl).
 - **Formal tests.** The pre-registered statistical study of carry-momentum, with its
   bootstrap, deflated Sharpe, PBO and factor-spanning tests, is in [NOTE.md](NOTE.md).
