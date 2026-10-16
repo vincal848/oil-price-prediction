@@ -1,0 +1,266 @@
+{"time": "2026-10-15T23:14:35.245314+00:00", "name": "H1 spread s=1 l=10 1m-13m", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:35.941950+00:00", "name": "H1 spread s=1 l=10 2m-7m", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:36.651257+00:00", "name": "H1 spread s=1 l=10 1m-4m", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:37.355432+00:00", "name": "H1 spread s=1 l=21 1m-13m", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:38.030873+00:00", "name": "H1 spread s=1 l=21 2m-7m", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:38.715921+00:00", "name": "H1 spread s=1 l=21 1m-4m", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:39.420537+00:00", "name": "H1 spread s=1 l=42 1m-13m", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:40.175243+00:00", "name": "H1 spread s=1 l=42 2m-7m", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:40.870110+00:00", "name": "H1 spread s=1 l=42 1m-4m", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:41.586132+00:00", "name": "H1 spread s=1 l=63 1m-13m", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:42.407823+00:00", "name": "H1 spread s=1 l=63 2m-7m", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:43.223336+00:00", "name": "H1 spread s=1 l=63 1m-4m", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:44.043869+00:00", "name": "H1 spread s=5 l=10 1m-13m", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:44.843383+00:00", "name": "H1 spread s=5 l=10 2m-7m", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:45.639519+00:00", "name": "H1 spread s=5 l=10 1m-4m", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:46.398226+00:00", "name": "H1 spread s=5 l=21 1m-13m", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:47.166620+00:00", "name": "H1 spread s=5 l=21 2m-7m", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:47.976974+00:00", "name": "H1 spread s=5 l=21 1m-4m", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:48.739488+00:00", "name": "H1 spread s=5 l=42 1m-13m", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:49.500723+00:00", "name": "H1 spread s=5 l=42 2m-7m", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:50.278077+00:00", "name": "H1 spread s=5 l=42 1m-4m", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:51.078399+00:00", "name": "H1 spread s=5 l=63 1m-13m", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:51.822450+00:00", "name": "H1 spread s=5 l=63 2m-7m", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:52.626515+00:00", "name": "H1 spread s=5 l=63 1m-4m", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:14:53.404619+00:00", "name": "H2 outright s=1 l=21 1m-13m", "params": {"instrument": "2nd outright"}}
+{"time": "2026-10-15T23:15:46.489974+00:00", "name": "H1 spread s=1 l=10 1m-13m", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:47.355924+00:00", "name": "H1 spread s=1 l=10 2m-7m", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:48.198756+00:00", "name": "H1 spread s=1 l=10 1m-4m", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:49.065078+00:00", "name": "H1 spread s=1 l=21 1m-13m", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:49.798938+00:00", "name": "H1 spread s=1 l=21 2m-7m", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:50.599750+00:00", "name": "H1 spread s=1 l=21 1m-4m", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:51.448104+00:00", "name": "H1 spread s=1 l=42 1m-13m", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:52.293120+00:00", "name": "H1 spread s=1 l=42 2m-7m", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:53.106092+00:00", "name": "H1 spread s=1 l=42 1m-4m", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:53.866572+00:00", "name": "H1 spread s=1 l=63 1m-13m", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:54.787440+00:00", "name": "H1 spread s=1 l=63 2m-7m", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:55.613556+00:00", "name": "H1 spread s=1 l=63 1m-4m", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:56.359044+00:00", "name": "H1 spread s=5 l=10 1m-13m", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:57.142613+00:00", "name": "H1 spread s=5 l=10 2m-7m", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:58.119535+00:00", "name": "H1 spread s=5 l=10 1m-4m", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:59.053247+00:00", "name": "H1 spread s=5 l=21 1m-13m", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:15:59.937765+00:00", "name": "H1 spread s=5 l=21 2m-7m", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:00.749125+00:00", "name": "H1 spread s=5 l=21 1m-4m", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:01.512306+00:00", "name": "H1 spread s=5 l=42 1m-13m", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:02.309293+00:00", "name": "H1 spread s=5 l=42 2m-7m", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:03.097117+00:00", "name": "H1 spread s=5 l=42 1m-4m", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:03.836066+00:00", "name": "H1 spread s=5 l=63 1m-13m", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:04.690654+00:00", "name": "H1 spread s=5 l=63 2m-7m", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:05.443821+00:00", "name": "H1 spread s=5 l=63 1m-4m", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:16:06.293923+00:00", "name": "H2 outright s=1 l=21 1m-13m", "params": {"instrument": "2nd outright"}}
+{"time": "2026-10-15T23:17:50.390719+00:00", "name": "H1 spread s=1 l=10 1m-13m", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:51.284511+00:00", "name": "H1 spread s=1 l=10 2m-7m", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:52.123743+00:00", "name": "H1 spread s=1 l=10 1m-4m", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:53.005939+00:00", "name": "H1 spread s=1 l=21 1m-13m", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:53.797485+00:00", "name": "H1 spread s=1 l=21 2m-7m", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:54.670017+00:00", "name": "H1 spread s=1 l=21 1m-4m", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:55.514368+00:00", "name": "H1 spread s=1 l=42 1m-13m", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:56.330381+00:00", "name": "H1 spread s=1 l=42 2m-7m", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:57.158138+00:00", "name": "H1 spread s=1 l=42 1m-4m", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:57.972528+00:00", "name": "H1 spread s=1 l=63 1m-13m", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:58.887353+00:00", "name": "H1 spread s=1 l=63 2m-7m", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:17:59.809292+00:00", "name": "H1 spread s=1 l=63 1m-4m", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:00.595483+00:00", "name": "H1 spread s=5 l=10 1m-13m", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:01.358141+00:00", "name": "H1 spread s=5 l=10 2m-7m", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:02.120411+00:00", "name": "H1 spread s=5 l=10 1m-4m", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:03.010938+00:00", "name": "H1 spread s=5 l=21 1m-13m", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:03.898048+00:00", "name": "H1 spread s=5 l=21 2m-7m", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:04.747471+00:00", "name": "H1 spread s=5 l=21 1m-4m", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:05.631480+00:00", "name": "H1 spread s=5 l=42 1m-13m", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:06.414645+00:00", "name": "H1 spread s=5 l=42 2m-7m", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:07.321564+00:00", "name": "H1 spread s=5 l=42 1m-4m", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:08.151800+00:00", "name": "H1 spread s=5 l=63 1m-13m", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:09.079614+00:00", "name": "H1 spread s=5 l=63 2m-7m", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:09.972270+00:00", "name": "H1 spread s=5 l=63 1m-4m", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:18:10.815723+00:00", "name": "H2 outright s=1 l=21 1m-13m", "params": {"instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:54.900055+00:00", "name": "H2 outright s=1 l=10 1m-13m", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:55.429015+00:00", "name": "H2 outright s=1 l=10 2m-7m", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:55.952826+00:00", "name": "H2 outright s=1 l=10 1m-4m", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:56.467728+00:00", "name": "H2 outright s=1 l=21 1m-13m", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:56.955878+00:00", "name": "H2 outright s=1 l=21 2m-7m", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:57.454191+00:00", "name": "H2 outright s=1 l=21 1m-4m", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:57.958040+00:00", "name": "H2 outright s=1 l=42 1m-13m", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:58.463672+00:00", "name": "H2 outright s=1 l=42 2m-7m", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:58.964792+00:00", "name": "H2 outright s=1 l=42 1m-4m", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:18:59.462406+00:00", "name": "H2 outright s=1 l=63 1m-13m", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:00.109780+00:00", "name": "H2 outright s=1 l=63 2m-7m", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:00.717849+00:00", "name": "H2 outright s=1 l=63 1m-4m", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:01.343019+00:00", "name": "H2 outright s=5 l=10 1m-13m", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:01.924070+00:00", "name": "H2 outright s=5 l=10 2m-7m", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:02.461488+00:00", "name": "H2 outright s=5 l=10 1m-4m", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:03.028147+00:00", "name": "H2 outright s=5 l=21 1m-13m", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:03.604298+00:00", "name": "H2 outright s=5 l=21 2m-7m", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:04.186300+00:00", "name": "H2 outright s=5 l=21 1m-4m", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:04.881420+00:00", "name": "H2 outright s=5 l=42 1m-13m", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:05.455632+00:00", "name": "H2 outright s=5 l=42 2m-7m", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:06.012903+00:00", "name": "H2 outright s=5 l=42 1m-4m", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:06.502490+00:00", "name": "H2 outright s=5 l=63 1m-13m", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:07.088590+00:00", "name": "H2 outright s=5 l=63 2m-7m", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:19:07.606715+00:00", "name": "H2 outright s=5 l=63 1m-4m", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:31:44.561936+00:00", "name": "H1 spread s=1 l=10 1m-13m", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:45.384118+00:00", "name": "H1 spread s=1 l=10 2m-7m", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:46.229106+00:00", "name": "H1 spread s=1 l=10 1m-4m", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:46.980099+00:00", "name": "H1 spread s=1 l=21 1m-13m", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:47.767092+00:00", "name": "H1 spread s=1 l=21 2m-7m", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:48.509993+00:00", "name": "H1 spread s=1 l=21 1m-4m", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:49.302045+00:00", "name": "H1 spread s=1 l=42 1m-13m", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:49.995560+00:00", "name": "H1 spread s=1 l=42 2m-7m", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:50.781216+00:00", "name": "H1 spread s=1 l=42 1m-4m", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:51.532570+00:00", "name": "H1 spread s=1 l=63 1m-13m", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:52.311750+00:00", "name": "H1 spread s=1 l=63 2m-7m", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:53.112780+00:00", "name": "H1 spread s=1 l=63 1m-4m", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:54.015301+00:00", "name": "H1 spread s=5 l=10 1m-13m", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:54.783741+00:00", "name": "H1 spread s=5 l=10 2m-7m", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:55.558393+00:00", "name": "H1 spread s=5 l=10 1m-4m", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:56.306385+00:00", "name": "H1 spread s=5 l=21 1m-13m", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:57.057553+00:00", "name": "H1 spread s=5 l=21 2m-7m", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:57.828101+00:00", "name": "H1 spread s=5 l=21 1m-4m", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:58.698587+00:00", "name": "H1 spread s=5 l=42 1m-13m", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:31:59.558319+00:00", "name": "H1 spread s=5 l=42 2m-7m", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:32:00.379170+00:00", "name": "H1 spread s=5 l=42 1m-4m", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:32:01.136669+00:00", "name": "H1 spread s=5 l=63 1m-13m", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:32:01.941079+00:00", "name": "H1 spread s=5 l=63 2m-7m", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:32:02.710198+00:00", "name": "H1 spread s=5 l=63 1m-4m", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread"}}
+{"time": "2026-10-15T23:32:03.482317+00:00", "name": "H2 outright s=1 l=21 1m-13m", "params": {"instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:47.304249+00:00", "name": "H2 outright s=1 l=10 1m-13m", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:47.858116+00:00", "name": "H2 outright s=1 l=10 2m-7m", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:48.405993+00:00", "name": "H2 outright s=1 l=10 1m-4m", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:48.983504+00:00", "name": "H2 outright s=1 l=21 1m-13m", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:49.544752+00:00", "name": "H2 outright s=1 l=21 2m-7m", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:50.050897+00:00", "name": "H2 outright s=1 l=21 1m-4m", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:50.652239+00:00", "name": "H2 outright s=1 l=42 1m-13m", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:51.216139+00:00", "name": "H2 outright s=1 l=42 2m-7m", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:51.773357+00:00", "name": "H2 outright s=1 l=42 1m-4m", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:52.306153+00:00", "name": "H2 outright s=1 l=63 1m-13m", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:52.870441+00:00", "name": "H2 outright s=1 l=63 2m-7m", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:53.491183+00:00", "name": "H2 outright s=1 l=63 1m-4m", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:54.043845+00:00", "name": "H2 outright s=5 l=10 1m-13m", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:54.611792+00:00", "name": "H2 outright s=5 l=10 2m-7m", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:55.157343+00:00", "name": "H2 outright s=5 l=10 1m-4m", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:55.691415+00:00", "name": "H2 outright s=5 l=21 1m-13m", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:56.195540+00:00", "name": "H2 outright s=5 l=21 2m-7m", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:56.718422+00:00", "name": "H2 outright s=5 l=21 1m-4m", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:57.313023+00:00", "name": "H2 outright s=5 l=42 1m-13m", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:57.922751+00:00", "name": "H2 outright s=5 l=42 2m-7m", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:58.492472+00:00", "name": "H2 outright s=5 l=42 1m-4m", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:58.999085+00:00", "name": "H2 outright s=5 l=63 1m-13m", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:32:59.497058+00:00", "name": "H2 outright s=5 l=63 2m-7m", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:33:00.191471+00:00", "name": "H2 outright s=5 l=63 1m-4m", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd outright"}}
+{"time": "2026-10-15T23:47:20.747156+00:00", "name": "H1 spread s=1 l=10 1m-13m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:21.442152+00:00", "name": "H1 spread s=1 l=10 2m-7m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:22.137831+00:00", "name": "H1 spread s=1 l=10 1m-4m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:22.876562+00:00", "name": "H1 spread s=1 l=21 1m-13m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:23.573834+00:00", "name": "H1 spread s=1 l=21 2m-7m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:24.358750+00:00", "name": "H1 spread s=1 l=21 1m-4m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:25.186965+00:00", "name": "H1 spread s=1 l=42 1m-13m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:26.020384+00:00", "name": "H1 spread s=1 l=42 2m-7m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:26.781078+00:00", "name": "H1 spread s=1 l=42 1m-4m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:27.620229+00:00", "name": "H1 spread s=1 l=63 1m-13m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:28.390538+00:00", "name": "H1 spread s=1 l=63 2m-7m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:29.200868+00:00", "name": "H1 spread s=1 l=63 1m-4m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:30.026336+00:00", "name": "H1 spread s=5 l=10 1m-13m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:30.872246+00:00", "name": "H1 spread s=5 l=10 2m-7m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:31.739897+00:00", "name": "H1 spread s=5 l=10 1m-4m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:32.506306+00:00", "name": "H1 spread s=5 l=21 1m-13m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:33.313041+00:00", "name": "H1 spread s=5 l=21 2m-7m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:34.067694+00:00", "name": "H1 spread s=5 l=21 1m-4m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:34.832645+00:00", "name": "H1 spread s=5 l=42 1m-13m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:35.654539+00:00", "name": "H1 spread s=5 l=42 2m-7m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:36.429304+00:00", "name": "H1 spread s=5 l=42 1m-4m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:37.200229+00:00", "name": "H1 spread s=5 l=63 1m-13m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:38.071487+00:00", "name": "H1 spread s=5 l=63 2m-7m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:38.842508+00:00", "name": "H1 spread s=5 l=63 1m-4m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:47:39.558537+00:00", "name": "H2 outright s=1 l=21 1m-13m start=2003-01-02", "params": {"instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:46.184794+00:00", "name": "H1 spread s=1 l=10 1m-13m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:46.900482+00:00", "name": "H1 spread s=1 l=10 2m-7m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:47.689397+00:00", "name": "H1 spread s=1 l=10 1m-4m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:48.540747+00:00", "name": "H1 spread s=1 l=21 1m-13m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:49.345644+00:00", "name": "H1 spread s=1 l=21 2m-7m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:50.158254+00:00", "name": "H1 spread s=1 l=21 1m-4m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:50.950951+00:00", "name": "H1 spread s=1 l=42 1m-13m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:51.716620+00:00", "name": "H1 spread s=1 l=42 2m-7m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:52.524453+00:00", "name": "H1 spread s=1 l=42 1m-4m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:53.318452+00:00", "name": "H1 spread s=1 l=63 1m-13m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:54.086057+00:00", "name": "H1 spread s=1 l=63 2m-7m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:54.885830+00:00", "name": "H1 spread s=1 l=63 1m-4m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:55.707367+00:00", "name": "H1 spread s=5 l=10 1m-13m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:56.470613+00:00", "name": "H1 spread s=5 l=10 2m-7m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:57.247320+00:00", "name": "H1 spread s=5 l=10 1m-4m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:57.977652+00:00", "name": "H1 spread s=5 l=21 1m-13m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:58.753812+00:00", "name": "H1 spread s=5 l=21 2m-7m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:49:59.586085+00:00", "name": "H1 spread s=5 l=21 1m-4m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:00.310638+00:00", "name": "H1 spread s=5 l=42 1m-13m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:01.074358+00:00", "name": "H1 spread s=5 l=42 2m-7m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:01.779986+00:00", "name": "H1 spread s=5 l=42 1m-4m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:02.448630+00:00", "name": "H1 spread s=5 l=63 1m-13m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:03.324236+00:00", "name": "H1 spread s=5 l=63 2m-7m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:04.175771+00:00", "name": "H1 spread s=5 l=63 1m-4m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd-7th spread", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:04.969165+00:00", "name": "H2 outright s=1 l=21 1m-13m start=2003-01-02", "params": {"instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:45.768592+00:00", "name": "H2 outright s=1 l=10 1m-13m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:46.236005+00:00", "name": "H2 outright s=1 l=10 2m-7m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:46.705534+00:00", "name": "H2 outright s=1 l=10 1m-4m start=2003-01-02", "params": {"short": 1, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:47.160081+00:00", "name": "H2 outright s=1 l=21 1m-13m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:47.644102+00:00", "name": "H2 outright s=1 l=21 2m-7m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:48.139561+00:00", "name": "H2 outright s=1 l=21 1m-4m start=2003-01-02", "params": {"short": 1, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:48.628976+00:00", "name": "H2 outright s=1 l=42 1m-13m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:49.182491+00:00", "name": "H2 outright s=1 l=42 2m-7m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:49.765297+00:00", "name": "H2 outright s=1 l=42 1m-4m start=2003-01-02", "params": {"short": 1, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:50.325731+00:00", "name": "H2 outright s=1 l=63 1m-13m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:50.905852+00:00", "name": "H2 outright s=1 l=63 2m-7m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:51.458913+00:00", "name": "H2 outright s=1 l=63 1m-4m start=2003-01-02", "params": {"short": 1, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:52.026363+00:00", "name": "H2 outright s=5 l=10 1m-13m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:52.585109+00:00", "name": "H2 outright s=5 l=10 2m-7m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:53.142355+00:00", "name": "H2 outright s=5 l=10 1m-4m start=2003-01-02", "params": {"short": 5, "long": 10, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:53.678374+00:00", "name": "H2 outright s=5 l=21 1m-13m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:54.233556+00:00", "name": "H2 outright s=5 l=21 2m-7m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:54.752982+00:00", "name": "H2 outright s=5 l=21 1m-4m start=2003-01-02", "params": {"short": 5, "long": 21, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:55.352494+00:00", "name": "H2 outright s=5 l=42 1m-13m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:55.856007+00:00", "name": "H2 outright s=5 l=42 2m-7m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:56.387226+00:00", "name": "H2 outright s=5 l=42 1m-4m start=2003-01-02", "params": {"short": 5, "long": 42, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:56.878239+00:00", "name": "H2 outright s=5 l=63 1m-13m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["1m", "13m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:57.398802+00:00", "name": "H2 outright s=5 l=63 2m-7m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["2m", "7m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:50:57.931386+00:00", "name": "H2 outright s=5 l=63 1m-4m start=2003-01-02", "params": {"short": 5, "long": 63, "tenors": ["1m", "4m"], "instrument": "2nd outright", "start": "2003-01-02"}}
+{"time": "2026-10-15T23:51:03.151306+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:51:03.639937+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:51:04.126396+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:51:04.684653+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:51:05.443316+00:00", "name": "book Combined book", "params": {"weights": "equal", "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-15T23:52:18.681357+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm", "short": 1, "long": 21, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:52:19.193286+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:52:19.700146+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:52:20.180684+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:52:21.013802+00:00", "name": "book Combined book", "params": {"weights": "equal", "sleeves": ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"], "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-15T23:53:59.903462+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm", "short": 1, "long": 21, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:54:00.483508+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:54:01.063311+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:54:01.587739+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:54:02.348838+00:00", "name": "book Combined book", "params": {"weights": "equal", "sleeves": ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"], "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-15T23:55:37.393673+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm", "short": 1, "long": 21, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:55:37.894316+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:55:38.404733+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:55:38.966944+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:55:39.727693+00:00", "name": "book Combined book", "params": {"weights": "equal", "sleeves": ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"], "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-15T23:56:23.376159+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm", "short": 1, "long": 21, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:56:23.920421+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:56:24.489834+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:56:24.999044+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-15T23:56:25.815691+00:00", "name": "book Combined book", "params": {"weights": "equal", "sleeves": ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"], "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-16T04:37:59.833843+00:00", "name": "book Curve carry gated by slow trend (outright)", "params": {"signal": "carry_band if sign==sign(trend 3/6/12m) else flat", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:38:00.404383+00:00", "name": "book Slow trend 3/6/12m (outright)", "params": {"signal": "trend_3_6_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:38:02.628834+00:00", "name": "book Combined book v2", "params": {"sleeves": ["cm", "gated carry", "slow trend"], "weights": "equal", "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-16T04:39:05.995487+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm", "short": 1, "long": 21, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:39:06.481989+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:39:06.958730+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:39:07.420687+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:39:08.096488+00:00", "name": "book Curve carry gated by slow trend (outright)", "params": {"signal": "carry_band if sign==sign(trend 3/6/12m) else flat", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:39:08.573016+00:00", "name": "book Slow trend 3/6/12m (outright)", "params": {"signal": "trend_3_6_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:39:09.024590+00:00", "name": "book Combined book", "params": {"weights": "equal", "sleeves": ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"], "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-16T04:39:19.841108+00:00", "name": "book Combined book v2", "params": {"sleeves": ["cm", "gated carry", "slow trend"], "weights": "equal", "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-16T04:40:22.375439+00:00", "name": "book Carry-momentum (outright)", "params": {"signal": "cm", "short": 1, "long": 21, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:40:22.973662+00:00", "name": "book Curve carry (outright)", "params": {"signal": "carry_band", "band": 0.5, "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:40:23.505898+00:00", "name": "book Trend (outright)", "params": {"signal": "trend_1_3_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:40:24.024184+00:00", "name": "book Carry-momentum (2nd-7th spread)", "params": {"signal": "cm_band", "short": 5, "long": 63, "band": 0.5, "tenors": "2m-7m", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:40:24.933647+00:00", "name": "book Curve carry gated by slow trend (outright)", "params": {"signal": "carry_band if sign==sign(trend 3/6/12m) else flat", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:40:25.482186+00:00", "name": "book Slow trend 3/6/12m (outright)", "params": {"signal": "trend_3_6_12", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-16T04:40:26.060859+00:00", "name": "book Combined book", "params": {"weights": "equal", "sleeves": ["Carry-momentum (outright)", "Curve carry (outright)", "Trend (outright)"], "vol_target": 0.15, "start": "2003-01-02"}}
+{"time": "2026-10-16T04:40:36.653462+00:00", "name": "book Combined book v2", "params": {"sleeves": ["cm", "gated carry", "slow trend"], "weights": "equal", "vol_target": 0.15, "start": "2003-01-02"}}

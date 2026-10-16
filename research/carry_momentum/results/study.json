@@ -1,0 +1,377 @@
+{
+  "run_time": "2026-10-15T23:31:44.561786+00:00",
+  "H1": {
+    "full": {
+      "sharpe": -0.17553704278556576,
+      "ann_return": -0.02824838696667356,
+      "ann_vol": 0.1609255033490652,
+      "max_drawdown": -0.9013003551556559,
+      "days": 9110
+    },
+    "seen": {
+      "sharpe": 0.026691499117848468,
+      "ann_return": 0.004226870283720127,
+      "ann_vol": 0.15836016797174352,
+      "max_drawdown": -0.5248932870962097,
+      "days": 4097
+    },
+    "unseen": {
+      "sharpe": -0.33618352197105855,
+      "ann_return": -0.05479961213463636,
+      "ann_vol": 0.16300505097139759,
+      "max_drawdown": -0.8793641601582987,
+      "days": 5012
+    },
+    "unseen_1990_2007": {
+      "sharpe": -0.4388089460148886,
+      "ann_return": -0.0690707982311167,
+      "ann_vol": 0.15740517338671842,
+      "max_drawdown": -0.8440036875303344,
+      "days": 4512
+    },
+    "unseen_2024_2026": {
+      "sharpe": 0.35773481828749876,
+      "ann_return": 0.07398357120000237,
+      "ann_vol": 0.20681121159569216,
+      "max_drawdown": -0.31288612953916517,
+      "days": 500
+    },
+    "bootstrap_90ci": [
+      -0.49551328112783605,
+      0.1454257163333018
+    ],
+    "deflated_sharpe": 5.409562834919585e-07,
+    "novelty": {
+      "alpha_annual": -0.04823418544860429,
+      "t_stat": -1.7748080086670561,
+      "loadings": {
+        "tsmom_wti": 0.08895229603540374,
+        "carry_wti": 0.262095448551824,
+        "basis_mom_wti": 0.09062451707531921,
+        "tsmom_cm_aqr": 0.01897727734372093
+      },
+      "r_squared": 0.08350171447286903,
+      "n_months": 436,
+      "nw_lags": 5
+    },
+    "costs_doubled": {
+      "sharpe": -0.7030533011093026,
+      "ann_return": -0.11466439293813349,
+      "ann_vol": 0.163094878805365,
+      "max_drawdown": -0.9951134364892673,
+      "days": 9110
+    },
+    "capacity": {
+      "capacity": 51475.009394964305,
+      "trade_over_adv": 9.713451359737178,
+      "position_over_oi": 0.25161290322580643,
+      "days_untradeable": 0
+    },
+    "capacity_q95": {
+      "capacity": 1026726.7027096197,
+      "trade_over_adv": 0.4869845097828441,
+      "position_over_oi": 0.101888404795244,
+      "days_untradeable": 0
+    },
+    "capacity_since_2010": {
+      "capacity": 1634309.7913322633,
+      "trade_over_adv": 0.3059395487023351,
+      "position_over_oi": 0.032343336961592285,
+      "days_untradeable": 0
+    },
+    "decomposition": {
+      "gross_ann_return": 0.058167619004786376,
+      "spot_ann_return": 0.0,
+      "roll_and_curve_ann_return": 0.058167619004786376
+    },
+    "turnover_units_per_year": 26592.943139407245,
+    "contracts_traded_per_year_incl_rolls": 75144.35301866083,
+    "cost_ann": 0.08641600597145993,
+    "zero_cost": {
+      "sharpe": 0.3641630840113592,
+      "ann_return": 0.05816761900478637,
+      "ann_vol": 0.15972958698628542,
+      "max_drawdown": -0.49619215708630016,
+      "days": 9110
+    }
+  },
+  "H2": {
+    "full": {
+      "sharpe": 0.43613457202904826,
+      "ann_return": 0.06801941493879261,
+      "ann_vol": 0.1559596952434724,
+      "max_drawdown": -0.460734622038693,
+      "days": 9110
+    },
+    "seen": {
+      "sharpe": 0.5331523995155417,
+      "ann_return": 0.08172748532701986,
+      "ann_vol": 0.15329103911242448,
+      "max_drawdown": -0.28544538445365963,
+      "days": 4097
+    },
+    "unseen": {
+      "sharpe": 0.35936158500045345,
+      "ann_return": 0.056827569534636954,
+      "ann_vol": 0.15813479210518636,
+      "max_drawdown": -0.4155095809953915,
+      "days": 5012
+    },
+    "novelty": {
+      "alpha_annual": 0.048392393685110974,
+      "t_stat": 1.909683445312806,
+      "loadings": {
+        "tsmom_wti": 0.02200875925832877,
+        "carry_wti": 0.2581379764725822,
+        "basis_mom_wti": 0.06522331235098255,
+        "tsmom_cm_aqr": -0.0005645399939292714
+      },
+      "r_squared": 0.07949374142772758,
+      "n_months": 436,
+      "nw_lags": 5
+    },
+    "capacity": {
+      "capacity": 3742940.4900816805,
+      "trade_over_adv": 0.13358481154721452,
+      "position_over_oi": 0.015452244571733048,
+      "days_untradeable": 0
+    },
+    "decomposition": {
+      "gross_ann_return": 0.08442629263363345,
+      "spot_ann_return": 0.06684829050498256,
+      "roll_and_curve_ann_return": 0.0175780021286509
+    },
+    "bootstrap_90ci": [
+      0.15057186600281472,
+      0.7192709700162571
+    ],
+    "deflated_sharpe": 0.37310733292259524,
+    "costs_doubled": {
+      "sharpe": 0.33067873427133415,
+      "ann_return": 0.051612537243951775,
+      "ann_vol": 0.1560806060228892,
+      "max_drawdown": -0.49805726802079797,
+      "days": 9110
+    },
+    "capacity_q95": {
+      "capacity": 25073752.49913396,
+      "trade_over_adv": 0.01612614957548746,
+      "position_over_oi": 0.007976468620199866,
+      "days_untradeable": 0
+    },
+    "capacity_q99": {
+      "capacity": 7594381.235495786,
+      "trade_over_adv": 0.06583814855949333,
+      "position_over_oi": 0.011114438777320696,
+      "days_untradeable": 0
+    },
+    "capacity_since_2010": {
+      "capacity": 87444240.19607845,
+      "trade_over_adv": 0.005717929492884121,
+      "position_over_oi": 0.00092938292178762,
+      "days_untradeable": 0
+    },
+    "turnover_units_per_year": 7685.391437980242,
+    "contracts_traded_per_year_incl_rolls": 10925.375631174533,
+    "cost_ann": 0.016406877694840834,
+    "by_window": {
+      "unseen_1990_2007": {
+        "sharpe": 0.42759707776133493,
+        "ann_return": 0.06700827537845752,
+        "ann_vol": 0.15670891795911307,
+        "max_drawdown": -0.4155095809953915,
+        "days": 4512
+      },
+      "unseen_2024_2026": {
+        "sharpe": -0.20550485502920196,
+        "ann_return": -0.035043119999999775,
+        "ann_vol": 0.17052210272608986,
+        "max_drawdown": -0.36155878510321926,
+        "days": 500
+      }
+    },
+    "zero_cost": {
+      "sharpe": 0.5415677584104316,
+      "ann_return": 0.08442629263363347,
+      "ann_vol": 0.1558923907904619,
+      "max_drawdown": -0.44512329162006736,
+      "days": 9110
+    }
+  },
+  "n_trials": 198,
+  "pbo": {
+    "pbo": 0.1397047397047397,
+    "degradation_slope": -0.9119255015679947
+  },
+  "variants": {
+    "H1 spread s=1 l=10 1m-13m": -0.7118879968064379,
+    "H1 spread s=1 l=10 2m-7m": -0.6616706691925759,
+    "H1 spread s=1 l=10 1m-4m": -0.6969662353777509,
+    "H1 spread s=1 l=21 1m-13m": -0.17553704278556576,
+    "H1 spread s=1 l=21 2m-7m": -0.2641789817900366,
+    "H1 spread s=1 l=21 1m-4m": -0.2938177214834991,
+    "H1 spread s=1 l=42 1m-13m": -0.23703474980665637,
+    "H1 spread s=1 l=42 2m-7m": -0.18063795115502812,
+    "H1 spread s=1 l=42 1m-4m": -0.07400612661656716,
+    "H1 spread s=1 l=63 1m-13m": -0.23503617819587289,
+    "H1 spread s=1 l=63 2m-7m": -0.26583459347423183,
+    "H1 spread s=1 l=63 1m-4m": -0.08604261461927933,
+    "H1 spread s=5 l=10 1m-13m": -0.7350205807014859,
+    "H1 spread s=5 l=10 2m-7m": -0.77095941486738,
+    "H1 spread s=5 l=10 1m-4m": -0.639279441174521,
+    "H1 spread s=5 l=21 1m-13m": 0.049646115911227195,
+    "H1 spread s=5 l=21 2m-7m": -0.02618912468221695,
+    "H1 spread s=5 l=21 1m-4m": -0.019853636581960547,
+    "H1 spread s=5 l=42 1m-13m": -0.0805595734474651,
+    "H1 spread s=5 l=42 2m-7m": -0.015935253464173186,
+    "H1 spread s=5 l=42 1m-4m": 0.11858766584698012,
+    "H1 spread s=5 l=63 1m-13m": -0.1497257563516022,
+    "H1 spread s=5 l=63 2m-7m": -0.14746871269699127,
+    "H1 spread s=5 l=63 1m-4m": 0.08130427718955524
+  },
+  "mechanism": {
+    "coef": 0.05241868576412219,
+    "t_stat": 0.2955261948526067,
+    "n_weeks": 1032,
+    "predicted_sign": "negative"
+  },
+  "mechanism_conditional_H1": {
+    "agree_ann_return": -0.03527049655022395,
+    "disagree_ann_return": 0.023646431467866443,
+    "agree_weeks": 439,
+    "disagree_weeks": 579
+  },
+  "live_expectation_63d": {
+    "p5": -0.14252204477812566,
+    "p25": -0.06961340669921348,
+    "p50": -0.015720435289733825,
+    "p75": 0.044783699139783195,
+    "p95": 0.14946214050365758
+  },
+  "pbo_H2": {
+    "pbo": 0.4926184926184926
+  },
+  "variants_H2": {
+    "H2 outright s=1 l=10 1m-13m": 0.119345195010587,
+    "H2 outright s=1 l=10 2m-7m": 0.11237355931338248,
+    "H2 outright s=1 l=10 1m-4m": -0.016297919758725826,
+    "H2 outright s=1 l=21 1m-13m": 0.43613457202904826,
+    "H2 outright s=1 l=21 2m-7m": 0.3583524330947001,
+    "H2 outright s=1 l=21 1m-4m": 0.2453449641862152,
+    "H2 outright s=1 l=42 1m-13m": 0.29870405315046983,
+    "H2 outright s=1 l=42 2m-7m": 0.3691453079807432,
+    "H2 outright s=1 l=42 1m-4m": 0.3449837622454399,
+    "H2 outright s=1 l=63 1m-13m": 0.35841649416692045,
+    "H2 outright s=1 l=63 2m-7m": 0.2724148170292705,
+    "H2 outright s=1 l=63 1m-4m": 0.3250058405573273,
+    "H2 outright s=5 l=10 1m-13m": -0.19304941881556728,
+    "H2 outright s=5 l=10 2m-7m": -0.1497244242664437,
+    "H2 outright s=5 l=10 1m-4m": -0.049948545662271734,
+    "H2 outright s=5 l=21 1m-13m": 0.4652448279743511,
+    "H2 outright s=5 l=21 2m-7m": 0.44447048817240165,
+    "H2 outright s=5 l=21 1m-4m": 0.3053595777785314,
+    "H2 outright s=5 l=42 1m-13m": 0.30893927835037976,
+    "H2 outright s=5 l=42 2m-7m": 0.32616086397837724,
+    "H2 outright s=5 l=42 1m-4m": 0.33235538515170626,
+    "H2 outright s=5 l=63 1m-13m": 0.33709280550038967,
+    "H2 outright s=5 l=63 2m-7m": 0.31467057400280596,
+    "H2 outright s=5 l=63 1m-4m": 0.22772870735889728
+  },
+  "live_expectation_63d_H2": {
+    "p5": -0.10918290542797425,
+    "p25": -0.040118669488746095,
+    "p50": 0.012954196913770755,
+    "p75": 0.06642608861956117,
+    "p95": 0.15403925026562543
+  },
+  "kill_criteria": {
+    "K1": {
+      "criterion": "H1 net Sharpe, unseen windows",
+      "value": -0.33618352197105855,
+      "threshold": "< 0.2",
+      "killed": true
+    },
+    "K2": {
+      "criterion": "H1 90% bootstrap lower bound, full sample",
+      "value": -0.49551328112783605,
+      "threshold": "< 0.0",
+      "killed": true
+    },
+    "K3": {
+      "criterion": "H1 deflated Sharpe probability",
+      "value": 5.409562834919585e-07,
+      "threshold": "< 0.9",
+      "killed": true
+    },
+    "K4": {
+      "criterion": "PBO across 24 variants",
+      "value": 0.1397047397047397,
+      "threshold": "> 0.5",
+      "killed": false
+    },
+    "K5": {
+      "criterion": "H1 alpha t-stat after factors",
+      "value": -1.7748080086670561,
+      "threshold": "< 2.0",
+      "killed": true
+    },
+    "K6": {
+      "criterion": "H1 net Sharpe, costs doubled",
+      "value": -0.7030533011093026,
+      "threshold": "< 0.2",
+      "killed": true
+    },
+    "K7": {
+      "criterion": "Capacity at 5% ADV / 2% OI ($)",
+      "value": 51475.009394964305,
+      "threshold": "< 10000000.0",
+      "killed": true
+    }
+  },
+  "deploy": false,
+  "kill_criteria_H2": {
+    "K1": {
+      "criterion": "H2 net Sharpe, unseen windows",
+      "value": 0.35936158500045345,
+      "threshold": "< 0.2",
+      "killed": false
+    },
+    "K2": {
+      "criterion": "H2 90% bootstrap lower bound, full sample",
+      "value": 0.15057186600281472,
+      "threshold": "< 0.0",
+      "killed": false
+    },
+    "K3": {
+      "criterion": "H2 deflated Sharpe probability",
+      "value": 0.37310733292259524,
+      "threshold": "< 0.9",
+      "killed": true
+    },
+    "K4": {
+      "criterion": "PBO across 24 variants",
+      "value": 0.4926184926184926,
+      "threshold": "> 0.5",
+      "killed": false
+    },
+    "K5": {
+      "criterion": "H2 alpha t-stat after factors",
+      "value": 1.909683445312806,
+      "threshold": "< 2.0",
+      "killed": true
+    },
+    "K6": {
+      "criterion": "H2 net Sharpe, costs doubled",
+      "value": 0.33067873427133415,
+      "threshold": "< 0.2",
+      "killed": false
+    },
+    "K7": {
+      "criterion": "Capacity at 5% ADV / 2% OI ($)",
+      "value": 3742940.4900816805,
+      "threshold": "< 10000000.0",
+      "killed": true
+    }
+  },
+  "deploy_H2": false
+}
