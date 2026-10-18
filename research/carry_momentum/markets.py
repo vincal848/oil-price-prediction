@@ -21,7 +21,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
 sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..", "..")))
-from roll import BDAY  # noqa: E402  (repo root module)
+from roll import BDAY
 
 
 def _delivery(contract: str) -> tuple[int, int]:
@@ -149,7 +149,7 @@ def check_expiries(p: pd.DataFrame) -> dict:
     done = exp < p.date.max()
     gap_last = (exp[done] - last[done]).dt.days
     return {
-        "contracts": int(len(exp)),
+        "contracts": len(exp),
         "rule_vs_datastream_diff_days": (exp - ds)
         .dt.days.value_counts()
         .head(5)
