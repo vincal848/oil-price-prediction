@@ -67,3 +67,15 @@ this protocol are EIA weekly US distillate and total motor gasoline stocks
 
 Not modelled: RIN prices, refinery utilisation and outages, export data. A
 result here says what product stocks and the calendar alone are worth.
+
+## Addendum, 2026-10-18: the strips as an overlay
+
+Written after the results above, before this step was run. The three seasonal
+strip strategies (heating oil, RBOB and 3-2-1), exactly as tested, join the
+all-markets outright book (six markets, three strategies each) as three more
+sleeves. All 21 sleeves are weighted equally and the book is scaled to 15%
+volatility on trailing one-year volatility, as before. The inventory strategy is
+not included. No crack is dropped for its result. Reported against the
+all-markets book without the overlay: annual return, Sharpe, maximum drawdown,
+longest drawdown, positive years, 2022-25 return and the oil declines. One new
+trial is logged.
