@@ -326,6 +326,7 @@ def run_legs(
     vol_com: float = 60.0,
     buffer: float = 0.0,
     unit_cost: float | None = None,
+    size: pd.Series | None = None,
 ) -> Book:
     """Simulate an inter-market spread in whole contracts, like run().
 
@@ -334,10 +335,14 @@ def run_legs(
     which is conservative: exchanges list most cracks as single instruments.
     unit_cost: $ per unit changed when the spread trades as one listed
     instrument, replacing the legged outright costs (rolls are unchanged).
+    size: units per unit of signal, set by the caller (an annual risk budget,
+    say), replacing the daily volatility target.
     """
-    unit_pnl = legs_unit_pnl(legs, idx)
-    vol = np.sqrt((unit_pnl**2).ewm(com=vol_com, min_periods=20).mean() * 252)
-    size = (target_vol * capital / vol).replace([np.inf, -np.inf], np.nan)
+    if size is None:
+        unit_pnl = legs_unit_pnl(legs, idx)
+        vol = np.sqrt((unit_pnl**2).ewm(com=vol_com, min_periods=20).mean() * 252)
+        size = (target_vol * capital / vol).replace([np.inf, -np.inf], np.nan)
+    size = size.reindex(idx)
     target = buffered((signal.reindex(idx).fillna(0.0) * size).fillna(0.0), buffer)
     units = target.shift(1).fillna(0.0)
     d_units = units.diff().abs().fillna(units.abs())

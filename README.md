@@ -26,7 +26,8 @@ one raised:
 6. **[The energy book.](#part-6-the-energy-book-crude-gas-and-products)** The same
    three strategies on WTI, Brent, natural gas, heating oil, gasoline and gasoil:
    11.4% a year after costs and a 0.76 Sharpe, with the worst drawdown cut from −54%
-   to −41%. Six crack and arb spreads were tested alongside and do not add to it.
+   to −41%. Crack and arb spreads were tested two ways. Run mechanically they lose,
+   and run as seasonal strips the summer gasoline cracks earn a real seasonal premium.
 
 ![The energy books against the WTI-only book, 2003-2026, net of costs](research/carry_momentum/results/multi/equity.png)
 
@@ -735,18 +736,81 @@ harder to predict from prices alone. The natural next test for the cracks is
 fundamental: EIA's weekly distillate and gasoline stocks against their seasonal norm,
 the same inventory-cycle idea that made a 0.60 Sharpe on WTI in Part 3.
 
+### Cracks traded like a products desk
+
+The spread test above applied the outright machinery mechanically. That is not how
+cracks are traded. So I rebuilt the three NYMEX cracks (heating oil, RBOB and 3-2-1)
+the way a products desk runs them, and committed the rules
+([CRACKS_PROTOCOL.md](research/carry_momentum/CRACKS_PROTOCOL.md)) before running
+anything:
+
+- Seasonal strips on a fixed calendar every year: long the December-February heating
+  oil crack from August to October, ahead of the heating season, and long the
+  May-August RBOB crack from January to March, ahead of the driving season. The
+  3-2-1 runs both.
+- An inventory signal on the prompt crack: long when US distillate or gasoline stocks
+  are more than half a standard deviation below their five-year average for that
+  week, short when above. Each EIA report is used on the Thursday after its
+  Wednesday release.
+- A risk budget set once a year (10% volatility on $10M from three years of
+  history) instead of a daily volatility target, and listed-spread costs.
+- 2006 to April 2026, NYMEX only, so every leg settles at the same time and RBOB is
+  used throughout.
+
+| | Seasonal strips | Inventories |
+|---|---|---|
+| Heating oil crack | 1.1% a year, Sharpe 0.20, 10 of 20 trades won | −0.9%, 0.01 |
+| RBOB crack | 2.4% a year, Sharpe 0.45, 15 of 21 trades won | −3.8%, −0.38 |
+| 3-2-1 crack | 3.3% a year, Sharpe 0.46, 23 of 41 trades won | −5.2%, −0.47 |
+| June 2022 to December 2025 | +21%, +9%, +17% | −6%, −12%, −6% |
+
+![Each seasonal trade](research/carry_momentum/results/cracks/seasonal_trades.png)
+
+The seasonal strips work, and they made money through 2022-25, the stretch that hurt
+every other book here. Their annual returns are small because they are in the market
+only a quarter of the year (half for the 3-2-1). The RBOB trade is the strongest: 15
+of 21 years were profitable, and the one large loss was 2020 (−18.5%), when COVID
+emptied the roads during the window.
+
+The inventory signal fails on all three. Low stocks did not lead to wider cracks a
+week later. One reading is that by the time EIA publishes, the curve has already
+moved.
+
+Cracks roughly tripled over 2006-2026, so a long-only trade could be riding that
+drift. Two placebos, added after the first run and logged as
+trials, separate the two:
+
+| | Actual strips | Same strips, 3 months earlier | Long the prompt crack all year |
+|---|---|---|---|
+| Heating oil crack | 5.1% a year in the market | 2.8% | 4.1% |
+| RBOB crack | 10.1% | 0.1% | 5.1% |
+| 3-2-1 crack | 7.1% | 1.0% | 5.7% |
+
+Per year actually in the market, the RBOB window earns twice the passive drift, and
+the same trade three months earlier earns nothing. That is a real seasonal effect.
+The 3-2-1's edge over the drift is smaller, and the heating oil winter trade is
+mostly drift. Holding the prompt crack long all year would have had a Sharpe of 0.28
+to 0.49 by itself, which is the refiner's margin rising over these twenty years.
+
+As a book, the inventory losses outweigh the strips: −2.3% a year (Sharpe −0.14), and
+it lowers the core book when combined. The usable result is narrower. The summer
+RBOB and 3-2-1 strips earn a seasonal premium while in the market only part of the
+year, and they made money through 2022-25. That makes them a candidate overlay for the core book, and
+a test of that is the obvious next step.
+
 Notes:
 
 - The outright run added 28 configurations to the trial ledger before running (24
-  market and strategy pairs and four books), and the spreads added 52 (24 spread and
-  strategy pairs at each cost basis, and four books). The ledger now holds 334.
+  market and strategy pairs and four books), the spreads added 52 (24 spread and
+  strategy pairs at each cost basis, and four books), and the crack rebuild added 17
+  (nine strategies, two books and six placebos). The ledger now holds 351.
 - The markets and strategies were fixed before any multi-market result was seen.
   The liquidity rule came after the first run, as described above, and no market was
   dropped for its returns.
 - Rerunning the WTI market through the multi-market code reproduces Part 5 exactly.
 
-Reproduce with `python multi.py` and `python spreads.py` (about three minutes each,
-writing `research/carry_momentum/results/multi/` and `results/spreads/`).
+Reproduce with `python multi.py`, `python spreads.py` and `python cracks.py` (one to
+three minutes each, writing to `research/carry_momentum/results/`).
 
 ## Decisions that run through the project
 
@@ -769,7 +833,7 @@ writing `research/carry_momentum/results/multi/` and `results/spreads/`).
 
 ```bash
 pip install -r requirements-dev.txt
-pytest tests research/carry_momentum/tests -q   # 93 tests, no network
+pytest tests research/carry_momentum/tests -q   # 96 tests, no network
 ```
 
 | Part | Code | Run |
@@ -779,7 +843,7 @@ pytest tests research/carry_momentum/tests -q   # 93 tests, no network
 | 3. Virtual Barrels | `virtual_barrels.py` | `python run_virtual_barrels.py` |
 | 4. Curve and study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python reconcile.py`, `python study.py` |
 | 5. Book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
-| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py` | `python multi.py`, `python spreads.py` (about three minutes each) |
+| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py`, `cracks.py` | `python multi.py`, `python spreads.py`, `python cracks.py` |
 
 - Parts 1-3 download from Yahoo, FRED, EIA and CFTC on the first run and cache
   locally.

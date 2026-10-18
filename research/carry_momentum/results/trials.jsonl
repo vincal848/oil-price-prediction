@@ -539,3 +539,55 @@
 {"time": "2026-10-18T19:20:36.529868+00:00", "name": "spread Core + spreads", "params": {"halves": ["core outright", "spread book"], "weights": "equal", "start": "2003-01-02"}}
 {"time": "2026-10-18T19:20:36.542266+00:00", "name": "spread Spread book listed costs", "params": {"costs": "listed", "start": "2003-01-02"}}
 {"time": "2026-10-18T19:20:36.546555+00:00", "name": "spread Core + spreads listed costs", "params": {"costs": "listed", "start": "2003-01-02"}}
+{"time": "2026-10-18T19:32:58.613048+00:00", "name": "crack Heating oil crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:32:58.799999+00:00", "name": "crack Heating oil crack Inventories", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Inventories", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:32:59.291288+00:00", "name": "crack Heating oil crack Combined", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Combined", "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:00.414266+00:00", "name": "crack RBOB crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:00.598273+00:00", "name": "crack RBOB crack Inventories", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Inventories", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:01.112492+00:00", "name": "crack RBOB crack Combined", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Combined", "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:02.749895+00:00", "name": "crack 3-2-1 crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:03.281928+00:00", "name": "crack 3-2-1 crack Inventories", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Inventories", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:03.971256+00:00", "name": "crack 3-2-1 crack Combined", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Combined", "start": "2006-01-03"}}
+{"time": "2026-10-18T19:33:32.690675+00:00", "name": "multi WTI Carry-momentum", "params": {"market": "WTI", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:33.316917+00:00", "name": "multi WTI Curve carry", "params": {"market": "WTI", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:33.977274+00:00", "name": "multi WTI Trend", "params": {"market": "WTI", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:44.451838+00:00", "name": "multi Brent Carry-momentum", "params": {"market": "Brent", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:44.591605+00:00", "name": "multi Brent Curve carry", "params": {"market": "Brent", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:44.728013+00:00", "name": "multi Brent Trend", "params": {"market": "Brent", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:55.417955+00:00", "name": "multi Natural gas Carry-momentum", "params": {"market": "Natural gas", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:55.639791+00:00", "name": "multi Natural gas Curve carry", "params": {"market": "Natural gas", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:55.849505+00:00", "name": "multi Natural gas Trend", "params": {"market": "Natural gas", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:33:56.089394+00:00", "name": "crack Crack book", "params": {"protocol": "CRACKS_PROTOCOL.md", "sleeves": "seasonal + inventories, 3 cracks"}}
+{"time": "2026-10-18T19:33:56.094082+00:00", "name": "crack Core + cracks", "params": {"protocol": "CRACKS_PROTOCOL.md", "halves": ["core outright", "crack book"]}}
+{"time": "2026-10-18T19:34:59.287387+00:00", "name": "crack Heating oil crack placebo early window", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:34:59.456068+00:00", "name": "crack Heating oil crack placebo always long prompt", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:35:00.856667+00:00", "name": "crack RBOB crack placebo early window", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:35:01.027511+00:00", "name": "crack RBOB crack placebo always long prompt", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:35:03.663469+00:00", "name": "crack 3-2-1 crack placebo early window", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:35:04.272314+00:00", "name": "crack 3-2-1 crack placebo always long prompt", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:36:22.943277+00:00", "name": "crack Heating oil crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:23.105830+00:00", "name": "crack Heating oil crack Inventories", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Inventories", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:23.630956+00:00", "name": "crack Heating oil crack Combined", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Combined", "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:23.693822+00:00", "name": "crack Heating oil crack placebo early window", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:36:23.941609+00:00", "name": "crack Heating oil crack placebo always long prompt", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:36:26.064279+00:00", "name": "crack RBOB crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:26.255029+00:00", "name": "crack RBOB crack Inventories", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Inventories", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:26.853706+00:00", "name": "crack RBOB crack Combined", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Combined", "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:26.930967+00:00", "name": "crack RBOB crack placebo early window", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:36:27.159106+00:00", "name": "crack RBOB crack placebo always long prompt", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:36:29.849278+00:00", "name": "crack 3-2-1 crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:30.412100+00:00", "name": "crack 3-2-1 crack Inventories", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Inventories", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:31.237068+00:00", "name": "crack 3-2-1 crack Combined", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Combined", "start": "2006-01-03"}}
+{"time": "2026-10-18T19:36:31.431835+00:00", "name": "crack 3-2-1 crack placebo early window", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:36:32.030976+00:00", "name": "crack 3-2-1 crack placebo always long prompt", "params": {"diagnostic": true}}
+{"time": "2026-10-18T19:37:03.427099+00:00", "name": "multi WTI Carry-momentum", "params": {"market": "WTI", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:04.146403+00:00", "name": "multi WTI Curve carry", "params": {"market": "WTI", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:04.866847+00:00", "name": "multi WTI Trend", "params": {"market": "WTI", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:15.748568+00:00", "name": "multi Brent Carry-momentum", "params": {"market": "Brent", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:15.902665+00:00", "name": "multi Brent Curve carry", "params": {"market": "Brent", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:16.060935+00:00", "name": "multi Brent Trend", "params": {"market": "Brent", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:27.610428+00:00", "name": "multi Natural gas Carry-momentum", "params": {"market": "Natural gas", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:27.798736+00:00", "name": "multi Natural gas Curve carry", "params": {"market": "Natural gas", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:27.991394+00:00", "name": "multi Natural gas Trend", "params": {"market": "Natural gas", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T19:37:28.202539+00:00", "name": "crack Crack book", "params": {"protocol": "CRACKS_PROTOCOL.md", "sleeves": "seasonal + inventories, 3 cracks"}}
+{"time": "2026-10-18T19:37:28.207158+00:00", "name": "crack Core + cracks", "params": {"protocol": "CRACKS_PROTOCOL.md", "halves": ["core outright", "crack book"]}}
