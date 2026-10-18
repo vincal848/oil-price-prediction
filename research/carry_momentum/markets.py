@@ -56,6 +56,10 @@ class Market:
     tick: float  # $ value of one minimum tick per contract
     expiry: object = None  # callable(contract) -> Timestamp, or None = Datastream
     switch: dict = field(default_factory=dict)  # prefix -> first date it is used
+    tier: str = (
+        "core"  # "core" markets set the headline book, "downstream" is reported apart
+    )
+    complex: str = "crude"  # "crude" or "gas", the primary each product comes from
 
     @property
     def key(self) -> str:
@@ -69,9 +73,19 @@ class Market:
 MARKETS = {
     m.key: m
     for m in [
+        # Core: the primaries. These set the headline book.
         Market("WTI", ("NCL",), 1000, 10.0, wti_expiry),
         Market("Brent", ("LLC",), 1000, 10.0, None),
-        Market("Heating oil", ("NHO",), 42000, 4.20, last_bd_prior_month),
+        Market("Natural gas", ("NNG",), 10000, 10.0, ng_expiry, complex="gas"),
+        # Downstream: refined products and gas liquids, reported as their own layer.
+        Market(
+            "Heating oil",
+            ("NHO",),
+            42000,
+            4.20,
+            last_bd_prior_month,
+            tier="downstream",
+        ),
         Market(
             "Gasoline",
             ("NHU", "NRB"),  # unleaded gasoline, replaced by RBOB in 2006
@@ -79,9 +93,9 @@ MARKETS = {
             4.20,
             last_bd_prior_month,
             switch={"NRB": "2006-01-01"},
+            tier="downstream",
         ),
-        Market("Natural gas", ("NNG",), 10000, 10.0, ng_expiry),
-        Market("Gasoil", ("LLE",), 100, 25.0, None),
+        Market("Gasoil", ("LLE",), 100, 25.0, None, tier="downstream"),
     ]
 }
 

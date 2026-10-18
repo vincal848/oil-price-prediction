@@ -99,19 +99,19 @@ def figures(
 
     # 1. Equity: each market's book, WTI-only book, full book
     fig, (a, b) = plt.subplots(2, 1, figsize=(11, 7), height_ratios=[3, 1], sharex=True)
-    for (k, r), c in zip(books.drop(columns=["Full book"]).items(), pal):
+    for (k, r), c in zip(books.drop(columns=["Core book"]).items(), pal):
         a.plot((1 + r).cumprod(), label=k, color=c, lw=1.0, alpha=0.85)
-    a.plot((1 + books["Full book"]).cumprod(), label="Full book", color="black", lw=2.6)
+    a.plot((1 + books["Core book"]).cumprod(), label="Core book", color="black", lw=2.6)
     a.set_yscale("log")
     a.set_ylabel("Growth of $1 (log), net of costs")
     a.set_title("Energy curve book: three sleeves on every market, 2003-2026")
     a.legend(frameon=False, loc="upper left", ncol=2, fontsize=9)
-    for k, c in (("Full book", "black"), ("WTI", pal[0])):
+    for k, c in (("Core book", "black"), ("WTI", pal[0])):
         dd = book.drawdown(books[k]) * 100
         b.plot(
             dd,
             color=c,
-            lw=1.4 if k == "Full book" else 0.9,
+            lw=1.4 if k == "Core book" else 0.9,
             label=k + (" only" if k == "WTI" else ""),
         )
     b.set_ylabel("Drawdown %")
@@ -160,10 +160,10 @@ def figures(
     names = list(drops)
     x = np.arange(len(names))
     w = np.array([drops[n]["wti_book"] for n in names]) * 100
-    f = np.array([drops[n]["full_book"] for n in names]) * 100
+    f = np.array([drops[n]["core_book"] for n in names]) * 100
     fig, ax = plt.subplots(figsize=(11, 3.8))
     ax.bar(x - 0.2, w, 0.4, color="#9dc3e6", label="WTI-only book")
-    ax.bar(x + 0.2, f, 0.4, color="black", label="Full energy book")
+    ax.bar(x + 0.2, f, 0.4, color="black", label="Core book (WTI, Brent, gas)")
     for xi, v1, v2 in zip(x, w, f):
         ax.text(
             xi - 0.2, v1 + (2 if v1 > 0 else -6), f"{v1:+.0f}", ha="center", fontsize=8
@@ -219,34 +219,41 @@ def main() -> None:
         {(mk, s): b.returns for mk, bs in runs.items() for s, b in bs.items()}
     ).loc[START:]
     books = pd.DataFrame({mk: book.combine(sleeve_rets[mk]) for mk in runs})
+    tier = {mk: data[mk]["market"].tier for mk in runs}
+    core = [mk for mk in runs if tier[mk] == "core"]
+    down = [mk for mk in runs if tier[mk] == "downstream"]
     log_trial(
-        "multi Full book",
+        "multi Core book",
         {
-            "markets": list(runs),
+            "markets": core,
             "sleeves": SLEEVES,
             "weights": "equal",
             "vol_target": 0.15,
             "start": START,
         },
     )
-    books["Full book"] = book.combine(sleeve_rets)
-    log_trial(
-        "multi Full book ex-WTI",
-        {
-            "markets": [k for k in runs if k != "WTI"],
-            "weights": "equal",
-            "vol_target": 0.15,
-            "start": START,
-        },
-    )
-    ex_wti = book.combine(sleeve_rets.drop(columns="WTI", level=0))
+    core_rets = sleeve_rets[core]
+    books["Core book"] = book.combine(core_rets)
+    layers = {}
+    if down:
+        for name, mks in (("Downstream book", down), ("All markets", list(runs))):
+            log_trial(
+                f"multi {name}",
+                {
+                    "markets": mks,
+                    "weights": "equal",
+                    "vol_target": 0.15,
+                    "start": START,
+                },
+            )
+            layers[name] = book.combine(sleeve_rets[mks])
 
     wti_oil = held_return(data["WTI"]).loc[START:]
     res = {
         "start": START,
         "end": str(books.index.max().date()),
         "markets": {},
-        "full_book": {},
+        "core_book": {},
     }
     for mk, bs in runs.items():
         m = data[mk]["market"]
@@ -271,31 +278,36 @@ def main() -> None:
                 for s, b in bs.items()
             },
         }
-    res["full_book"] = {
-        "performance": book.tearsheet(books["Full book"], wti_oil),
+    res["core_book"] = {
+        "performance": book.tearsheet(books["Core book"], wti_oil),
         "at_10pct_vol": {
             k: v
-            for k, v in book.tearsheet(book.combine(sleeve_rets, 0.10), wti_oil).items()
+            for k, v in book.tearsheet(book.combine(core_rets, 0.10), wti_oil).items()
             if k not in ("annual", "crises")
         },
-        "ex_wti": {
-            k: v
-            for k, v in book.tearsheet(ex_wti, wti_oil).items()
-            if k not in ("annual",)
-        },
-        "grind": window_return(books["Full book"], *GRIND),
+        "markets": core,
+        "grind": window_return(books["Core book"], *GRIND),
         "sleeve_type_across_markets": {
             s: {
                 k: v
                 for k, v in book.tearsheet(
-                    book.combine(sleeve_rets.xs(s, axis=1, level=1)), wti_oil
+                    book.combine(core_rets.xs(s, axis=1, level=1)), wti_oil
                 ).items()
                 if k not in ("annual", "crises")
             }
             for s in SLEEVES
         },
     }
-    corr = books.drop(columns="Full book").corr().round(2)
+    res["layers"] = {
+        name: {
+            "markets": down if name == "Downstream book" else list(runs),
+            "performance": book.tearsheet(r, wti_oil),
+            "grind": window_return(r, *GRIND),
+            "corr_to_core_book": float(r.corr(books["Core book"])),
+        }
+        for name, r in layers.items()
+    }
+    corr = books.drop(columns="Core book").corr().round(2)
     res["market_book_correlations"] = corr.to_dict()
 
     eq = (1 + wti_oil.fillna(0.0)).cumprod()
@@ -303,12 +315,12 @@ def main() -> None:
         n: {
             "wti": float(eq.loc[b] / eq.loc[a] - 1),
             "wti_book": window_return(books["WTI"], a, b),
-            "full_book": window_return(books["Full book"], a, b),
+            "core_book": window_return(books["Core book"], a, b),
         }
         for n, (a, b) in book.DROPS.items()
     }
     res["oil_drops"] = drops
-    m_full = (1 + books["Full book"]).groupby(books.index.to_period("M")).prod() - 1
+    m_full = (1 + books["Core book"]).groupby(books.index.to_period("M")).prod() - 1
     m_wti = (1 + books["WTI"]).groupby(books.index.to_period("M")).prod() - 1
     mo = (1 + wti_oil).groupby(wti_oil.index.to_period("M")).prod() - 1
     bucket = pd.cut(
@@ -318,7 +330,7 @@ def main() -> None:
     )
     res["avg_month_by_wti_move"] = pd.DataFrame(
         {
-            "full_book": m_full.groupby(bucket, observed=True).mean(),
+            "core_book": m_full.groupby(bucket, observed=True).mean(),
             "wti_book": m_wti.groupby(bucket, observed=True).mean(),
             "months": mo.reindex(m_full.index).groupby(bucket, observed=True).size(),
         }
@@ -341,7 +353,7 @@ def main() -> None:
         }
     )
     grind["Market book"] = {mk: window_return(books[mk], *GRIND) for mk in runs}
-    grind.loc["Full book"] = [np.nan] * len(SLEEVES) + [res["full_book"]["grind"]]
+    grind.loc["Core book"] = [np.nan] * len(SLEEVES) + [res["core_book"]["grind"]]
 
     with open(os.path.join(OUT, "multi.json"), "w") as f:
         json.dump(res, f, indent=2, default=float)
@@ -352,14 +364,16 @@ def main() -> None:
     for k in books:
         p = book.tearsheet(books[k], wti_oil)
         print(
-            f"{k:12s} CAGR {p['cagr']:6.1%} SR {p['sharpe']:5.2f} "
+            f"{k:16s} CAGR {p['cagr']:6.1%} SR {p['sharpe']:5.2f} "
             f"MDD {p['max_drawdown']:6.1%} yrs+ {p['positive_years']}"
         )
-    p = res["full_book"]["ex_wti"]
-    print(
-        f"{'ex-WTI':12s} CAGR {p['cagr']:6.1%} SR {p['sharpe']:5.2f} "
-        f"MDD {p['max_drawdown']:6.1%}"
-    )
+    for k, v in res["layers"].items():
+        p = v["performance"]
+        print(
+            f"{k:16s} CAGR {p['cagr']:6.1%} SR {p['sharpe']:5.2f} "
+            f"MDD {p['max_drawdown']:6.1%} 2022-25 {v['grind']:+.0%} "
+            f"corr to core {v['corr_to_core_book']:.2f}"
+        )
 
 
 if __name__ == "__main__":
