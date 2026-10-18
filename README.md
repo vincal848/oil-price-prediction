@@ -1,561 +1,148 @@
-# WTI Crude Forecasting: LSTM vs. Echo State Network
+# WTI Crude: From Price Forecasting to a Systematic Futures Book
 
 [![tests](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml)
 
-For this project I was working from my coursework series in mathematical computing,
-and I wanted to use neural networks on a price series. I took WTI Crude Oil Futures
-(`CL=F`) and compared an LSTM against an Echo State Network reservoir model. My
-reasoning for choosing a recurrent architecture over feedforward and convolutional
-networks is in [docs/METHODS.md](docs/METHODS.md), along with the gate equations and
-what the reservoir is actually doing.
+This project started as a neural-network forecast of the WTI crude price and ended as
+a systematic trading book on WTI futures. Each stage answered a question the one
+before it raised, so the README follows that path. The result at the end is a
+three-strategy book that trades the shape of the futures curve.
 
-I have since rebuilt it, and the conclusion changed. The original compared the two
-models against each other and found the LSTM won. It did — but I never checked either
-of them against the obvious benchmark, which is predicting that tomorrow's price is
-today's price. **Both models lose to that benchmark, badly.** Everything below is the
-work of establishing that.
+## The result: a WTI curve strategy book
 
-![One-step-ahead forecasts over the validation window](docs/img/forecasts.png)
-
-*The naive forecast is on this chart. It is the grey line, and you cannot see it,
-because it sits underneath the actual price for the entire window. That is the whole
-problem with judging a one-step-ahead price model by eye.*
-
-## At a glance
+Three rules on the second-month NYMEX WTI contract, run as one risk-balanced book. It
+trades whole contracts at the next day's settlement and is net of fees, ticks and
+every roll, January 2003 to April 2026:
 
 | | |
 |---|---|
-| **Data** | WTI front-month continuous (`CL=F`), 2000-08-30 to 2024-05-30, 5,962 daily closes |
-| **Models** | Naive persistence; Echo State Network (ReservoirPy); stacked LSTM (TensorFlow) |
-| **Split** | 75% train, chronological. Evaluation 2018-12-18 to 2024-05-30, 1,371 days |
-| **Task** | One-step-ahead close, 120 trading days of memory |
-| **Metrics** | RMSE, MAE, MASE, directional accuracy, skill vs. persistence |
-| **Result** | Neither model beats persistence. LSTM 50% worse on RMSE, ESN 158% worse |
-| **Stack** | Python, TensorFlow, ReservoirPy, scikit-learn, pandas |
+| Annual return / Sharpe | **8.0% / 0.56** (Sortino 0.74) at a 15% vol target |
+| Growth of $1 | **$5.99** |
+| Positive years | **17 of 24** |
+| Correlation to WTI | **-0.07** |
+| Oil crashes (2008, 2014-16, Q4 2018, 2020) | **+22%, +54%, +18%, +16%** |
+| Worst stretch | -53% from 2022 to 2025 (-39% at a 10% vol target) |
 
-## Results
+![Equity curves](research/carry_momentum/results/book/equity.png)
 
-| model | RMSE | MAE | MASE | directional accuracy | seconds |
-|---|---|---|---|---|---|
-| **naive persistence** | **2.71** | **1.36** | **1.35** | — | 0.0 |
-| LSTM | 4.06 | 2.82 | 2.80 | 0.477 | ~94 |
-| echo state network | 7.00 | 5.12 | 5.09 | 0.498 | ~0.05 |
+- **Carry-momentum** (6.6% a year, Sharpe 0.49) goes long when backwardation is
+  steepening and short when the curve is sliding toward contango.
+- **Curve carry** (6.2%, 0.46) is long in backwardation and short in contango. It
+  changes sides less than once a year.
+- **Trend** (2.6%, 0.27) follows the 1, 3 and 12-month price direction.
 
-Skill against persistence, where positive would mean an improvement:
+Carry-momentum and curve carry are almost uncorrelated (0.03), which is why the
+book beats each strategy on its own. The book wins big when oil moves violently and
+loses slowly when oil grinds sideways or lower. The 2022-25 drawdown, two fixes
+that were tried and failed, sizing, execution and capacity are all in
+**[BOOK.md](research/carry_momentum/BOOK.md)**.
 
-| model | RMSE skill | MAE skill |
+![Oil declines](research/carry_momentum/results/book/oil_drops.png)
+
+## How it got here
+
+### 1. Forecasting the price: nothing beats "tomorrow = today"
+
+The original project compared an LSTM with an echo state network on the continuous
+front-month series (`CL=F`). Measured against the naive forecast that tomorrow's
+price equals today's, both lose: the LSTM's error is 50% larger and the reservoir's
+158% larger. Neither calls the direction better than a coin flip. Two pre-registered
+follow-ups score once on unseen data:
+
+- ridge models on returns at 1, 5 and 20 days;
+- the Brent-WTI spread, the spot basis and the dollar index as predictors.
+
+Neither beats persistence. The contract roll was checked as an excuse and moves the
+answer by about one percentage point.
+
+**Takeaway:** the next-day price of WTI is close to unpredictable from public price
+data, so the question has to change from *where will price go* to *what position
+to hold*.
+[Full write-up](docs/1_FORECASTING.md) · [methods](docs/METHODS.md) ·
+[protocol 1](docs/PROTOCOL.md) · [protocol 2](docs/PROTOCOL-2.md)
+
+### 2. Positions instead of forecasts: trend, carry and volatility targeting
+
+The three rules behind most CTA books were run on WTI, Brent, RBOB and heating oil.
+Two findings carried forward:
+
+- **Carry is the strongest rule.** Measured as next contract vs front contract, WTI
+  carry has a Sharpe of 0.49, and trend plus carry reaches 0.48 with a -31% drawdown.
+  Daily returns have no usable autocorrelation, but their *size* does, which is the
+  case for volatility targeting.
+- **The curve matters more than the price.** Measured as front contract vs spot, the
+  same carry rule loses money.
+
+[Full write-up](docs/2_TREND_CARRY_VOL.md)
+
+### 3. Virtual Barrels: one strategy per financial footprint
+
+Following Ilia Bouchouev's *Virtual Barrels*, twelve strategies read the footprints
+that financial players leave in oil: the curve, CFTC positioning, EIA inventories
+and option volatility. They ran on EIA's four-contract WTI curve, 2008-2024.
+Carry-momentum (0.61), the inventory cycle (0.60), curve carry (0.45) and following
+managed-money flow (0.40) were the strongest. Twelve nearly uncorrelated strategies
+made a 0.53 Sharpe book. **Carry-momentum stood out, so it got its own study.**
+[Full write-up](docs/3_VIRTUAL_BARRELS.md)
+
+### 4. Carry-momentum on raw contracts, then the book
+
+EIA stopped publishing its contract series in 2024. So the curve was rebuilt from
+all 547 individual NYMEX WTI contract months since 1983, from LSEG Datastream via
+WRDS, and two checks confirmed it:
+
+- contracts 1-4 match EIA's prices to the cent on 99.6% of days;
+- the rolled series tracks the S&P GSCI Crude index at 0.9992 correlation.
+
+**The formal study.** Carry-momentum went through a pre-registered study: rules
+committed before any data, kill criteria, bootstrap, deflated Sharpe, PBO and a
+factor-spanning test.
+- **What worked:** the outright held up with a 0.44-0.48 Sharpe.
+- **What didn't:** the calendar-spread version could not pay for its own turnover.
+- **The mechanism:** the storage-hedger explanation was not in the positioning data.
+
+[Study note](research/carry_momentum/NOTE.md) ·
+[protocol](research/carry_momentum/PROTOCOL.md) ·
+[deviations](research/carry_momentum/DEVIATIONS.md) ·
+[data](research/carry_momentum/DATA.md)
+
+**The book.** That study fed straight into the book at the top of this page. It
+starts in 2003, after the thin pit-traded years. It keeps the outright, with a
+rebalance buffer to cut costs, and adds curve carry and trend. Every configuration
+run anywhere in this repository is logged in a trial ledger (254 so far).
+
+## Next: more markets
+
+The book's weak spot is a single market grinding sideways. The code to run the same
+three strategies on Brent, heating oil, gasoline, natural gas and ICE gasoil is in
+place (`markets.py`, `multi.py`). Rebuilding WTI through it reproduces the book
+exactly. It is waiting on the contract data for the other markets.
+
+## Repository map
+
+| Stage | Code | Run |
 |---|---|---|
-| LSTM | −0.496 | −1.077 |
-| echo state network | −1.580 | −2.766 |
+| 1. Forecasting | `data.py`, `models.py`, `forecast.py`, `metrics.py`, `roll.py` | `python run.py` (`--holdout`, `--holdout2`, `--no-lstm`) |
+| 2. Trend, carry, vol | `strategies.py` | `python run_strategies.py` |
+| 3. Virtual Barrels | `virtual_barrels.py` | `python run_virtual_barrels.py` |
+| 4. Curve and study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python study.py` (needs the private capstone validation library) |
+| 4. Book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
+| Next | `research/carry_momentum/markets.py`, `multi.py` | `python multi.py` once data is in |
 
-Three things follow from this.
+Results that the write-ups quote are tracked in `results/` and
+`research/carry_momentum/results/`. Price data is cached locally and not committed.
+The Datastream contracts are licensed through WRDS, so
+[DATA.md](research/carry_momentum/DATA.md) says how to rebuild them. `legacy/` holds
+the original script, annotated.
 
-**The LSTM does beat the ESN,** which is what the original concluded, and that part
-holds up. It is about 42% better on RMSE. The reservoir, though, fits in a
-twentieth of a second against the LSTM's ninety-odd -- three orders of magnitude,
-which is the whole point of a fixed random reservoir with a trained readout. Here
-it pays for that speed with a much noisier forecast.
+```bash
+pip install -r requirements-dev.txt
+pytest tests research/carry_momentum/tests -q   # 89 tests run without network
+```
 
-**Neither beats doing nothing.** Persistence gets RMSE 2.71; the LSTM 4.06. A model
-that costs 94 seconds of training and produces a worse forecast than copying
-yesterday's number is not a model I would trade on. MASE says the same thing in
-scale-free terms: both are well above 1.
-
-**Neither has directional skill.** 0.477 and 0.498 against a coin flip. Level accuracy
-on a near-random-walk is easy to obtain and tells you almost nothing, because most of
-tomorrow's price is today's price. The direction of the move is the part with the
-information in it, and neither model has any.
-
-![Forecast errors](docs/img/errors.png)
-
-## Does the contract roll explain this?
-
-`CL=F` is a continuous front-month series: when the front contract expires, Yahoo
-splices the series onto the next one. The day-over-day change across a splice mixes a
-real price move with the spread between two different contracts, and nothing can
-forecast the second part. That is a genuine defect in the data and it was worth asking
-whether it was compressing the comparison.
-
-I derived the roll dates from the CME contract rule rather than detecting them from
-the data, so they are known in advance and cannot be fitted to whatever happens to
-look like a jump. The rule is three business days before the 25th of the month
-preceding delivery, or four if that 25th is not a business day. The implementation is
-checked against eight published termination dates in the test suite.
-
-| | |
-|---|---|
-| Roll days | 285 of 5,961 (4.8%), 66 of them in the evaluation window |
-| Mean absolute change, roll days | $1.34 |
-| Mean absolute change, other days | $1.07 |
-| Volatility ratio | 1.24× |
-| Share of total variance | 5.3% |
-
-So the roll is real, and roll days are about a quarter more volatile than ordinary
-ones. But 4.8% of days carrying 5.3% of variance is barely over-represented, and
-removing them does not change anything:
-
-| model | RMSE skill, all days | RMSE skill, excluding roll days |
-|---|---|---|
-| LSTM | −0.496 | −0.485 |
-| echo state network | −1.580 | −1.528 |
-
-The roll moves the answer by about one percentage point. It is not what is compressing
-the comparison. What compresses it is the task: one-step-ahead prediction of something
-close to a random walk, where the benchmark is already most of the way to the answer.
-
-A related point worth recording. I assumed the −$37.63 close on 2020-04-20 was a roll
-artefact. It is not — it falls the day *before* that contract's termination, and
-FRED's Cushing spot series, which has no contract and therefore no roll, went negative
-the same day at −$36.98. That was a genuine collapse in the expiring contract under a
-storage shortage, and no model here anticipates it.
-
-![April 2020](docs/img/april_2020.png)
-
-## Returns, scored once out of sample
-
-The results above frame the task as predicting the price level, which cannot beat
-persistence. [docs/PROTOCOL.md](docs/PROTOCOL.md) fixes an honest test **before** any
-return model was fitted: train to 2014, choose hyperparameters and the shrinkage weight
-on 2015-2018, score 2019-01-02 to 2024-05-30 once, with expanding-window refits every
-calendar quarter. Models predict the h-day log return and price = last * exp(r_hat), so
-r_hat = 0 is persistence exactly. Horizons h = 1, 5, 20; for h > 1 only non-overlapping
-targets are scored. Skill is `1 - RMSE/RMSE_persistence`; DM is a Diebold-Mariano test on
-squared dollar error vs persistence with a Newey-West (HAC) variance; the direction
-columns count the days the model calls a non-zero move, with a two-sided binomial test
-against 0.5.
-
-| h | model | n | RMSE | MAE | skill | DM p | dir. acc. | binomial p |
-|---|---|---|---|---|---|---|---|---|
-| 1 | persistence | 1359 | 1.851 | 1.284 | 0 | | | |
-| 1 | random walk + drift | 1359 | 1.851 | 1.283 | -0.0002 | 0.570 | 0.536 | 0.009 |
-| 1 | ridge (k=1, alpha=0.01) | 1359 | 1.852 | 1.286 | -0.0008 | 0.261 | 0.500 | 1.000 |
-| 1 | w * ridge (w=1.00) | 1359 | 1.852 | 1.286 | -0.0008 | 0.261 | 0.500 | 1.000 |
-| 5 | persistence | 272 | 4.055 | 2.907 | 0 | | | |
-| 5 | random walk + drift | 272 | 4.058 | 2.906 | -0.0007 | 0.625 | 0.529 | 0.363 |
-| 5 | ridge (k=20, alpha=100) | 272 | 4.055 | 2.906 | +0.0002 | 0.388 | 0.559 | 0.060 |
-| 5 | w * ridge (w=1.00) | 272 | 4.055 | 2.906 | +0.0002 | 0.388 | 0.559 | 0.060 |
-| 20 | persistence | 68 | 7.793 | 5.924 | 0 | | | |
-| 20 | random walk + drift | 68 | 7.812 | 5.967 | -0.0025 | 0.673 | 0.485 | 0.904 |
-| 20 | ridge (k=1, alpha=0.01) | 68 | 7.832 | 5.983 | -0.0049 | 0.060 | 0.471 | 0.716 |
-| 20 | w * ridge (w=1.00) | 68 | 7.832 | 5.983 | -0.0049 | 0.060 | 0.471 | 0.716 |
-
-**Nothing beats persistence significantly.** The largest skill is +0.02% (h=5), with
-DM p = 0.39. The only small p-value in the directional columns is the drift baseline at
-h=1 (binomial p = 0.009): it always calls "up", so it is scoring the share of up days
-(53.6%), not forecasting skill, and it does not improve RMSE. The validation weight came out at w = 1.0 for every horizon (the clip at 1; the raw
-least-squares weight was at or above 1), so the combination is identical to the ridge. The
-ridge did show a tiny edge on validation (skill +0.26% at h=1, about 0 at h=5, +0.03% at
-h=20) and it did not carry over to the holdout.
-
-Sign strategy, h = 1, long/short by the sign of the ridge forecast, 2bp per side plus a
-close-and-reopen on contract-roll days: gross -3.2% a year, net -8.7% a year, net Sharpe
--0.17. No edge.
-
-Notes on the numbers:
-
-- **Configurations tried: 48.** 15 ridge configurations (3 lag lengths x 5 alphas)
-  x 3 horizons chosen on validation, plus the drift baseline at each horizon. The
-  holdout was run once. Persistence and the weight fit are not counted as
-  configurations. Before that single run I tried nothing on the holdout; the exploratory
-  runs were on synthetic data in the tests.
-- **2020-04-20** closes at -$37.63, so it has no log return. The two origins touching it
-  (and lagged returns that involve it, set to 0) are skipped for every model alike.
-- The h = 20 sample is 68 non-overlapping targets, so it has little power; the 5%-level
-  statement is "cannot reject", not "equal".
-- The continuous `CL=F` series splices contracts, so daily returns on roll days include
-  a contract-spread jump no model can predict (see the roll section above).
-- The LSTM and ESN were **not** reframed to returns. The ESN readout is already a ridge
-  regression, the linear model above is the shrinkage-friendly version of the same idea,
-  and it found nothing; an LSTM on the same returns is a bigger search for the same
-  signal-free target. Add them only if a linear model ever shows skill.
-- Evaluation checks (in `tests/test_forecast.py`): permuted returns give mean skill
-  <= 0 across 10 seeds; planted AR(1) returns with phi = 0.1 give skill > 0 and DM
-  p < 0.05; forecasts made at or before a date do not change when later prices change.
-
-Reproduce with `python run.py --holdout` (writes `results/holdout.json`).
-
-## Second attempt: public spread, basis and dollar information
-
-[docs/PROTOCOL-2.md](docs/PROTOCOL-2.md) was committed before any post-May-2024 data was
-downloaded. It declares a fresh holdout (2024-06-03 to 2026-10-08, 591 one-day targets,
-scored once), six candidates chosen from economics (Brent-WTI spread, spot-vs-front
-basis, dollar index, and combinations; FRED keyless CSVs `DCOILBRENTEU`, `DCOILWTICO`,
-`DTWEXBGS`, all lagged one day), strong ridge shrinkage (alpha = 1000), a weight `w`
-fit on 2019-2024 (already seen, so validation), quarterly expanding refits, and a
-Bonferroni threshold of 0.05 / 6 = 0.0083.
-
-**The validation weight was 0 for all six candidates**: on 2019-2024 every candidate's
-forecast was uncorrelated or slightly anti-correlated with the next return (corr between
--0.056 and -0.003). The pre-declared shrunk forecasts are therefore persistence exactly:
-skill 0.0000, nothing to test. To still look for signal, the table below shows the
-unshrunk (w = 1) forecasts, a diagnostic I added after seeing w = 0; the same six
-candidates, so the same Bonferroni threshold.
-
-| model | RMSE | skill | DM p | dir. acc. | binomial p | sign strategy net / yr, Sharpe |
-|---|---|---|---|---|---|---|
-| persistence | 2.311 | 0 | | | | |
-| random walk + drift | 2.311 | -0.0001 | 0.653 | 0.519 | 0.387 | |
-| C1 spread | 2.311 | +0.0000 | 0.982 | 0.503 | 0.902 | -6.6%, -0.15 |
-| C2 basis | 2.312 | -0.0003 | 0.127 | 0.473 | 0.202 | -46.8%, -1.07 |
-| C3 dollar | 2.311 | +0.0003 | 0.431 | 0.554 | 0.0094 | +56.7%, +1.30 |
-| C4 spread + basis | 2.312 | -0.0005 | 0.781 | 0.507 | 0.773 | +6.4%, +0.14 |
-| C5 spread + basis + dollar | 2.312 | -0.0002 | 0.900 | 0.536 | 0.091 | +38.0%, +0.87 |
-| C6 all + last return | 2.309 | +0.0008 | 0.685 | 0.524 | 0.266 | -3.4%, -0.08 |
-
-**No candidate is significant.** No DM p-value is below 0.0083; RMSE differs from
-persistence in the fourth decimal. The one tempting row is the dollar index: 55.4%
-direction hits (binomial p = 0.0094, just above the 0.0083 threshold) and a sign
-strategy Sharpe of 1.3. But its RMSE skill is +0.03% with DM p = 0.43, its validation
-weight was 0, its Sharpe has a standard error near 0.65 over 2.4 years, and it is the
-best of six sign strategies plus six direction tests. I read it as a lead for a future
-untouched sample, not a result, and I did not tune anything around it.
-
-Configurations tried in this protocol: 6 (plus the unshrunk diagnostic of the same
-six). The earlier protocol used 48; together 54. The holdout of each protocol was read
-once. Checks: `tests/test_forecast.py` has an exogenous null (permuted returns, skill
-<= 0), a planted exogenous signal (skill > 0) and a one-day-lag test of the feature
-builder (broken by removing the shift).
-
-**Conclusion.** Against own-price returns (2019-2024) and against Brent-WTI spread, the
-spot basis and the dollar (2024-2026), one-step WTI front-month forecasts do not beat
-persistence in dollar error, and no directional edge survives the multiple-testing
-correction. This is evidence that the one-day-ahead WTI front-month price is efficient
-against public price, spread and dollar information; it is not proof, since the
-samples are short (591 targets) and only linear models and these features were tried.
-The work stops here. Reproduce with `python run.py --holdout2` (downloads FRED CSVs
-and the Yahoo rows after 2024-05-30 once, then caches).
-
-## Changing the question: what position to hold
-
-Everything above asks what tomorrow's price will be, and the answer is today's price.
-Systematic futures traders mostly ask a different question: what position to hold,
-given what the market is already showing. That does not need a next-day forecast. So I
-tried the three rules that make up most of a CTA book, on WTI, Brent, RBOB and heating
-oil from 2001 to October 2026, monthly rebalance, net of 2bp per side plus a
-close-and-reopen on every contract roll:
-
-- **Trend:** long or short on the sign of the trailing 1-, 3- or 12-month return
-  (time-series momentum, Moskowitz, Ooi and Pedersen 2012).
-- **Carry:** long in backwardation, short in contango.
-- **Volatility targeting:** scale any position to 20% annualised ex-ante volatility
-  (EWMA, centre of mass 60 days).
-
-WTI, 2001-08 to 2026-10, all vol-targeted except the first row:
-
-| rule | Sharpe | ann. return | max drawdown |
-|---|---|---|---|
-| buy and hold | 0.34 | 13.7% (40% vol) | -94% |
-| buy and hold, vol-targeted | 0.26 | 5.3% | -72% |
-| trend 1m | 0.35 | 7.1% | -41% |
-| trend 12m | 0.21 | 4.2% | -66% |
-| carry, front vs spot | -0.22 | -4.5% | -92% |
-| **carry, next contract vs front** | **0.49** | **9.9%** | **-41%** |
-| trend 12m + carry | 0.48 | 7.2% (15% vol) | -31% |
-
-![WTI equity curves](docs/img/strat_equity.png)
-
-What I learned from it:
-
-**You can forecast the size of tomorrow's move, not its direction.** The daily return
-autocorrelation is about -0.02 at every lag, on all four contracts. The autocorrelation
-of the absolute return is 0.17 to 0.25 at one day and still 0.13 to 0.16 at a month.
-That is the whole case for volatility targeting, and the reason a price-level model had
-nothing to find.
-
-**Carry works, but only once it is measured properly.** My first version used the
-futures-minus-spot basis, the same feature that failed in protocol 2, and it lost money
-on every contract. The front month sits almost on top of spot for most of its life, so
-that basis is mostly noise. The slope that matters is next contract vs front, and a
-continuous front-month series does contain it: on each roll day the futures-minus-spot
-basis jumps by roughly log(next/front), because the series switches contracts while
-spot does not. Read that way, WTI carry has a Sharpe of 0.49, is positive in every
-regime I split out, and its best year is 2020, when it was short through the super
-contango. It is also negatively correlated with buy and hold (-0.21).
-
-![Carry](docs/img/strat_carry.png)
-
-**Single-contract trend is weak and unstable.** 12-month trend on WTI is 0.21, and the
-lookback grid has no smooth ridge: neighbouring lookbacks swing from 0.38 to -0.07. The
-Sharpe that the trend literature reports comes from diversifying across dozens of
-futures, not from any one of them. Where trend does earn is the big directional
-regimes, 2014-2016 especially (0.95), which is the "crisis alpha" pattern.
-
-![Lookbacks](docs/img/strat_lookbacks.png)
-
-**Volatility targeting halves the drawdown but does not raise the Sharpe of a long
-position in oil.** It cuts exposure after a volatility spike, and in oil the spike comes
-with the crash and with the rebound. In 2020 it was underweight for the recovery. On
-trend and carry, whose returns do not depend on the market going up, it is what keeps
-the position sizes comparable through time.
-
-**Combining the two lowers risk more than it adds return.** Trend 12m and carry are
-correlated 0.11, so the blend runs at 15% volatility against a 20% target, with a
--31% drawdown against -94% for buy and hold.
-
-**Gasoline is different.** RBOB's curve is seasonal, because the summer and winter
-specifications differ, so its contango and backwardation mostly reflect the calendar
-rather than inventories. Carry is flat there (-0.04) and 12-month trend loses (-0.18).
-A seasonally adjusted carry signal would be the next thing to try.
-
-Notes:
-
-- Rolls: the WTI splice days come from the CME rule in `roll.py`. RBOB and heating oil
-  splice on the first trading day of each month (they expire on the last business day
-  of the month before delivery); Brent follows ICE's two expiry rules, before and after
-  2016. Each calendar is checked against the data: the futures-minus-spot basis moves
-  2.1-3.0x more on its splice days than on other days for WTI, RBOB and heating oil.
-  For Brent it is only 1.3x, because FRED's Brent spot is Dated Brent rather than the
-  ICE future's underlying, so the Brent rows (in `results/strategies.json`) are rough.
-- Returns on splice days are set to zero, since part of that day's change is the
-  spread between two contracts, not a return. 2020-04-20, when the May WTI contract
-  settled negative, is also set to zero.
-- Sharpe ratios over 25 years carry a standard error of roughly 0.2, and I ran about a
-  dozen rules on four contracts, so differences of 0.1-0.2 between rows are noise. The
-  gap between the two carry measures (0.7) is not.
-- Data: Yahoo continuous front-month closes (`CL=F`, `BZ=F`, `RB=F`, `HO=F`) and FRED
-  spot prices (`DCOILWTICO`, `DCOILBRENTEU`, `DGASNYH`, `DHOILNYH`), cached in
-  `data/futures/`. Tests in `tests/test_strategies.py` check that no rule sees the
-  future, that trend finds planted regimes and finds nothing in a random walk, and
-  that the splice spread reads a known contract spread.
-
-Reproduce with `python run_strategies.py`.
-
-## Virtual barrels: trading the financial footprints in oil
-
-The rules above use only prices. Ilia Bouchouev's *Virtual Barrels* (2023) argues
-that oil is now priced as much by financial barrels as physical ones: storage
-hedgers, trend followers, slow inflation-hedging money and option sellers each
-leave a footprint in the curve, the positioning data or the volatility surface. I
-built one strategy family per footprint, from the book's chapter structure and the
-rules he spells out in his public *Energy Quantamentals* comments for the Oxford
-Institute for Energy Studies.
-
-That needed more data than a front-month price: EIA's daily Cushing futures
-contracts 1-4 (the curve, 2000 to April 2024, when EIA stopped publishing it), EIA
-weekly crude stocks, CFTC disaggregated positions for NYMEX WTI, and the CBOE OVX
-index. With four contracts the roll is exact rather than zeroed out: on the day after
-an expiry, yesterday's second contract is today's first, so the held return is
-C1(t)/C2(t-1).
-
-WTI, 2008 to April 2024, every strategy scaled to 15% volatility, net of costs:
-
-| family | rule | Sharpe | max drawdown |
-|---|---|---|---|
-| benchmark | buy and hold (contract 2, rolled) | -0.12 | -71% |
-| curve | carry: long backwardation, short contango | 0.45 | -28% |
-| curve | **carry-momentum**: carry vs its 1-month average | **0.61** | -28% |
-| price | momentum M(1,20) | 0.15 | -48% |
-| price | multi-horizon M(1,5)+M(5,20)+M(20,250) | 0.20 | -41% |
-| price | M(1,20) sized by the reaction function | 0.25 | -26% |
-| positioning | **follow the flow** (managed money MA crossover) | **0.40** | -29% |
-| positioning | fade the crowd (range extremes) | -0.04 | -21% |
-| positioning | hedging pressure (Keynes premium) | -0.28 | -69% |
-| inventories | **inventory cycle** (stocks vs 5-year seasonal norm) | **0.60** | -38% |
-| inventories | squeeze spread: C2-C3 on Cushing fill | 0.16 | -28% |
-| quantamental | WTI-Brent convergence | -0.49 | -72% |
-| volatility | short one-month variance at OVX | 0.42 | -80% |
-| book | all twelve, equal risk | 0.53 | -32% |
-| book | simple: M(1,20) + carry | 0.40 | -44% |
-| book | core four (bold rows, chosen after seeing this table) | 0.90 | -25% |
-
-![Strategy families](docs/img/vb_families.png)
-
-**The curve carries most of the information, and its change carries more than its
-level.** Carry-momentum buys when backwardation is steepening or contango flattening.
-Bouchouev reports Sharpe 0.48 for carry and 0.63 for carry-momentum on WTI over
-1994-2023; I get 0.45 and 0.61 on a different window, and every one of seven
-lookback pairs I tried is between 0.51 and 0.70. Inventory flows show up in the
-curve before they show up in the outright price, which is why trend followers
-watch it.
-
-**Price momentum on its own is the weakest of the systematic rules (0.15).** The
-reaction function, which builds the position up to one standard deviation of the
-signal and then cuts it, does not change the Sharpe much (0.25) but halves the
-drawdown, because it stops adding to a move that is already stretched.
-
-**In positioning, the information is in the flow, not the level.** Following the
-managed-money crossover earns 0.40, and all sixteen parameter pairs are positive.
-Fading the crowd at range extremes is a coin flip across its twenty parameter sets,
-and Bouchouev finds the same until about 2022. The classic hedging-pressure premium
-(long when producers and swap dealers are unusually net short) loses: in WTI those
-shorts are mostly swap dealers hedging shale producers' OTC trades, and their level
-moves slowly against a market the funds are already trading.
-
-**Inventories work through the seasonal surplus, not the level.** Going long when
-US crude stocks are drawing relative to the five-year same-week average earns 0.60,
-and is positive in every period except 2020, when stocks built faster than ever and
-prices recovered anyway. The squeeze-model spread trade on Cushing (short the C2-C3
-spread when Cushing fills near its recent maximum, long when it drains toward
-empty) is weak at 0.16: the extremes it is built for, like April 2020, are rare.
-
-**WTI-Brent does not mean-revert on a three-month horizon.** The spread trended
-through every structural change in the period: the Cushing glut of 2011-13, the end
-of the US export ban in 2015, the pipeline build-out after it.
-
-**The volatility premium is real but dangerous.** OVX averaged 39 against 35%
-realised front-month volatility. Sold as one-month variance swaps, marked to market
-every day, the premium earns 0.42 with an -80% drawdown, nearly all of it in 2020.
-The first version of this (Sharpe 1.22) booked only the daily accrual, which hides
-the swings in implied volatility, so the risk looked half as large and the sizing
-ran at the leverage cap; an independent review of the code caught it.
-
-**The book is better than its parts because the parts are nearly uncorrelated.**
-The average pairwise correlation across the twelve strategies is 0.07; carry,
-carry-momentum, the inventory cycle and following the flow are correlated 0.10 to
-0.22 with each other. An equal-risk book of all twelve has a Sharpe of 0.53 and a
--32% drawdown against -71% for buy and hold. Keeping only the four strong families
-gives 0.90 and is positive in every period, but that book was chosen by looking at
-this table, so 0.90 is an upper bound, not an estimate.
-
-![Correlations](docs/img/vb_correlation.png)
-
-Notes:
-
-- Timing: a signal from data known at the close of day t sets the position for day
-  t+1. COT reports (as of Tuesday) are released Friday at 3:30pm ET, after the oil
-  settlement, so they are first used at Monday's close, Tuesday's in holiday weeks,
-  and after the catch-up in the 2013 and 2018-19 shutdowns. EIA weekly stocks are
-  first used at Thursday's close. A truncation test (rerun everything with all data
-  cut at a date, compare every strategy's returns before that date) finds no
-  differences at three cut dates.
-- Costs: 2bp per side on outright trades plus a full roll each month, 4bp on spreads,
-  1 vol point of bid-ask per variance swap, and 2bp on each monthly re-sizing of
-  the books.
-- Limits: OVX is implied volatility on USO options, a proxy for options on the WTI
-  future, and a variance swap at OVX is not something you can trade at that level.
-  Cushing utilisation uses stocks over their trailing three-year maximum, because
-  EIA's capacity survey is semi-annual and capacity roughly doubled after 2010. The
-  ensembles average each rule over its parameter grid rather than drawing parameters
-  at random as Bouchouev does, which is the deterministic version of the same idea.
-- Tests in `tests/test_virtual_barrels.py`: the roll mapping, carry sign and scale,
-  the reaction function's peak, COT and EIA release timing, Good Friday rolls, that
-  a variance swap settles to strike minus realised and marks implied-vol moves, that
-  moving P&L between calendars loses none of it, and that carry and carry-momentum
-  find nothing on a random-walk curve.
+Two more smoke tests run the LSTM and the reservoir when TensorFlow and ReservoirPy
+are installed. Everything is seeded, and every signal uses only data known at the
+previous close.
 
 Sources: Bouchouev, *Virtual Barrels: Quantitative Trading in the Oil Market*
-(Springer, 2023); *Energy Quantamentals* comments, Oxford Institute for Energy
-Studies: "Myths and Realities about CTAs" (2024), "Who is who in Financial
-Barrels" (2024), "The Revival of the Volatility Risk Premium" (2025), "A Tale of Two
-Algorithms and OPEC+" (2025), "To Follow the Crowd or to Fade the Extremes?" (2025);
-"A Lesson from Physics on Oil Prices" (OIES, 2021).
-
-Reproduce with `python run_virtual_barrels.py` (data in `data/vb/`).
-
-## How it works
-
-```mermaid
-flowchart LR
-    Y[yfinance CL=F<br/>2000-2024] --> C[(cached CSV)]
-    C --> S[split 75/25<br/>chronological]
-    S --> F[fit scaler on<br/>TRAIN ONLY]
-    F --> W[windowed sequences<br/>120 days memory]
-    W --> N[naive<br/>persistence]
-    W --> E[echo state<br/>network]
-    W --> L[stacked<br/>LSTM]
-    N --> M{same targets,<br/>same window}
-    E --> M
-    L --> M
-    R[CME roll calendar] --> M
-    M --> O[RMSE, MAE, MASE,<br/>direction, skill<br/>with and without roll days]
-```
-
-## Decisions
-
-- **Persistence is the benchmark, not the ESN.** Comparing two models to each other
-  answers which is better; it does not answer whether either is any good. On a price
-  series the naive forecast is strong enough that it has to be the reference.
-- **MASE instead of MAPE.** Forced by the data: a percentage error needs a strictly
-  positive denominator and this series has a negative one.
-- **Directional accuracy is reported as undefined for persistence.** A flat forecast
-  makes no directional call at all. Scoring it against the realised sign returns
-  0.000, which reads as perfectly anti-predictive rather than as silent.
-- **Roll dates from the CME rule, not from the data.** Detecting jumps and calling
-  them rolls would be fitting the diagnosis to the symptom.
-- **Both models see identical windows.** They are given the same inputs and scored on
-  the same targets, so any difference is the model rather than the setup.
-- **Everything is seeded.** Two runs give the same numbers.
-
-## Quick start
-
-```bash
-pip install -r requirements.txt
-```
-
-```bash
-python run.py
-```
-
-```
-Evaluation window: 2018-12-18 to 2024-05-30  (1371 days, memory 120)
-model                     rmse          rmse_ex_roll                   mae           mae_ex_roll                  mase  directional_accuracy               seconds
-naive                   2.7134                2.7510                1.3602                1.3604                1.3505                   nan                0.0000
-esn                     7.0013                6.9543                5.1217                5.0922                5.0853                0.4982                0.0539
-lstm                    4.0594                4.0861                2.8244                2.8360                2.8044                0.4769               94.3368
-
-roll: 285 of 5961 days (4.8%), 1.24x the mean absolute change of other days, 5.3% of total variance. 66 fall in the evaluation window.
-
-skill vs naive persistence (positive = better than repeating today's price)
-  esn    RMSE -1.5803   MAE -2.7655   RMSE excluding roll days -1.5279
-  lstm   RMSE -0.4961   MAE -1.0765   RMSE excluding roll days -0.4853
-```
-
-Other options:
-
-```bash
-python run.py --window 60    # the memory length I tried first
-python run.py --no-lstm      # skip TensorFlow, runs in about a second
-python run.py --holdout      # the return-model holdout table above
-python run_strategies.py     # trend, carry and vol targeting on four energy contracts
-python run_virtual_barrels.py  # the Virtual Barrels strategy families and books
-pytest tests -q              # 73 tests, no network; the ESN/LSTM smoke tests need requirements.txt
-```
-
-The first run downloads from Yahoo and caches to `data/wti.csv`, so later runs are
-offline and reproducible.
-
-## Repository guide
-
-| Path | Contents |
-|---|---|
-| `data.py` | Chronological split, leak-free scaling, windowing (pure, no I/O) |
-| `forecast.py` | Walk-forward ridge on returns, DM and binomial tests, sign P&L (pure) |
-| `models.py` | The three forecasters, each returning predictions in dollars |
-| `metrics.py` | RMSE, MAE, MASE, directional accuracy, skill scores, and why MAPE is gone |
-| `roll.py` | CME termination dates and what the contract roll costs |
-| `run.py` | Download and cache, the experiment, the printed tables, `results/` and the figures |
-| `strategies.py` | Trend, carry (including the splice spread) and volatility targeting, P&L with costs (pure) |
-| `run_strategies.py` | Runs the rules on WTI, Brent, RBOB and heating oil; tables, `results/strategies.json`, figures |
-| `virtual_barrels.py` | Curve, positioning, inventory, convergence and volatility strategies from *Virtual Barrels* (pure) |
-| `run_virtual_barrels.py` | Runs them on WTI 2008-2024, the books, parameter robustness, `results/virtual_barrels.json`, figures |
-| `docs/PROTOCOL-2.md` | The second protocol (public spread/basis/dollar features, new holdout) |
-| `docs/PROTOCOL.md` | The evaluation protocol, written before the return models were fitted |
-| `tests/` | 41 tests |
-| `docs/METHODS.md` | My original write-up: why an RNN, the LSTM gates, the reservoir |
-| `legacy/` | The original script, annotated. Does not run on current dependencies |
-
-## Future interests
-
-- **Forecast returns, not levels.** Done for a linear model (see above): no skill over
-  persistence. Next hypothesis: features beyond own-price returns (term structure,
-  inventories), which a price-only model cannot see.
-- **A horizon longer than one day**, where persistence weakens and a model has room to
-  add value.
-- **Exogenous inputs** — inventories, the term structure, the dollar — since a
-  univariate price series has little left in it after the last observation.
-- **Modelling based on *Virtual Barrels* by Dr. Ilia Bouchouev**, which is where I
-  wanted to take this originally and is a better frame for oil specifically than a
-  generic sequence model.
-- **A roll-adjusted continuous series**, built from individual contract months rather
-  than Yahoo's spliced one. Yahoo does not serve expired contracts, so this needs a
-  different data source.
-
-## Notes
-
-- ESN hyperparameters follow Kumar K. (2023), as in the original.
-- `CL=F` is Yahoo's continuous front-month series. See the roll section for what that
-  implies; it is not a roll-adjusted series.
-- Timings are single-core on one machine and vary between runs; they are there for
-  the order-of-magnitude comparison. Every accuracy figure is seeded and stable.
-- All numbers in this README come from `python run.py` and are reproduced in
-  `results/metrics.json`.
+(Springer, 2023) and his *Energy Quantamentals* comments for the Oxford Institute for
+Energy Studies. Moskowitz, Ooi and Pedersen, "Time Series Momentum" (2012).

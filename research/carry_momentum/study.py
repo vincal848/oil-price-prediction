@@ -28,12 +28,12 @@ CAPSTONE = os.path.abspath(
 )
 sys.path.insert(0, CAPSTONE)
 
-from capstone.pbo import cscv
-from capstone.validation.sharpe import (
-    deflated_sharpe_ratio,
-    sharpe_variance,
-)
-from capstone.validation.spanning import spanning_test
+try:  # the formal tests use the capstone validation library (private repository)
+    from capstone.pbo import cscv
+    from capstone.validation.sharpe import deflated_sharpe_ratio, sharpe_variance
+    from capstone.validation.spanning import spanning_test
+except ImportError:  # book.py and multi.py only need the data helpers below
+    cscv = deflated_sharpe_ratio = sharpe_variance = spanning_test = None
 
 # CM_START reruns the frozen study on a later start date (DEVIATIONS.md #9);
 # outputs then go to results/study_<year>.json and trials are logged under that tag.
