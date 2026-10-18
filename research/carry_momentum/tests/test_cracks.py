@@ -16,7 +16,9 @@ def test_winter_strip_holds_dec_to_feb_only_in_aug_to_oct():
     w, on = cracks.strip_weights(idx, [cracks.WINTER])
     aug = w.loc["2020-08-14"]
     assert aug[aug > 0].round(4).to_dict() == {
-        "NCL1220": 0.3333, "NCL0121": 0.3333, "NCL0221": 0.3333
+        "NCL1220": 0.3333,
+        "NCL0121": 0.3333,
+        "NCL0221": 0.3333,
     }
     assert on.loc["2020-07-31"] == 0 and on.loc["2020-08-03"] == 1
     assert on.loc["2020-10-30"] == 1 and on.loc["2020-11-02"] == 0
@@ -36,4 +38,4 @@ def test_stock_report_is_used_six_days_after_the_week_ends():
     assert (z.index - weeks).unique().tolist() == [pd.Timedelta(days=6)]
     assert (z.index.dayofweek == 3).all()  # Thursday
     # The first five years have no full norm.
-    assert z.loc[: "2012-12-31"].isna().all()
+    assert z.loc[:"2012-12-31"].isna().all()

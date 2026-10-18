@@ -24,12 +24,13 @@ one raised:
    trend strategies run as one book from 2003 to 2026: 8.0% a year after costs, a
    0.56 Sharpe, positive in 17 of 24 years.
 6. **[The energy book.](#part-6-the-energy-book-crude-gas-and-products)** The same
-   three strategies on WTI, Brent, natural gas, heating oil, gasoline and gasoil:
-   11.4% a year after costs and a 0.76 Sharpe, with the worst drawdown cut from −54%
-   to −41%. Crack and arb spreads were tested two ways. Run mechanically they lose,
-   and run as seasonal strips the summer gasoline cracks earn a real seasonal premium.
+   three strategies on WTI, Brent, natural gas, heating oil, gasoline and gasoil,
+   plus seasonal crack strips: 11.6% a year after costs and a 0.79 Sharpe, with the
+   worst drawdown cut from −54% to −37% and the 2022-25 loss from −50% to −31%.
+   Crack spreads run mechanically lose, and run as seasonal strips they earn a real
+   seasonal premium.
 
-![The energy books against the WTI-only book, 2003-2026, net of costs](research/carry_momentum/results/multi/equity.png)
+![The energy book against the WTI-only book, 2003-2026, net of costs](research/carry_momentum/results/energy/equity.png)
 
 ## Part 1. Forecasting the price
 
@@ -795,22 +796,55 @@ to 0.49 by itself, which is the refiner's margin rising over these twenty years.
 As a book, the inventory losses outweigh the strips: −2.3% a year (Sharpe −0.14), and
 it lowers the core book when combined. The usable result is narrower. The summer
 RBOB and 3-2-1 strips earn a seasonal premium while in the market only part of the
-year, and they made money through 2022-25. That makes them a candidate overlay for the core book, and
-a test of that is the obvious next step.
+year, and they made money through 2022-25.
+
+### The final energy book
+
+So the strips go into the book. I committed the rule before running it (the addendum
+to the crack protocol): the three seasonal strip strategies, exactly as tested and
+with none dropped, join the 18 outright sleeves of the all-markets book. All 21 are
+weighted equally and the book is scaled to 15% volatility as before. The inventory
+strategy stays out.
+
+| | WTI only | All markets | All markets + crack strips |
+|---|---|---|---|
+| Annual return | 8.0% | 11.4% | **11.6%** |
+| Sharpe / Sortino | 0.56 / 0.74 | 0.76 / 1.02 | **0.79 / 1.06** |
+| Growth of $1 | $5.99 | $13.03 | **$13.68** |
+| Max drawdown | −54% | −41% | **−37%** |
+| Longest drawdown | 1,023 days | 658 days | 658 days |
+| Positive years | 17/24 | 15/24 | 16/24 |
+| June 2022 to December 2025 | −50% | −37% | **−31%** |
+| 2014-16 collapse | +54% | +111% | +104% |
+
+![The energy book](research/carry_momentum/results/energy/equity.png)
+
+The strips are correlated 0.08 with the rest of the book. Three sleeves out of 21,
+in the market for part of each year, move the totals a little: 0.2 points of return,
+0.03 of Sharpe. They do most of their work where the book was weakest, cutting the
+2022-25 loss by six points and the worst drawdown by five. They give up a little in
+the big trending crashes, where the outright sleeves were already doing the work.
+
+The inventory signal is the open item. EIA's weekly numbers are national totals from
+a survey, published with a lag. A desk would use regional and closer-to-real-time
+data (New York Harbor and Gulf Coast product stocks, ARA storage, tank and satellite
+counts), which is paid data I do not have here.
 
 Notes:
 
 - The outright run added 28 configurations to the trial ledger before running (24
   market and strategy pairs and four books), the spreads added 52 (24 spread and
   strategy pairs at each cost basis, and four books), and the crack rebuild added 17
-  (nine strategies, two books and six placebos). The ledger now holds 351.
+  (nine strategies, two books and six placebos), and the final book one more. The
+  ledger now holds 352.
 - The markets and strategies were fixed before any multi-market result was seen.
   The liquidity rule came after the first run, as described above, and no market was
   dropped for its returns.
 - Rerunning the WTI market through the multi-market code reproduces Part 5 exactly.
 
-Reproduce with `python multi.py`, `python spreads.py` and `python cracks.py` (one to
-three minutes each, writing to `research/carry_momentum/results/`).
+Reproduce with `python multi.py`, `python spreads.py`, `python cracks.py` and
+`python energy_book.py` (one to three minutes each, writing to
+`research/carry_momentum/results/`).
 
 ## Decisions that run through the project
 
@@ -843,7 +877,7 @@ pytest tests research/carry_momentum/tests -q   # 96 tests, no network
 | 3. Virtual Barrels | `virtual_barrels.py` | `python run_virtual_barrels.py` |
 | 4. Curve and study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python reconcile.py`, `python study.py` |
 | 5. Book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
-| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py`, `cracks.py` | `python multi.py`, `python spreads.py`, `python cracks.py` |
+| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py`, `cracks.py`, `energy_book.py` | `python multi.py`, `python spreads.py`, `python cracks.py`, `python energy_book.py` |
 
 - Parts 1-3 download from Yahoo, FRED, EIA and CFTC on the first run and cache
   locally.
