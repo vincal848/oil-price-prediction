@@ -10,6 +10,7 @@ WRDS and are not redistributed). Each source, how it was obtained, and what it h
 | `gsci_crude.xls` | S&P Dow Jones Indices, S&P GSCI Crude Oil (index id 10003087), daily, export of 2026-10-15 | Reconciliation target, 2016-09 to 2026-10 |
 | `cot_wti_disagg.csv` | CFTC Public Reporting Environment, disaggregated futures-only, NYMEX WTI (067651) | Weekly positions incl. spreading, 2006-06 to 2026-10 |
 | `USCRUDE.csv`, `CUSHING.csv` | EIA weekly stocks (WCESTUS1, Cushing) | Mechanism test only |
+| `USDISTILLATE.csv`, `USGASOLINE.csv` | EIA weekly US distillate and total motor gasoline stocks (WDISTUS1, WGTSTUS1), same pull as Part 3 | Crack inventory signal (`cracks.py`) |
 | `aqr_tsmom_monthly.xlsx` | AQR Data Sets, "Time Series Momentum: Factors, Monthly" | TSMOM^CM for the novelty test |
 | `CL_yahoo.csv` | Yahoo `CL=F` | Tie-break source only (identified the Datastream 2007 expiry error) |
 
