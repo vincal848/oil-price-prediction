@@ -196,21 +196,18 @@ def trading(book: engine.Book, d: dict) -> dict:
     u = book.units.loc[START:]
     traded = h.diff().abs().sum(axis=1)
     cost = book.cost.loc[START:]
-    caps = {
-        q: engine.capacity(
-            engine.Book(
-                book.returns.loc[START:],
-                book.gross.loc[START:],
-                h,
-                u,
-                cost,
-            ),
-            d["vol"],
-            d["oi"],
-            quantile=q,
-        )["capacity"]
-        for q in (None, 0.95)
-    }
+
+    def cap(since: str, q: float | None) -> float:
+        b = engine.Book(
+            book.returns.loc[since:],
+            book.gross.loc[since:],
+            h.loc[since:],
+            u.loc[since:],
+            cost.loc[since:],
+        )
+        return engine.capacity(b, d["vol"], d["oi"], quantile=q)["capacity"]
+
+    caps = {q: cap(START, q) for q in (None, 0.95)}
     sign = np.sign(u)
     return {
         "gross_ann_return": float(book.gross.loc[START:].mean() * 252),
@@ -224,6 +221,9 @@ def trading(book: engine.Book, d: dict) -> dict:
         "avg_contracts_held": float(u.abs().mean()),
         "capacity_worst_day": caps[None],
         "capacity_q95": caps[0.95],
+        # Electronic trading made every market here deeper after the mid-2000s.
+        "capacity_worst_day_since_2010": cap("2010-01-01", None),
+        "capacity_q95_since_2010": cap("2010-01-01", 0.95),
     }
 
 

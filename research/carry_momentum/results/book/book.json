@@ -67,7 +67,9 @@
         "time_short": 0.4902530779753762,
         "avg_contracts_held": 78.12978796169631,
         "capacity_worst_day": 15344677.419354841,
-        "capacity_q95": 84902628.85674994
+        "capacity_q95": 84902628.85674994,
+        "capacity_worst_day_since_2010": 89641331.65829146,
+        "capacity_q95_since_2010": 199463525.99858364
       }
     },
     "Curve carry (outright)": {
@@ -134,7 +136,9 @@
         "time_short": 0.4594733242134063,
         "avg_contracts_held": 78.8031805745554,
         "capacity_worst_day": 51051034.48275861,
-        "capacity_q95": 111539228.65690751
+        "capacity_q95": 111539228.65690751,
+        "capacity_worst_day_since_2010": 124021022.72727273,
+        "capacity_q95_since_2010": 337792293.35983926
       }
     },
     "Trend (outright)": {
@@ -200,7 +204,9 @@
         "time_short": 0.454172366621067,
         "avg_contracts_held": 52.9671682626539,
         "capacity_worst_day": 42421381.57894737,
-        "capacity_q95": 179731294.95235428
+        "capacity_q95": 179731294.95235428,
+        "capacity_worst_day_since_2010": 161947483.2214765,
+        "capacity_q95_since_2010": 374763808.5563307
       }
     },
     "Carry-momentum (2nd-7th spread)": {
@@ -270,7 +276,9 @@
         "time_short": 0.4719562243502052,
         "avg_contracts_held": 374.9473324213406,
         "capacity_worst_day": 334782.6086956522,
-        "capacity_q95": 3230160.432825349
+        "capacity_q95": 3230160.432825349,
+        "capacity_worst_day_since_2010": 1470991.9028340082,
+        "capacity_q95_since_2010": 10884186.861934625
       }
     },
     "Curve carry gated by slow trend (outright)": {
@@ -336,7 +344,9 @@
         "time_short": 0.30523255813953487,
         "avg_contracts_held": 56.83584131326949,
         "capacity_worst_day": 45693827.16049383,
-        "capacity_q95": 95369668.75816889
+        "capacity_q95": 95369668.75816889,
+        "capacity_worst_day_since_2010": 182440789.47368422,
+        "capacity_q95_since_2010": 334110655.0488151
       }
     },
     "Slow trend 3/6/12m (outright)": {
@@ -402,7 +412,9 @@
         "time_short": 0.46169630642954856,
         "avg_contracts_held": 58.31344049247606,
         "capacity_worst_day": 43037209.30232558,
-        "capacity_q95": 146411418.8550414
+        "capacity_q95": 146411418.8550414,
+        "capacity_worst_day_since_2010": 164150850.34013608,
+        "capacity_q95_since_2010": 357554774.7873936
       }
     }
   },

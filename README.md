@@ -1,10 +1,11 @@
-# WTI crude: from price forecasting to a futures strategy book
+# From WTI price forecasting to an energy futures strategy book
 
 [![tests](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml)
 
 This project started in my mathematical computing coursework as a neural-network
-forecast of the WTI crude price. It ended as a systematic trading book on WTI
-futures. Each stage answered a question the previous one raised:
+forecast of the WTI crude price. It ended as a systematic trading book on crude,
+natural gas and refined product futures. Each stage answered a question the previous
+one raised:
 
 1. **[Forecasting the price.](#part-1-forecasting-the-price)** An LSTM and an echo
    state network lose to the naive forecast that tomorrow's price equals today's.
@@ -19,11 +20,15 @@ futures. Each stage answered a question the previous one raised:
 4. **[Carry-momentum on raw contracts.](#part-4-carry-momentum-on-raw-contracts)** A
    futures curve rebuilt from every NYMEX WTI contract month since 1983, and a
    pre-registered study of carry-momentum on it.
-5. **[The strategy book.](#part-5-the-wti-curve-strategy-book)** Three curve and
+5. **[The WTI strategy book.](#part-5-the-wti-curve-strategy-book)** Three curve and
    trend strategies run as one book from 2003 to 2026: 8.0% a year after costs, a
    0.56 Sharpe, positive in 17 of 24 years.
+6. **[The energy book.](#part-6-the-energy-book-crude-gas-and-products)** The same
+   three strategies on WTI, Brent, natural gas, heating oil, gasoline and gasoil:
+   11.4% a year after costs and a 0.76 Sharpe, with the worst drawdown cut from −54%
+   to −41%.
 
-![The WTI curve strategy book, 2003-2026, net of costs](research/carry_momentum/results/book/equity.png)
+![The energy books against the WTI-only book, 2003-2026, net of costs](research/carry_momentum/results/multi/equity.png)
 
 ## Part 1. Forecasting the price
 
@@ -558,19 +563,117 @@ trend lost −51% against −42%. Both are logged and left out of the book.
 
 The calendar-spread version of carry-momentum did not make the book. Even with a
 slower, banded signal it cost 2.8% a year against 1.2% gross, with $0.3M of capacity.
-Every configuration run anywhere in this repository is in a trial ledger, 254 so far.
+Every configuration run anywhere in this repository is in a trial ledger.
 The full write-up with sizing, risk rules and capacity is
 [BOOK.md](research/carry_momentum/BOOK.md).
 
-## Next: more markets
+## Part 6. The energy book: crude, gas and products
 
-The book's weak spot is a single market grinding sideways. Brent spreads and the
-heating oil and gasoline cracks did not all stay backwardated through 2023-25, so the
-same three strategies there should lose at different times. The code is in place:
-`markets.py` holds contract sizes, tick values and expiry rules for Brent, heating
-oil, gasoline (unleaded, then RBOB from 2006), natural gas and ICE gasoil, and
-`multi.py` runs the book across all of them. Rebuilding WTI through it reproduces the
-book exactly. The contract data for the other markets comes next.
+The WTI book's weak spot was one market grinding lower. Part 6 runs the same three
+strategies, with the same engine, sizing, buffer and costs, on two layers of
+markets:
+
+- Core: WTI, ICE Brent and Henry Hub natural gas, the primaries.
+- Downstream: NYMEX heating oil (ULSD), NYMEX gasoline (unleaded until 2006, then
+  RBOB), ICE low-sulphur gasoil, Rotterdam 3.5% fuel oil and Mont Belvieu propane.
+
+All contracts come from Datastream through WRDS, like WTI: about 720,000
+contract-days across 13 contract families, cut to the contracts within 15 months of
+delivery (16 for Brent). NYMEX
+expiries come from the exchange rules (they match Datastream on 97-99% of
+contracts) and ICE expiries from Datastream. The ICE rows start in September 2003,
+and the book stops on 2 April 2026, when the NYMEX rows end. On a day one exchange
+is shut, that market counts as zero P&L.
+
+Several products on WRDS barely trade, so I left them out: European jet kerosene
+(median daily volume 0), Mont Belvieu physical ethane (one contract listed a day),
+and the Mont Belvieu ethane, butane and natural gasoline swaps, which stop in 2015.
+Fuel oil and propane are cleared monthly swaps, so I costed them at a realistic half
+spread ($0.25 a tonne and 0.17 cents a gallon) instead of the exchange's minimum
+tick.
+
+A market joins the tradeable books only if all three of its strategies could run a
+$10M book on a typical busy day since 2010 (5% of volume, 2% of open interest). I
+added this rule after the first run showed that fuel oil and propane had almost no
+capacity. It looks at capacity only: fuel oil, which made money, fails it along with
+propane, which did not. Both are reported but kept out of the tradeable books.
+
+### Each market
+
+| Market | Data from | Annual return | Sharpe | Max drawdown | Positive years | Costs a year | Capacity, busy day since 2010 |
+|---|---|---|---|---|---|---|---|
+| WTI | 1983 | 8.0% | 0.56 | −54% | 17/24 | 0.6% | $199M |
+| Brent | 2003 | 7.7% | 0.54 | −61% | 13/24 | 0.5% | $221M |
+| Natural gas | 2000 | 4.6% | 0.36 | −51% | 16/24 | 0.7% | $55M |
+| Heating oil | 2000 | 10.5% | 0.70 | −34% | 15/24 | 0.2% | $55M |
+| Gasoline | 2000 | 5.1% | 0.40 | −44% | 15/24 | 0.2% | $63M |
+| Gasoil | 2003 | 10.7% | 0.70 | −51% | 16/24 | 1.3% | $121M |
+| Fuel oil (thin) | 2005 | 5.1% | 0.39 | −42% | 13/22 | 2.0% | $0M |
+| Propane (thin) | 2009 | −1.7% | −0.01 | −69% | 8/18 | 4.8% | $0M |
+
+![Sharpe by market and strategy](research/carry_momentum/results/multi/sharpe_grid.png)
+
+The distillates are the best markets in the project. Heating oil and gasoil each make
+a 0.70 Sharpe, and all three strategies work on both, between 0.45 and 0.58. Diesel
+inventories have a strong seasonal cycle and draw down hard in shortages, which gives
+the curve strategies more to read. Brent's trend strategy (0.56) is twice as good as
+WTI's (0.27).
+
+### The books
+
+| | WTI only | Core book | Downstream book | All markets |
+|---|---|---|---|---|
+| Markets | WTI | WTI, Brent, natural gas | Heating oil, gasoline, gasoil | All six |
+| Annual return | 8.0% | 9.9% | 10.6% | **11.4%** |
+| Sharpe / Sortino | 0.56 / 0.74 | 0.67 / 0.90 | 0.71 / 0.93 | **0.76 / 1.02** |
+| Growth of $1 | $5.99 | $9.36 | $11.06 | **$13.03** |
+| Max drawdown | −54% | −46% | −38% | −41% |
+| Longest drawdown | 1,023 days | 987 days | 1,529 days | **658 days** |
+| Positive years | 17/24 | 16/24 | 16/24 | 15/24 |
+| Correlation to WTI | −0.06 | −0.04 | 0.06 | 0.02 |
+| June 2022 to December 2025 | −50% | −44% | −23% | −37% |
+
+Each book weights every market and strategy equally and targets 15% volatility. The
+all-markets book makes 3.4 points a year more than the WTI book, with a drawdown 12
+points smaller and less than two thirds as long. Adding fuel oil and propane would
+lower its Sharpe to 0.74 and deepen its drawdown to −50%.
+
+![Market correlations](research/carry_momentum/results/multi/correlation.png)
+
+Natural gas is the real diversifier. Its book is correlated 0.02 to 0.08 with every
+oil market. The tradeable oil markets are correlated with each other at 0.42 to 0.76, so the
+products add less than their number suggests.
+
+### Did more markets fix the grind?
+
+Partly. Over June 2022 to December 2025 the all-markets book lost 37% against 50% for
+WTI alone.
+
+![2022-25 by market](research/carry_momentum/results/multi/grind.png)
+
+The loss was spread across the whole crude complex: Brent −57%, gasoline −36%. The
+distillates held close to flat (heating oil −12%, gasoil −4%). Their curve and trend
+moved more cleanly through the 2022 diesel shortage and its unwinding than crude's. Natural gas made +28%,
+mostly from carry-momentum (+31%), as gas fell from about $9 to about $2.
+One gas market against five oil markets was not enough to offset the oil losses.
+
+![WTI declines](research/carry_momentum/results/multi/oil_drops.png)
+
+In the crashes, more markets made the book stronger. Through 2014-16 the
+all-markets book made +111% against +54% for WTI alone, through 2008 +33% against
++22%, and through COVID +23% against +16%.
+
+Notes:
+
+- 28 configurations were added to the trial ledger before running: 24 market and
+  strategy pairs and four books. The ledger now holds 282.
+- The markets and strategies were fixed before any multi-market result was seen.
+  The liquidity rule came after the first run, as described above, and no market was
+  dropped for its returns.
+- Rerunning the WTI market through the multi-market code reproduces Part 5 exactly.
+
+Reproduce with `python multi.py` (about three minutes, writes
+`research/carry_momentum/results/multi/`).
 
 ## Decisions that run through the project
 
@@ -593,7 +696,7 @@ book exactly. The contract data for the other markets comes next.
 
 ```bash
 pip install -r requirements-dev.txt
-pytest tests research/carry_momentum/tests -q   # 89 tests, no network
+pytest tests research/carry_momentum/tests -q   # 91 tests, no network
 ```
 
 | Part | Code | Run |
@@ -603,11 +706,11 @@ pytest tests research/carry_momentum/tests -q   # 89 tests, no network
 | 3. Virtual Barrels | `virtual_barrels.py` | `python run_virtual_barrels.py` |
 | 4. Curve and study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python reconcile.py`, `python study.py` |
 | 5. Book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
-| Next | `research/carry_momentum/markets.py`, `multi.py` | `python multi.py` |
+| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py` | `python multi.py` (about three minutes) |
 
 - Parts 1-3 download from Yahoo, FRED, EIA and CFTC on the first run and cache
   locally.
-- Parts 4-5 need the Datastream contract files, which are licensed through WRDS and
+- Parts 4-6 need the Datastream contract files, which are licensed through WRDS and
   not committed. [DATA.md](research/carry_momentum/DATA.md) says how to rebuild them.
 - `study.py` also needs the private capstone validation library. `book.py` and
   `multi.py` run without it.

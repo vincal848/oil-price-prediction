@@ -96,6 +96,13 @@ MARKETS = {
             tier="downstream",
         ),
         Market("Gasoil", ("LLE",), 100, 25.0, None, tier="downstream"),
+        # Cleared monthly swaps: thin, so cost one "tick" at a realistic half spread
+        # ($0.25/t on 1,000 t of fuel oil, 0.17 c/gal on 42,000 gal of propane)
+        # instead of the exchange's minimum tick.
+        Market("Fuel oil", ("NUE",), 1000, 250.0, None, tier="downstream"),
+        Market(
+            "Propane", ("NBG",), 42000, 70.0, None, tier="downstream", complex="gas"
+        ),
     ]
 }
 

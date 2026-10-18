@@ -34,3 +34,14 @@ def test_dollar_pnl_scales_with_contract_multiplier():
     a = engine.unit_dollar_pnl(px, w, multiplier=1000)
     b = engine.unit_dollar_pnl(px, w, multiplier=42000)
     assert (b - a * 42).abs().max() < 1e-9
+
+
+def test_core_tier_is_the_primaries():
+    core = {m.name for m in markets.MARKETS.values() if m.tier == "core"}
+    assert core == {"WTI", "Brent", "Natural gas"}
+
+
+def test_swap_costs_use_a_realistic_half_spread():
+    # Fuel oil: $0.25/t on 1,000 t is $250 a side before fees and the TAS premium.
+    fo = markets.MARKETS["fuel_oil"].costs
+    assert fo.outright == 250.0 + engine.FEES + 125.0

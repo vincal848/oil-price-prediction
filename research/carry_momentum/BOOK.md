@@ -143,10 +143,10 @@ That episode argues for:
   Returns and drawdowns scale with the target, and the Sharpe ratio does not change.
 - **A drawdown rule.** Halve the size once the book is down more than twice its annual
   vol target, and restore it at a new high. This rule has not been backtested here.
-- **More markets for more breadth.** The fix for the 2022-25 grind is probably not a
-  better WTI signal but other curves. Brent spreads and the product cracks (heating oil,
-  gasoline) did not all stay backwardated through 2023-25, so the same three signals there
-  should lose at different times. This is the next build.
+- **More markets for more breadth.** This is now done: the same three strategies on
+  Brent, natural gas, heating oil, gasoline and gasoil make 11.4% a year with a 0.76
+  Sharpe, and cut the 2022-25 loss from -50% to -37%. See Part 6 of the
+  [project README](../../README.md#part-6-the-energy-book-crude-gas-and-products).
 
 ![rolling](results/book/rolling_sharpe.png)
 

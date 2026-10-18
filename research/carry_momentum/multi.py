@@ -26,6 +26,9 @@ START = book.START
 OUT = os.path.join(RESULTS, "multi")
 SLEEVES = ["Carry-momentum", "Curve carry", "Trend"]
 GRIND = ("2022-06-15", "2025-12-31")
+# A market joins the tradeable books only if every sleeve could run a $10M book
+# on a typical busy day since 2010 (95th percentile day at 5% of volume, 2% of OI).
+LIQUIDITY_MIN = 10e6
 
 
 def signals(d: dict) -> dict[str, pd.Series]:
@@ -81,6 +84,7 @@ def window_return(r: pd.Series, a: str, b: str) -> float:
 
 
 def figures(
+    layers: dict,
     books: pd.DataFrame,
     grid: pd.DataFrame,
     corr: pd.DataFrame,
@@ -95,25 +99,35 @@ def figures(
     plt.rcParams.update(
         {"font.size": 10, "axes.spines.top": False, "axes.spines.right": False}
     )
-    pal = ["#1f4e79", "#c55a11", "#548235", "#7f6000", "#7030a0", "#2e75b6", "#a5a5a5"]
 
-    # 1. Equity: each market's book, WTI-only book, full book
+    # 1. Equity: the WTI-only book against the multi-market books
+    lines = {
+        "WTI only": books["WTI"],
+        "Core book (WTI, Brent, gas)": books["Core book"],
+    }
+    for k in ("Downstream book", "All markets"):
+        if k in layers:
+            lines[k] = layers[k]
+    style = {
+        "WTI only": ("#9dc3e6", 1.3),
+        "Core book (WTI, Brent, gas)": ("#1f4e79", 1.8),
+        "Downstream book": ("#c55a11", 1.4),
+        "All markets": ("black", 2.6),
+    }
     fig, (a, b) = plt.subplots(2, 1, figsize=(11, 7), height_ratios=[3, 1], sharex=True)
-    for (k, r), c in zip(books.drop(columns=["Core book"]).items(), pal):
-        a.plot((1 + r).cumprod(), label=k, color=c, lw=1.0, alpha=0.85)
-    a.plot((1 + books["Core book"]).cumprod(), label="Core book", color="black", lw=2.6)
+    for k, r in lines.items():
+        c, lw = style[k]
+        a.plot((1 + r.dropna()).cumprod(), label=k, color=c, lw=lw)
     a.set_yscale("log")
     a.set_ylabel("Growth of $1 (log), net of costs")
-    a.set_title("Energy curve book: three sleeves on every market, 2003-2026")
-    a.legend(frameon=False, loc="upper left", ncol=2, fontsize=9)
-    for k, c in (("Core book", "black"), ("WTI", pal[0])):
-        dd = book.drawdown(books[k]) * 100
-        b.plot(
-            dd,
-            color=c,
-            lw=1.4 if k == "Core book" else 0.9,
-            label=k + (" only" if k == "WTI" else ""),
-        )
+    a.set_title("Energy curve books, 2003-2026, 15% vol target, net of costs")
+    a.legend(frameon=False, loc="upper left", fontsize=9)
+    for k in ("WTI only", "All markets"):
+        if k in lines:
+            c, lw = style[k]
+            b.plot(
+                book.drawdown(lines[k].dropna()) * 100, color=c, lw=lw * 0.6, label=k
+            )
     b.set_ylabel("Drawdown %")
     b.legend(frameon=False, fontsize=8, loc="lower left")
     fig.tight_layout()
@@ -156,31 +170,30 @@ def figures(
     fig.savefig(os.path.join(OUT, "correlation.png"), dpi=150)
     plt.close(fig)
 
-    # 4. Oil declines: WTI-only book vs full book
+    # 4. Oil declines: WTI-only book against the multi-market books
     names = list(drops)
     x = np.arange(len(names))
-    w = np.array([drops[n]["wti_book"] for n in names]) * 100
-    f = np.array([drops[n]["core_book"] for n in names]) * 100
+    series = [
+        ("wti_book", "WTI-only book", "#9dc3e6"),
+        ("core_book", "Core book (WTI, Brent, gas)", "#1f4e79"),
+        ("all_markets", "All markets", "black"),
+    ]
+    series = [s for s in series if s[0] in drops[names[0]]]
+    wdt = 0.8 / len(series)
     fig, ax = plt.subplots(figsize=(11, 3.8))
-    ax.bar(x - 0.2, w, 0.4, color="#9dc3e6", label="WTI-only book")
-    ax.bar(x + 0.2, f, 0.4, color="black", label="Core book (WTI, Brent, gas)")
-    for xi, v1, v2 in zip(x, w, f):
-        ax.text(
-            xi - 0.2, v1 + (2 if v1 > 0 else -6), f"{v1:+.0f}", ha="center", fontsize=8
-        )
-        ax.text(
-            xi + 0.2,
-            v2 + (2 if v2 > 0 else -6),
-            f"{v2:+.0f}",
-            ha="center",
-            fontsize=8,
-            fontweight="bold",
-        )
+    for j, (key, label, color) in enumerate(series):
+        v = np.array([drops[n][key] for n in names]) * 100
+        xs = x + (j - (len(series) - 1) / 2) * wdt
+        ax.bar(xs, v, wdt, color=color, label=label)
+        for xi, vi in zip(xs, v):
+            ax.text(
+                xi, vi + (2 if vi > 0 else -7), f"{vi:+.0f}", ha="center", fontsize=7
+            )
     ax.axhline(0, color="black", lw=0.6)
     ax.set_xticks(x, names)
     ax.set_ylabel("% over the decline")
-    ax.set_title("Major WTI declines since 2003: WTI-only book vs full energy book")
-    ax.legend(frameon=False)
+    ax.set_title("Major WTI declines since 2003: WTI-only book vs multi-market books")
+    ax.legend(frameon=False, fontsize=8)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "oil_drops.png"), dpi=150)
     plt.close(fig)
@@ -195,6 +208,8 @@ def figures(
     ax.set_yticks(range(grind.shape[0]), grind.index)
     for i in range(grind.shape[0]):
         for j in range(grind.shape[1]):
+            if np.isnan(grind.iat[i, j]):
+                continue
             ax.text(
                 j,
                 i,
@@ -215,13 +230,31 @@ def main() -> None:
     data = {m.name: markets.inputs(m) for m in mkts}
     runs = {name: run_market(d) for name, d in data.items()}
 
-    sleeve_rets = pd.DataFrame(
+    # Every market stops where WTI does: Datastream's NYMEX rows end before ICE's.
+    end = data["WTI"]["panel"].date.max()
+    own_cal = pd.DataFrame(
         {(mk, s): b.returns for mk, bs in runs.items() for s, b in bs.items()}
-    ).loc[START:]
-    books = pd.DataFrame({mk: book.combine(sleeve_rets[mk]) for mk in runs})
+    ).loc[START:end]
+    # Across markets, a day one exchange is shut (a US holiday at ICE, say) is a
+    # zero-P&L day for that market, not a day it drops out of the average.
+    started = own_cal.notna().cummax()
+    sleeve_rets = own_cal.fillna(0.0).where(started)
+    books = pd.DataFrame(
+        {mk: book.combine(own_cal[mk].dropna(how="all")) for mk in runs}
+    )
     tier = {mk: data[mk]["market"].tier for mk in runs}
-    core = [mk for mk in runs if tier[mk] == "core"]
-    down = [mk for mk in runs if tier[mk] == "downstream"]
+    trading = {
+        mk: {s: book.trading(b, data[mk]) for s, b in bs.items()}
+        for mk, bs in runs.items()
+    }
+    capacity = {
+        mk: min(t["capacity_q95_since_2010"] for t in trading[mk].values())
+        for mk in runs
+    }
+    liquid = {mk: capacity[mk] >= LIQUIDITY_MIN for mk in runs}
+    core = [mk for mk in runs if tier[mk] == "core" and liquid[mk]]
+    down = [mk for mk in runs if tier[mk] == "downstream" and liquid[mk]]
+    thin = [mk for mk in runs if not liquid[mk]]
     log_trial(
         "multi Core book",
         {
@@ -236,7 +269,10 @@ def main() -> None:
     books["Core book"] = book.combine(core_rets)
     layers = {}
     if down:
-        for name, mks in (("Downstream book", down), ("All markets", list(runs))):
+        members = {"Downstream book": down, "All markets": core + down}
+        if thin:
+            members["All markets incl. thin swaps"] = list(runs)
+        for name, mks in members.items():
             log_trial(
                 f"multi {name}",
                 {
@@ -248,20 +284,25 @@ def main() -> None:
             )
             layers[name] = book.combine(sleeve_rets[mks])
 
-    wti_oil = held_return(data["WTI"]).loc[START:]
+    wti_oil = held_return(data["WTI"]).loc[START:end]
     res = {
         "start": START,
         "end": str(books.index.max().date()),
         "markets": {},
         "core_book": {},
+        "liquidity_min_q95_since_2010": LIQUIDITY_MIN,
+        "thin_markets": thin,
     }
     for mk, bs in runs.items():
         m = data[mk]["market"]
-        own = held_return(data[mk]).loc[START:]
+        own = held_return(data[mk]).loc[START:end]
         res["markets"][mk] = {
             "first_date": str(data[mk]["panel"].date.min().date()),
             "expiry_check": markets.check_expiries(data[mk]["panel"]),
             "multiplier": m.multiplier,
+            "tier": m.tier,
+            "capacity_q95_since_2010": capacity[mk],
+            "tradeable": liquid[mk],
             "tick": m.tick,
             "book": book.tearsheet(books[mk], wti_oil),
             "corr_to_own_market": float(books[mk].corr(own.reindex(books.index))),
@@ -269,11 +310,11 @@ def main() -> None:
                 s: {
                     "performance": {
                         k: v
-                        for k, v in book.tearsheet(sleeve_rets[(mk, s)], own).items()
+                        for k, v in book.tearsheet(own_cal[(mk, s)], own).items()
                         if k not in ("annual", "crises")
                     },
-                    "trading": book.trading(b, data[mk]),
-                    "grind": window_return(sleeve_rets[(mk, s)], *GRIND),
+                    "trading": trading[mk][s],
+                    "grind": window_return(own_cal[(mk, s)].dropna(), *GRIND),
                 }
                 for s, b in bs.items()
             },
@@ -300,7 +341,7 @@ def main() -> None:
     }
     res["layers"] = {
         name: {
-            "markets": down if name == "Downstream book" else list(runs),
+            "markets": members[name],
             "performance": book.tearsheet(r, wti_oil),
             "grind": window_return(r, *GRIND),
             "corr_to_core_book": float(r.corr(books["Core book"])),
@@ -316,6 +357,11 @@ def main() -> None:
             "wti": float(eq.loc[b] / eq.loc[a] - 1),
             "wti_book": window_return(books["WTI"], a, b),
             "core_book": window_return(books["Core book"], a, b),
+            **(
+                {"all_markets": window_return(layers["All markets"], a, b)}
+                if "All markets" in layers
+                else {}
+            ),
         }
         for n, (a, b) in book.DROPS.items()
     }
@@ -354,10 +400,17 @@ def main() -> None:
     )
     grind["Market book"] = {mk: window_return(books[mk], *GRIND) for mk in runs}
     grind.loc["Core book"] = [np.nan] * len(SLEEVES) + [res["core_book"]["grind"]]
+    if "All markets" in res["layers"]:
+        grind.loc["All markets"] = [np.nan] * len(SLEEVES) + [
+            res["layers"]["All markets"]["grind"]
+        ]
+    label = {mk: f"{mk} (thin)" for mk in thin}
+    grid = grid.rename(index=label)
+    grind = grind.rename(index=label)
 
     with open(os.path.join(OUT, "multi.json"), "w") as f:
         json.dump(res, f, indent=2, default=float)
-    figures(books, grid, corr, grind, drops)
+    figures(layers, books, grid, corr, grind, drops)
 
     print(grid.round(2).to_string())
     print(grind.round(2).to_string())
