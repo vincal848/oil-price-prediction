@@ -1,0 +1,68 @@
+{
+  "rank_match_vs_EIA": {
+    "C1": {
+      "days": 6039,
+      "share_to_the_cent": 0.9966881934095049,
+      "share_within_2c": 0.9970193740685543,
+      "max_abs_diff": 1.499998999999999,
+      "worst_dates": [
+        "2001-09-14",
+        "2010-10-11",
+        "2002-11-06"
+      ]
+    },
+    "C2": {
+      "days": 5998,
+      "share_to_the_cent": 0.9976658886295432,
+      "share_within_2c": 0.9984994998332778,
+      "max_abs_diff": 1.2399909999999998,
+      "worst_dates": [
+        "2003-04-29",
+        "2003-01-03",
+        "2003-04-01"
+      ]
+    },
+    "C3": {
+      "days": 6064,
+      "share_to_the_cent": 0.996042216358839,
+      "share_within_2c": 0.9976912928759895,
+      "max_abs_diff": 1.4799989999999994,
+      "worst_dates": [
+        "2001-09-14",
+        "2003-04-29",
+        "2003-01-03"
+      ]
+    },
+    "C4": {
+      "days": 5975,
+      "share_to_the_cent": 0.9968200836820084,
+      "share_within_2c": 0.9973221757322176,
+      "max_abs_diff": 3.849997000000002,
+      "worst_dates": [
+        "2004-07-20",
+        "2003-04-29",
+        "2002-12-04"
+      ]
+    }
+  },
+  "gsci_crude_all": {
+    "days": 2390,
+    "start": "2016-10-03",
+    "end": "2026-04-02",
+    "correlation": 0.9476834804520792,
+    "tracking_error_annual": 0.15094059878946894,
+    "mean_diff_annual": -0.0020842586514296115,
+    "cumulative_rebuilt": 1.2817605020170904,
+    "cumulative_index": 1.3121525019857088
+  },
+  "gsci_crude_ex_2020_intervention": {
+    "days": 2314,
+    "start": "2016-10-03",
+    "end": "2026-04-02",
+    "correlation": 0.9992177196479267,
+    "tracking_error_annual": 0.01436717601600098,
+    "mean_diff_annual": 0.02923679588370489,
+    "cumulative_rebuilt": 1.4344970704994582,
+    "cumulative_index": 0.8644272236961299
+  }
+}

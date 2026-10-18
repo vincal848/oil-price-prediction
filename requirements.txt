@@ -14,3 +14,11 @@ reservoirpy>=0.4
 # Only needed for the LSTM. `python run.py --no-lstm` skips it, and the test suite
 # does not import it, so CI does not install TensorFlow.
 tensorflow>=2.16
+
+# Research code in research/carry_momentum: block bootstrap, the mechanism
+# regression and the cached contract panels. The formal study (study.py) also
+# uses the capstone validation library from a private repository; book.py and
+# multi.py run without it.
+arch>=7.0
+statsmodels>=0.14
+pyarrow>=15

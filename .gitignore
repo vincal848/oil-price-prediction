@@ -12,3 +12,8 @@ data/
 results/*
 !results/holdout.json
 !results/metrics.json
+!results/strategies.json
+!results/virtual_barrels.json
+
+# Intermediate return arrays written by study.py
+research/carry_momentum/results/_*.npy
