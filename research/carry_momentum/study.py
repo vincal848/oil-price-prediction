@@ -17,7 +17,6 @@ import curve
 import engine
 import numpy as np
 import pandas as pd
-from arch.bootstrap import StationaryBootstrap
 from reconcile import contracts
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -113,6 +112,8 @@ def bootstrap_sharpe_ci(
     r: pd.Series, reps: int = 10000, block: int = 21, seed: int = 0
 ) -> tuple[float, float]:
     x = r.dropna().to_numpy()
+    from arch.bootstrap import StationaryBootstrap  # only the formal study needs it
+
     bs = StationaryBootstrap(block, x, seed=seed)
     draws = bs.apply(lambda a: a.mean() / a.std() * np.sqrt(252), reps).ravel()
     return float(np.percentile(draws, 5)), float(np.percentile(draws, 95))
@@ -123,6 +124,8 @@ def bootstrap_63d(
 ) -> dict:
     """Distribution of 63-day compounded returns, for the live test."""
     x = r.dropna().to_numpy()
+    from arch.bootstrap import StationaryBootstrap  # only the formal study needs it
+
     bs = StationaryBootstrap(block, x, seed=seed)
     draws = np.array([np.prod(1 + d[0][0][:63]) - 1 for d in bs.bootstrap(reps)])
     return {f"p{q}": float(np.percentile(draws, q)) for q in (5, 25, 50, 75, 95)}
