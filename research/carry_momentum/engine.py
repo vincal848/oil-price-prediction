@@ -36,6 +36,11 @@ class Costs:
     def scaled(self, k: float) -> Costs:
         return Costs(self.outright * k, self.spread * k)
 
+    @classmethod
+    def for_tick(cls, tick: float, fees: float = FEES) -> Costs:
+        """Protocol costs for a contract whose one-tick value is `tick` dollars."""
+        return cls(tick + fees + tick / 2, tick + 2 * (fees + tick / 2))
+
 
 # ---------------------------------------------------------------------------
 # Signal
@@ -124,11 +129,13 @@ def leg_weights(panel: pd.DataFrame, offset: int) -> pd.DataFrame:
     return w.unstack(fill_value=0.0)
 
 
-def unit_dollar_pnl(prices: pd.DataFrame, weights: pd.DataFrame) -> pd.Series:
+def unit_dollar_pnl(
+    prices: pd.DataFrame, weights: pd.DataFrame, multiplier: float = BBL
+) -> pd.Series:
     """$ P&L per contract-unit of a leg from d-1 to d (weights at close of d-1)."""
     w = weights.reindex(index=prices.index, columns=prices.columns, fill_value=0.0)
     dp = prices.diff().fillna(0.0)
-    return (w.shift(1).fillna(0.0) * dp).sum(axis=1) * BBL
+    return (w.shift(1).fillna(0.0) * dp).sum(axis=1) * multiplier
 
 
 # ---------------------------------------------------------------------------
@@ -156,6 +163,7 @@ def run(
     costs: Costs | None = None,
     spread_trade: bool = True,
     buffer: float = 0.0,
+    multiplier: float = BBL,
 ) -> Book:
     """Simulate the strategy on whole contracts.
 
@@ -166,7 +174,9 @@ def run(
     """
     costs = costs or Costs()
     idx = prices.index
-    unit_pnl = sum(sign * unit_dollar_pnl(prices, w) for sign, w in legs.values())
+    unit_pnl = sum(
+        sign * unit_dollar_pnl(prices, w, multiplier) for sign, w in legs.values()
+    )
     # Ex-ante $ vol of one unit, from P&L through day t.
     vol = np.sqrt((unit_pnl**2).ewm(com=vol_com, min_periods=20).mean() * 252)
     size = (target_vol * capital / vol).replace([np.inf, -np.inf], np.nan)
@@ -195,7 +205,7 @@ def run(
     )
 
     dp = prices.reindex(columns=holdings.columns).diff().fillna(0.0)
-    gross_dollars = (holdings.shift(1).fillna(0.0) * dp).sum(axis=1) * BBL
+    gross_dollars = (holdings.shift(1).fillna(0.0) * dp).sum(axis=1) * multiplier
 
     # Costs: unit changes as spreads (or outright legs), plus rolls as spreads.
     d_units = units.diff().abs().fillna(units.abs())
