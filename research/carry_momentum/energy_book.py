@@ -17,6 +17,7 @@ import cracks
 import engine
 import markets
 import multi
+import numpy as np
 import pandas as pd
 from study import RESULTS, log_trial
 
@@ -68,6 +69,65 @@ def strip_sleeves() -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
+COMPONENTS = {
+    "WTI": ["WTI"],
+    "Brent": ["Brent"],
+    "Natural gas": ["Natural gas"],
+    "Products, outright": ["Heating oil", "Gasoline", "Gasoil"],
+    "Crack strips": list(cracks.CRACKS),
+}
+
+
+def attribution(sleeves: pd.DataFrame, oil: pd.Series) -> dict:
+    """Split the book into what each component and strategy contributes.
+
+    The book is lev_t times the mean of the sleeves live on day t, so each
+    sleeve contributes lev_t * r_it / n_t, and the contributions add up to the
+    book exactly. Risk share is each part's covariance with the book over the
+    book's variance. Leave-one-out books drop one component and are rebuilt.
+    """
+    eq = sleeves.mean(axis=1)
+    vol = eq.rolling(252, min_periods=63).std().shift(1) * np.sqrt(252)
+    lev = (0.15 / vol).clip(upper=3.0).fillna(1.0)
+    n = sleeves.notna().sum(axis=1)
+    contrib = sleeves.mul(lev / n, axis=0)
+    total = contrib.sum(axis=1)
+
+    def summarise(groups: dict) -> dict:
+        out = {}
+        for g, cols in groups.items():
+            c = contrib[cols].sum(axis=1)
+            out[g] = {
+                "return_contribution": float(c.mean() * 252),
+                "risk_share": float(c.cov(total) / total.var()),
+                "grind_contribution": float(c.loc[slice(*multi.GRIND)].sum()),
+            }
+        return out
+
+    by_component = {
+        k: [c for c in sleeves.columns if c[0] in v] for k, v in COMPONENTS.items()
+    }
+    by_strategy = {}
+    for c in sleeves.columns:
+        by_strategy.setdefault(c[1], []).append(c)
+    loo = {}
+    for k, cols in by_component.items():
+        r = book.combine(sleeves.drop(columns=cols))
+        p = book.tearsheet(r, oil)
+        loo[k] = {
+            "cagr": p["cagr"],
+            "sharpe": p["sharpe"],
+            "max_drawdown": p["max_drawdown"],
+            "grind": multi.window_return(r.dropna(), *multi.GRIND),
+        }
+    return {
+        "check_max_abs_diff": float((total - book.combine(sleeves)).abs().max()),
+        "by_component": summarise(by_component),
+        "by_strategy": summarise(by_strategy),
+        "leave_one_out": loo,
+    }
+
+
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
     wti = markets.inputs(markets.MARKETS["wti"])
@@ -109,9 +169,12 @@ def main() -> None:
         for n, (a, b) in book.DROPS.items()
     }
     res["strip_corr_to_all_markets"] = float(strips.mean(axis=1).corr(without))
+    log_trial("energy leave-one-out decomposition", {"diagnostic": True})
+    res["attribution"] = attribution(pd.concat([out, strips], axis=1), oil)
     with open(os.path.join(OUT, "energy.json"), "w") as f:
         json.dump(res, f, indent=2, default=float)
     figure(books)
+    attribution_figure(res["attribution"])
 
     for k, p in res["books"].items():
         print(
@@ -128,6 +191,41 @@ def main() -> None:
         },
     )
     print("strip corr", round(res["strip_corr_to_all_markets"], 2))
+
+
+def attribution_figure(att: dict) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    plt.rcParams.update(
+        {"font.size": 10, "axes.spines.top": False, "axes.spines.right": False}
+    )
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4), sharey=True)
+    comp = att["by_component"]
+    names = list(comp)[::-1]
+    for ax, key, title, scale in (
+        (axes[0], "return_contribution", "Return contribution, % a year", 100),
+        (axes[1], "risk_share", "Share of book risk, %", 100),
+        (axes[2], "grind_contribution", "Contribution over 2022-25, %", 100),
+    ):
+        v = [comp[n][key] * scale for n in names]
+        ax.barh(names, v, color=["#548235" if x > 0 else "#c00000" for x in v])
+        for i, x in enumerate(v):
+            ax.text(
+                x,
+                i,
+                f" {x:+.1f}" if key != "risk_share" else f" {x:.0f}",
+                va="center",
+                fontsize=9,
+            )
+        ax.axvline(0, color="black", lw=0.6)
+        ax.set_title(title, fontsize=10)
+    fig.suptitle("What each component adds to the energy book, 2003-2026")
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "attribution.png"), dpi=150)
+    plt.close(fig)
 
 
 def figure(books: dict) -> None:

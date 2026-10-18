@@ -1,38 +1,515 @@
-# From WTI price forecasting to an energy futures strategy book
+# Energy futures strategy book: crude, natural gas and refined products
 
 [![tests](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/vincal848/oil-price-prediction/actions/workflows/tests.yml)
 
-This project started in my mathematical computing coursework as a neural-network
-forecast of the WTI crude price. It ended as a systematic trading book on crude,
-natural gas and refined product futures. Each stage answered a question the previous
-one raised:
+A systematic book that trades the futures curves of six energy markets (WTI, Brent,
+Henry Hub natural gas, heating oil, RBOB gasoline and ICE gasoil) with three curve
+and trend strategies, plus seasonal crack-spread strips. Every contract month comes
+from LSEG Datastream through WRDS, every trade is in whole contracts at the next
+day's settlement, and every number is after trading and roll costs. January 2003 to
+April 2026:
 
-1. **[Forecasting the price.](#part-1-forecasting-the-price)** An LSTM and an echo
-   state network lose to the naive forecast that tomorrow's price equals today's.
-   So do linear return models and spread, basis and dollar predictors, each scored
-   once on data they had never seen.
-2. **[Trend, carry and volatility targeting.](#part-2-trend-carry-and-volatility-targeting)**
-   Changing the question from where price will go to what position to hold. Carry,
-   measured on the futures curve, is the strongest rule.
-3. **[Virtual Barrels.](#part-3-virtual-barrels)** Twelve strategies built on Ilia
-   Bouchouev's book, reading the curve, positioning, inventories and option
-   volatility. Carry-momentum comes out on top.
-4. **[Carry-momentum on raw contracts.](#part-4-carry-momentum-on-raw-contracts)** A
-   futures curve rebuilt from every NYMEX WTI contract month since 1983, and a
-   pre-registered study of carry-momentum on it.
-5. **[The WTI strategy book.](#part-5-the-wti-curve-strategy-book)** Three curve and
-   trend strategies run as one book from 2003 to 2026: 8.0% a year after costs, a
-   0.56 Sharpe, positive in 17 of 24 years.
-6. **[The energy book.](#part-6-the-energy-book-crude-gas-and-products)** The same
-   three strategies on WTI, Brent, natural gas, heating oil, gasoline and gasoil,
-   plus seasonal crack strips: 11.6% a year after costs and a 0.79 Sharpe, with the
-   worst drawdown cut from −54% to −37% and the 2022-25 loss from −50% to −31%.
-   Crack spreads run mechanically lose, and run as seasonal strips they earn a real
-   seasonal premium.
+| | Energy book | WTI on its own |
+|---|---|---|
+| Annual return | **11.6%** | 8.0% |
+| Sharpe / Sortino | **0.79 / 1.06** | 0.56 / 0.74 |
+| Growth of $1 | **$13.68** | $5.99 |
+| Max drawdown | **−37%** | −54% |
+| Longest drawdown | **658 days** | 1,023 days |
+| Positive years | 16 of 24 | 17 of 24 |
+| Correlation to WTI | 0.02 | −0.06 |
+| Best / worst month | +33% / −12% | +31% / −16% |
+| June 2022 to December 2025 | **−31%** | −50% |
 
-![The energy book against the WTI-only book, 2003-2026, net of costs](research/carry_momentum/results/energy/equity.png)
+![The energy book against WTI alone, 2003-2026, net of costs](research/carry_momentum/results/energy/equity.png)
 
-## Part 1. Forecasting the price
+The book makes its money in violent oil moves, in either direction: +34% through the
+2008 crash, +104% through the 2014-16 collapse, +27% through the 2022 Ukraine spike
+and +37% in the March 2026 supply shock. It gives some back when oil drifts or grinds
+lower in steps, which is where diversifying across markets and adding the crack
+strips helped most.
+
+The project began as a neural-network forecast of the WTI price, and the parts that
+did not make the book are written up in the
+[research record](#research-record-what-was-tested-and-left-out) at the end.
+
+**Contents**
+
+- [What the book is made of](#what-the-book-is-made-of)
+- [The strategies](#the-strategies)
+- [The markets](#the-markets)
+- [Seasonal crack strips](#seasonal-crack-strips)
+- [How the book behaves](#how-the-book-behaves)
+- [Trading it](#trading-it)
+- [How the code fits together](#how-the-code-fits-together)
+- [Data and the futures curve](#data-and-the-futures-curve)
+- [Validation](#validation)
+- [Research record: what was tested and left out](#research-record-what-was-tested-and-left-out)
+- [Decisions](#decisions-that-run-through-the-project), [quick start](#quick-start) and [sources](#sources)
+
+## What the book is made of
+
+The book holds 21 sleeves: three strategies on each of six markets, and three
+seasonal crack strips. All are weighted equally and the total is scaled to 15%
+volatility on its trailing one-year volatility. Because the book is a scaled average,
+each sleeve's daily contribution can be measured exactly, and the contributions add
+up to the book's return to the 17th decimal place.
+
+| Component | Sleeves | Return a year | Share of risk | 2022-25 | Book without it: Sharpe, max drawdown |
+|---|---|---|---|---|---|
+| WTI | 3 | 2.0% | 18% | −14% | 0.80, −32% |
+| Brent | 3 | 2.1% | 20% | −17% | 0.81, −31% |
+| Natural gas | 3 | 1.2% | 9% | +4% | 0.74, −42% |
+| Products, outright (heating oil, gasoline, gasoil) | 9 | 6.2% | 51% | −11% | 0.72, −39% |
+| Crack strips (heating oil, RBOB, 3-2-1) | 3 | 0.6% | 2% | +4% | 0.76, −41% |
+| **Whole book** | 21 | 12.2% (arithmetic) | 100% | −31% (compounded) | 0.79, −37% |
+
+![What each component adds](research/carry_momentum/results/energy/attribution.png)
+
+| Strategy, across all markets | Return a year | Share of risk | 2022-25 |
+|---|---|---|---|
+| Carry-momentum | 4.0% | 28% | −14% |
+| Curve carry | 4.3% | 36% | −5% |
+| Trend | 3.3% | 34% | −19% |
+| Seasonal crack strips | 0.6% | 2% | +4% |
+
+What the breakdown shows:
+
+- The refined products are the engine. Nine product sleeves bring half the return
+  and half the risk, and taking them out costs the most Sharpe (0.79 to 0.72).
+- Natural gas and the crack strips are the diversifiers. They are the only
+  components that made money over 2022-25, and the book's drawdown is five points
+  deeper without either of them.
+- WTI and Brent overlap. Their books are correlated 0.76, and the book is marginally
+  better without either one (Sharpe 0.80 or 0.81). The two are kept because the
+  composition was fixed before this breakdown was run, and dropping a market on this
+  result would be fitting to it.
+- Curve carry is the most even contributor. Trend and carry-momentum earn similar
+  amounts but lost most of 2022-25.
+
+## The strategies
+
+The same three strategies run on every market, each long or short that market's
+second listed contract:
+
+- Carry-momentum trades the change in the curve. When the 1-to-13-month spread
+  steepens into backwardation, prompt barrels are getting scarcer than the market had
+  priced, so it goes long. When the curve flattens toward contango, it goes short.
+- Curve carry trades the level of the curve. In backwardation a long position rolls
+  up the curve and earns the roll yield, and in contango a short does. A no-trade band
+  keeps it from flipping on noise.
+- Trend is the standard CTA signal, the average of the 1, 3 and 12-month price
+  directions.
+
+On WTI alone, 2003-2026:
+
+| | Carry-momentum | Curve carry | Trend |
+|---|---|---|---|
+| Signal | Is backwardation getting steeper or flatter? | Is the curve backwardated or in contango? | 1, 3 and 12-month price direction |
+| Annual return (net) | 6.6% | 6.2% | 2.6% |
+| Sharpe | 0.49 | 0.46 | 0.27 |
+| Max drawdown | −47% | −33% | −46% |
+| Positive years | 16/24 | 15/24 | 13/24 |
+| Costs a year | 0.9% | 0.2% | 0.5% |
+| Position flips a year | 28 | 0.8 | 17 |
+| Capacity, worst day / busy day | $15M / $85M | $51M / $112M | $42M / $180M |
+
+Carry-momentum reacts within days and tends to turn first in a crash, which is why
+it made +44% through 2014-16 on WTI.
+
+Curve carry changes sides less than once a year, so it is the cheapest strategy to
+run. Its best year on WTI was 2008 (+74%), short into the contango after the crash.
+
+![Curve carry positioning](research/carry_momentum/results/book/positioning.png)
+
+Trend earns least alone on WTI but pays off in long moves, with +51% through 2014-16
+and +20% through COVID, when curve carry was flat.
+
+Carry-momentum and curve carry are correlated 0.03, and carry-momentum and trend 0.29.
+Weighting the three equally lifts WTI's Sharpe from 0.46-0.49 for the best single
+strategy to 0.56. The full WTI write-up, with sizing and risk rules, is
+[BOOK.md](research/carry_momentum/BOOK.md).
+
+![Calendar-year returns](research/carry_momentum/results/book/annual.png)
+
+## The markets
+
+The same strategies, engine, sizing and costs run on every market. Brent and Henry
+Hub natural gas join WTI as the primaries. The refined products are NYMEX heating oil
+(ULSD), NYMEX gasoline (unleaded until 2006, then RBOB) and ICE low-sulphur gasoil,
+traded outright here and as crack spreads further down.
+
+A market joins the book only if all three of its strategies could run a $10M book on
+a typical busy day since 2010 (5% of volume, 2% of open interest). I added this rule
+after the first run showed that Rotterdam fuel oil and Mont Belvieu propane, both
+cleared monthly swaps, had almost no capacity. It looks at capacity only: fuel oil,
+which made money, fails it along with propane, which did not.
+
+| Market | Data from | Annual return | Sharpe | Max drawdown | Positive years | Costs a year | Capacity, busy day since 2010 |
+|---|---|---|---|---|---|---|---|
+| WTI | 1983 | 8.0% | 0.56 | −54% | 17/24 | 0.6% | $199M |
+| Brent | 2003 | 7.7% | 0.54 | −61% | 13/24 | 0.5% | $221M |
+| Natural gas | 2000 | 4.6% | 0.36 | −51% | 16/24 | 0.7% | $55M |
+| Heating oil | 2000 | 10.5% | 0.70 | −34% | 15/24 | 0.2% | $55M |
+| Gasoline | 2000 | 5.1% | 0.40 | −44% | 15/24 | 0.2% | $63M |
+| Gasoil | 2003 | 10.7% | 0.70 | −51% | 16/24 | 1.3% | $121M |
+| Fuel oil (thin) | 2005 | 5.1% | 0.39 | −42% | 13/22 | 2.0% | $0M |
+| Propane (thin) | 2009 | −1.7% | −0.01 | −69% | 8/18 | 4.8% | $0M |
+
+![Sharpe by market and strategy](research/carry_momentum/results/multi/sharpe_grid.png)
+
+The distillates are the best markets in the project. Heating oil and gasoil each make
+a 0.70 Sharpe, and all three strategies work on both, between 0.45 and 0.58. Diesel
+inventories have a strong seasonal cycle and draw down hard in shortages, which gives
+the curve strategies more to read. Brent's trend strategy (0.56) is twice as good as
+WTI's (0.27).
+
+### Books by market group
+
+| | WTI only | Core book | Downstream book | All markets |
+|---|---|---|---|---|
+| Markets | WTI | WTI, Brent, natural gas | Heating oil, gasoline, gasoil | All six |
+| Annual return | 8.0% | 9.9% | 10.6% | **11.4%** |
+| Sharpe / Sortino | 0.56 / 0.74 | 0.67 / 0.90 | 0.71 / 0.93 | **0.76 / 1.02** |
+| Growth of $1 | $5.99 | $9.36 | $11.06 | **$13.03** |
+| Max drawdown | −54% | −46% | −38% | −41% |
+| Longest drawdown | 1,023 days | 987 days | 1,529 days | **658 days** |
+| Positive years | 17/24 | 16/24 | 16/24 | 15/24 |
+| Correlation to WTI | −0.06 | −0.04 | 0.06 | 0.02 |
+| June 2022 to December 2025 | −50% | −44% | −23% | −37% |
+
+Each book weights every market and strategy equally and targets 15% volatility. The
+all-markets book, before the crack strips, makes 3.4 points a year more than the WTI
+book, with a drawdown 12 points smaller and less than two thirds as long. Adding fuel oil and propane would
+lower its Sharpe to 0.74 and deepen its drawdown to −50%.
+
+![Market correlations](research/carry_momentum/results/multi/correlation.png)
+
+Natural gas is the real diversifier. Its book is correlated 0.02 to 0.08 with every
+oil market. The tradeable oil markets are correlated with each other at 0.42 to 0.76,
+so the products add less than their number suggests.
+
+## Seasonal crack strips
+
+Running crack spreads with the outright strategies did not work (see the
+[research record](#crack-and-arb-spreads-run-mechanically)). That is not how cracks
+are traded, so I rebuilt the three NYMEX cracks (heating oil, RBOB and 3-2-1)
+the way a products desk runs them, and committed the rules
+([CRACKS_PROTOCOL.md](research/carry_momentum/CRACKS_PROTOCOL.md)) before running
+anything:
+
+- Seasonal strips on a fixed calendar every year: long the December-February heating
+  oil crack from August to October, ahead of the heating season, and long the
+  May-August RBOB crack from January to March, ahead of the driving season. The
+  3-2-1 runs both.
+- An inventory signal on the prompt crack: long when US distillate or gasoline stocks
+  are more than half a standard deviation below their five-year average for that
+  week, short when above. Each EIA report is used on the Thursday after its
+  Wednesday release.
+- A risk budget set once a year (10% volatility on $10M from three years of
+  history) instead of a daily volatility target, and listed-spread costs.
+- 2006 to April 2026, NYMEX only, so every leg settles at the same time and RBOB is
+  used throughout.
+
+| | Seasonal strips | Inventories |
+|---|---|---|
+| Heating oil crack | 1.1% a year, Sharpe 0.20, 10 of 20 trades won | −0.9%, 0.01 |
+| RBOB crack | 2.4% a year, Sharpe 0.45, 15 of 21 trades won | −3.8%, −0.38 |
+| 3-2-1 crack | 3.3% a year, Sharpe 0.46, 23 of 41 trades won | −5.2%, −0.47 |
+| June 2022 to December 2025 | +21%, +9%, +17% | −6%, −12%, −6% |
+
+![Each seasonal trade](research/carry_momentum/results/cracks/seasonal_trades.png)
+
+The seasonal strips work, and they made money through 2022-25, the stretch that hurt
+every other book here. Their annual returns are small because they are in the market
+only a quarter of the year (half for the 3-2-1). The RBOB trade is the strongest: 15
+of 21 years were profitable, and the one large loss was 2020 (−18.5%), when COVID
+emptied the roads during the window.
+
+The inventory signal fails on all three. Low stocks did not lead to wider cracks a
+week later. One reading is that by the time EIA publishes, the curve has already
+moved.
+
+Cracks roughly tripled over 2006-2026, so a long-only trade could be riding that
+drift. Two placebos, added after the first run and logged as
+trials, separate the two:
+
+| | Actual strips | Same strips, 3 months earlier | Long the prompt crack all year |
+|---|---|---|---|
+| Heating oil crack | 5.1% a year in the market | 2.8% | 4.1% |
+| RBOB crack | 10.1% | 0.1% | 5.1% |
+| 3-2-1 crack | 7.1% | 1.0% | 5.7% |
+
+Per year actually in the market, the RBOB window earns twice the passive drift, and
+the same trade three months earlier earns nothing. That is a real seasonal effect.
+The 3-2-1's edge over the drift is smaller, and the heating oil winter trade is
+mostly drift. Holding the prompt crack long all year would have had a Sharpe of 0.28
+to 0.49 by itself, which is the refiner's margin rising over these twenty years.
+
+As a book, the inventory losses outweigh the strips: −2.3% a year (Sharpe −0.14), and
+it lowers the core book when combined. The usable result is narrower. The summer
+RBOB and 3-2-1 strips earn a seasonal premium while in the market only part of the
+year, and they made money through 2022-25.
+
+### Adding the strips to the book
+
+The strips went into the book under a rule committed before it was run (the addendum
+to the crack protocol): the three seasonal strip strategies, exactly as tested and
+with none dropped, join the 18 outright sleeves of the all-markets book. All 21 are
+weighted equally and the book is scaled to 15% volatility as before. The inventory
+strategy stays out.
+
+| | WTI only | All markets | All markets + crack strips |
+|---|---|---|---|
+| Annual return | 8.0% | 11.4% | **11.6%** |
+| Sharpe / Sortino | 0.56 / 0.74 | 0.76 / 1.02 | **0.79 / 1.06** |
+| Growth of $1 | $5.99 | $13.03 | **$13.68** |
+| Max drawdown | −54% | −41% | **−37%** |
+| Longest drawdown | 1,023 days | 658 days | 658 days |
+| Positive years | 17/24 | 15/24 | 16/24 |
+| June 2022 to December 2025 | −50% | −37% | **−31%** |
+| 2014-16 collapse | +54% | +111% | +104% |
+
+![The energy book](research/carry_momentum/results/energy/equity.png)
+
+The strips are correlated 0.08 with the rest of the book. Three sleeves out of 21,
+in the market for part of each year, move the totals a little: 0.2 points of return,
+0.03 of Sharpe. They do most of their work where the book was weakest, cutting the
+2022-25 loss by six points and the worst drawdown by five. They give up a little in
+the big trending crashes, where the outright sleeves were already doing the work.
+
+The inventory signal is the open item. EIA's weekly numbers are national totals from
+a survey, published with a lag. A desk would use regional and closer-to-real-time
+data (New York Harbor and Gulf Coast product stocks, ARA storage, tank and satellite
+counts), which is paid data I do not have here.
+
+## How the book behaves
+
+### Crashes and grinds, on WTI
+
+The WTI book makes money when oil crashes and loses when oil grinds lower in steps.
+
+![Oil declines](research/carry_momentum/results/book/oil_drops.png)
+
+| Oil decline | WTI | WTI book | Carry-momentum | Curve carry | Trend |
+|---|---|---|---|---|---|
+| 2008 crash | −72% | **+22%** | +23% | +33% | +5% |
+| 2014-16 collapse | −80% | **+54%** | +48% | −3% | +56% |
+| Q4 2018 | −45% | **+18%** | +35% | +3% | +7% |
+| 2020 COVID | −85% | **+16%** | +16% | −1% | +23% |
+| 2022-23 slide | −41% | −14% | −14% | −15% | −9% |
+| Late 2023 | −25% | −16% | −2% | −11% | −9% |
+| 2024-25 slide | −27% | −28% | −15% | −16% | −16% |
+
+It also made money in the two big rallies: +18% in the 2022 Ukraine spike and +33%
+in the March 2026 supply shock. Averaged by month, the WTI book earns +3.5% when WTI falls
+more than 10% and +4.2% when WTI rises more than 10%, and gives a little back in
+between. That is a long-volatility payoff, and it is why the book holds up in oil
+shocks.
+
+The 2022-25 declines were different from the crashes. OPEC+ cuts kept prompt barrels
+tight while WTI fell from $120 to $60, so the curve stayed backwardated and curve
+carry was long 99% of the time, collecting roll yield while losing more on price. The
+fall came in steps with sharp rebounds, and each rebound caught trend and
+carry-momentum short. The WTI book's deepest drawdown ran from March 2022 to December
+2025: −53% at a 15% vol target and −39% at 10%. It then made +42% in the first three months
+of 2026.
+
+Two fixes for the grind made it worse. Taking carry flat whenever trend disagreed
+lost −40% over 2022-25 against −22% for plain carry. Dropping the 1-month part of
+trend lost −51% against −42%. Both are logged and left out of the book.
+
+### Across markets
+
+More markets cut the 2022-25 loss but did not remove it. Over June 2022 to December
+2025 the all-markets book lost 37% against 50% for WTI alone, and the crack strips
+took the final book to −31%.
+
+![2022-25 by market](research/carry_momentum/results/multi/grind.png)
+
+The loss was spread across the whole crude complex: Brent −57%, gasoline −36%. The
+distillates held close to flat (heating oil −12%, gasoil −4%). Their curve and trend
+moved more cleanly through the 2022 diesel shortage and its unwinding than crude's.
+Natural gas made +28%, mostly from carry-momentum (+31%), as gas fell from about $9 to
+about $2.
+One gas market against five oil markets was not enough to offset the oil losses.
+
+![WTI declines](research/carry_momentum/results/multi/oil_drops.png)
+
+In the crashes, more markets made the book stronger. Through 2014-16 the
+all-markets book made +111% against +54% for WTI alone, through 2008 +33% against
++22%, and through COVID +23% against +16%.
+
+## Trading it
+
+- The 2nd listed contract of each market, rolled one fifth a day on business days 5
+  to 9 (the S&P GSCI schedule), so no position is held into delivery.
+- Signals use day t's settlement. Trades go through at day t+1's settlement with
+  trade-at-settlement orders.
+- Each strategy targets 15% annual volatility on $10M (about 50-80 contracts on WTI).
+  The book rescales the equal-weight blend to target on trailing one-year volatility.
+- Costs per contract a side: one tick, $1.50 of exchange and clearing fees and half a
+  tick to trade at settlement ($16.50 on WTI). Every roll is charged as a calendar
+  spread. Crack strips pay listed-spread costs: $0.01/bbl plus fees on every lot.
+- Capacity, at 5% of volume and 2% of open interest per contract since 2010, is at
+  least $27M on the worst day for every market in the book and $55M to $221M on a
+  typical busy day. The crack strips can carry about $26M on a busy day.
+
+The worst stretch, March 2022 to late 2025, argues for running the book at 10%
+volatility as one sleeve of a broader portfolio. Returns and drawdowns scale with the
+target and the Sharpe ratio does not change.
+
+## How the code fits together
+
+```mermaid
+flowchart LR
+    W[Datastream via WRDS<br/>every contract month] --> M[markets.py<br/>contract specs, expiries,<br/>panels]
+    E[EIA and the GSCI<br/>crude index] --> R[reconcile.py<br/>curve checks]
+    M --> C[curve.py<br/>ranks, constant-maturity<br/>curve, GSCI roll]
+    C --> R
+    C --> S[signals<br/>carry-momentum, curve carry,<br/>trend, seasonal strips]
+    S --> X[engine.py<br/>whole contracts, next-day<br/>settlement, costs, rolls]
+    X --> B[sleeves<br/>6 markets x 3 strategies<br/>+ 3 crack strips]
+    B --> K[energy_book.py<br/>equal weight, 15% vol,<br/>attribution]
+    X -.-> L[(trial ledger)]
+    S -.-> L
+```
+
+| Component | What it does | Code |
+|---|---|---|
+| Contract data | Loads every Datastream contract month, applies exchange expiry rules, drops stale holiday rows | `markets.py`, `curve.py` |
+| Curve and roll | Ranks listed contracts, builds the constant-maturity curve, holds the 2nd contract on the GSCI roll | `curve.py` |
+| Reconciliation | Checks the rebuilt curve against EIA contract prices and the S&P GSCI Crude index | `reconcile.py` |
+| Signals | Carry-momentum, curve carry with a no-trade band, multi-horizon trend, seasonal strips | `engine.py`, `book.py`, `cracks.py` |
+| Execution engine | Whole contracts, next-settlement trades, tick, fee and settlement costs, rolls as calendar spreads, a 25% rebalance buffer, capacity | `engine.py` |
+| Spread engine | Multi-leg positions matched by delivery month, per-leg contract sizes and costs, listed-spread costs | `engine.py` (`Leg`, `run_legs`) |
+| Books | WTI book, multi-market books, crack strips, the final energy book and its attribution | `book.py`, `multi.py`, `cracks.py`, `energy_book.py` |
+| Validation | Pre-registered protocols, trial ledger, bootstrap, deflated Sharpe, PBO, factor spanning | `study.py`, `PROTOCOL.md`, `CRACKS_PROTOCOL.md` |
+
+All code is under `research/carry_momentum/` except the research-record scripts at
+the repository root.
+
+## Data and the futures curve
+
+For WTI: 515,119 daily rows covering all 547 NYMEX WTI contract months since 1983, from LSEG
+Datastream through WRDS, with settlement, volume and open interest for each contract.
+Two independent checks:
+
+- Rebuilt contracts 1-4 match EIA's published series to the cent on 99.6-99.8% of
+  6,000 days (pass mark 99%). Getting there exposed a Datastream error: three 2007
+  contracts carry last trading dates a month early, so expiries come from the CME
+  rule.
+- The roll-scheduled series tracks the S&P GSCI Crude Oil index with a daily
+  correlation of 0.9992 and 1.4% a year tracking error over 2016-2026, outside April
+  2020, when S&P changed the index roll by hand (pass marks 0.98 and 2%).
+
+From that panel the code builds a constant-maturity curve (log-linear interpolation
+at fixed days to expiry), rolls on the GSCI schedule (one fifth a day on business
+days 5 to 9 of each month), and holds whole 1,000-barrel contracts. Every trade
+executes at the next day's settlement and pays a tick, exchange and clearing fees and
+half a tick to trade at settlement. Every roll is charged as a calendar spread.
+
+The other markets come from the same source: about 720,000 contract-days across 13
+contract families, cut to the contracts within 15 months of delivery (16 for Brent).
+NYMEX expiries come from the exchange rules (they match Datastream on 97-99% of
+contracts) and ICE expiries from Datastream. The ICE rows start in September 2003,
+and the book stops on 2 April 2026, when the NYMEX rows end. On a day one exchange is
+shut, that market counts as zero P&L. US product stocks for the crack study are EIA's
+weekly series. Sources and the WRDS queries that rebuild every file are in
+[DATA.md](research/carry_momentum/DATA.md).
+
+## Validation
+
+Three rules run through the work:
+
+- Write the test down first. The carry-momentum study, the crack study and the
+  overlay that added the strips to the book were each committed to GitHub before
+  they were run. Changes made after a result are logged with the reason, and each is
+  flagged where it appears in this README.
+- Count every try. Every configuration run anywhere in this repository is in a trial
+  ledger (`research/carry_momentum/results/trials.jsonl`, 352 entries). The deflated
+  Sharpe in the formal study discounts a result by that count.
+- Check against an independent source. The curve is reconciled to EIA and S&P GSCI,
+  and spread P&L is checked against a hand calculation from raw settlements. The
+  study and the Virtual Barrels strategies were rerun with all data cut at fixed
+  dates, and no earlier return changed, so they never see the future.
+
+### The carry-momentum study
+
+The book grew out of a formal, pre-registered test of carry-momentum on WTI, with
+seven kill criteria. It is stricter than the book: it counts the trial ledger in a
+deflated Sharpe, tests for alpha against WTI and AQR factors, and checks capacity on
+the worst day back to 1990.
+
+The protocol ([PROTOCOL.md](research/carry_momentum/PROTOCOL.md)) was committed
+before any data was pulled. It fixed the signal (carry = ln(F1m/F13m), signal =
+sign of carry minus its 21-day average), two instruments, the cost model, a trial
+count and seven kill criteria. Every later change is logged with its reason in
+[DEVIATIONS.md](research/carry_momentum/DEVIATIONS.md). The two instruments, both on a
+$10m book at 15% volatility:
+
+- H1, a calendar spread: long the 2nd listed contract, short the 7th.
+- H2, an outright: long or short the 2nd listed contract.
+
+| | H1 spread | H2 outright |
+|---|---|---|
+| Net Sharpe, 1990-2026 | −0.18 | 0.44 |
+| Net Sharpe, 2003-2026 | −0.14 | 0.48 |
+| Before costs, 1990-2026 | 0.36 | 0.54 |
+| Costs, % of capital a year | 8.6 | 1.6 |
+| 90% bootstrap interval for Sharpe | −0.50 to 0.15 | 0.15 to 0.72 |
+| Deflated Sharpe (198 trials) | 0.00 | 0.37 |
+| Probability of backtest overfitting, 24 variants | 0.14 | 0.49 |
+| Alpha after WTI and AQR factors (t) | −4.8% (−1.77) | 4.8% (1.91) |
+| Return from spot moves / from the curve | 0 / 5.8% | 6.7% / 1.8% |
+| Capacity, worst day / 95th percentile day | $0.1m / $1.0m | $3.7m / $25m |
+
+The curve signal in the spread is real, but the spread cannot pay for it. Before
+costs it earns 5.8% a year with a 0.36 Sharpe, all from the curve. A 21-day carry
+signal flips about 26 times a year, and a spread has so little dollar volatility that
+a 15% target means 400-500 spreads. With rolls that is 75,000 contracts a year, and
+costs take 8.6 points.
+
+![Spread costs](research/carry_momentum/results/h1_costs.png)
+
+The outright works, mostly as a price bet. 6.7 of its 8.4 points of gross return come
+from spot moves. It replicates the Virtual Barrels result (0.53 on the same window) and holds
+up before 2008 (0.43). It fails three of the kill criteria. The deflated Sharpe counts
+every configuration ever run in this repository, and the alpha t-stat of 1.91 falls
+just short of 2 after controlling for plain carry, to which it loads 0.26. The third
+is capacity on the worst 1990s day. Started in 2003, after the thin pit-traded years,
+the outright's Sharpe rises to 0.48 and its worst-day capacity to $15m.
+
+Bouchouev's storage-hedger mechanism does not show up in the data. If hedgers drive
+the curve, a rise in producers' and merchants' net short should deepen contango the
+next week. The coefficient has the wrong sign (+0.05, t = 0.30, 1,032 weeks).
+
+An independent audit of the code found no look-ahead and six issues, all fixed and
+listed in DEVIATIONS.md. The one that mattered: the factors in the alpha test had
+been built net of costs, which flattered the alpha. Built gross, the t-stat fell from
+2.06 to 1.91. The rules are frozen at commit `dd460df`. The full note is
+[NOTE.md](research/carry_momentum/NOTE.md).
+
+### Notes on the multi-market and crack runs
+
+- The outright run added 28 configurations to the trial ledger before running (24
+  market and strategy pairs and four books), the spreads added 52 (24 spread and
+  strategy pairs at each cost basis, and four books), and the crack rebuild added 17
+  (nine strategies, two books and six placebos). The final book added one. The
+  ledger now holds 352.
+- The markets and strategies were fixed before any multi-market result was seen.
+  The liquidity rule came after the first run, as described under the markets, and
+  no market was dropped for its returns.
+- Rerunning the WTI market through the multi-market code reproduces the WTI book
+  exactly.
+
+Reproduce with `python multi.py`, `python spreads.py`, `python cracks.py` and
+`python energy_book.py` (one to three minutes each, writing to
+`research/carry_momentum/results/`).
+
+## Research record: what was tested and left out
+
+### Forecasting the price
 
 I took WTI crude oil futures (`CL=F`, Yahoo's continuous front-month series) and
 compared an LSTM against an echo state network (ESN) reservoir model. My reasons
@@ -59,7 +536,7 @@ problem with judging a one-step-ahead price model by eye.*
 | Task | One-step-ahead close, 120 trading days of memory |
 | Metrics | RMSE, MAE, MASE, directional accuracy, skill against persistence |
 
-### Results
+#### Results
 
 | model | RMSE | MAE | MASE | directional accuracy | seconds |
 |---|---|---|---|---|---|
@@ -87,7 +564,7 @@ where the information is, and neither model has any.
 
 ![Forecast errors](docs/img/errors.png)
 
-### Does the contract roll explain it?
+#### Does the contract roll explain it?
 
 `CL=F` splices onto the next contract when the front one expires. The change across
 a splice mixes a real price move with the spread between two contracts, and no
@@ -112,7 +589,7 @@ saw it coming.
 
 ![April 2020](docs/img/april_2020.png)
 
-### Returns, scored once on unseen data
+#### Returns, scored once on unseen data
 
 Predicting the price level cannot beat persistence, so I moved to returns.
 [docs/PROTOCOL.md](docs/PROTOCOL.md) fixed the test before any return model was
@@ -153,7 +630,7 @@ across ten seeds, a planted AR(1) signal is found, and forecasts made at a date 
 not change when later prices change (`tests/test_forecast.py`). Reproduce with
 `python run.py --holdout`.
 
-### Second attempt: spread, basis and the dollar
+#### Second attempt: spread, basis and the dollar
 
 [docs/PROTOCOL-2.md](docs/PROTOCOL-2.md) was committed before any data after May
 2024 was downloaded. It set a fresh holdout (2024-06-03 to 2026-10-08, 591 one-day
@@ -186,15 +663,15 @@ weight was 0, its Sharpe has a standard error near 0.65 over 2.4 years, and it i
 best of six. I read it as a lead for a future sample and did not tune anything
 around it. Reproduce with `python run.py --holdout2`.
 
-The conclusion of Part 1: against its own past returns (2019-2024) and against the
+The conclusion: against its own past returns (2019-2024) and against the
 Brent-WTI spread, the spot basis and the dollar (2024-2026), the next-day WTI
 front-month price does not beat persistence, and no directional edge survives the
 multiple-testing correction. The samples are short and only linear models were
 tried, so this is evidence and not proof.
 
-## Part 2. Trend, carry and volatility targeting
+### Price rules on continuous futures
 
-Part 1 asked what tomorrow's price will be, and the answer was today's price.
+The forecasting work asked what tomorrow's price will be, and the answer was today's price.
 Systematic futures traders mostly ask what position to hold, given what the market
 already shows. That does not need a next-day forecast. So I ran the three rules
 behind most CTA books on WTI, Brent, RBOB and heating oil from 2001 to October 2026,
@@ -227,7 +704,7 @@ autocorrelation of the absolute return is 0.17 to 0.25 at one day and still 0.13
 price-level model had nothing to find.
 
 Carry works once it is measured on the right part of the curve. My first version
-used the futures-minus-spot basis, the same feature that failed in Part 1, and it
+used the futures-minus-spot basis, the same feature that failed in the forecasting work, and it
 lost money on every contract. The front month sits almost on top of spot for most of
 its life, so that basis is mostly noise. The slope that matters is next contract
 against front, and a continuous series contains it: on each roll day the basis jumps
@@ -277,9 +754,9 @@ Notes:
 
 Reproduce with `python run_strategies.py`.
 
-## Part 3. Virtual Barrels
+### Virtual Barrels strategy families
 
-The rules in Part 2 only use prices. Ilia Bouchouev's *Virtual Barrels* (2023)
+The rules on continuous futures only use prices. Ilia Bouchouev's *Virtual Barrels* (2023)
 argues that oil is now priced as much by financial barrels as by physical ones.
 Storage hedgers, trend followers, slow inflation-hedging money and option sellers
 each leave a footprint in the curve, the positioning data or the volatility surface.
@@ -383,291 +860,7 @@ Notes:
 
 Reproduce with `python run_virtual_barrels.py`.
 
-## Part 4. Carry-momentum on raw contracts
-
-Carry-momentum was the best rule in Part 3, but it ran on EIA's four-contract curve,
-which stops in April 2024, and on 2008-2024 only. To test it properly I rebuilt the
-curve from individual contracts and wrote the test down before looking at any data.
-
-### The data
-
-515,119 daily rows covering all 547 NYMEX WTI contract months since 1983, from LSEG
-Datastream through WRDS, with settlement, volume and open interest for each contract.
-Two independent checks:
-
-- Rebuilt contracts 1-4 match EIA's published series to the cent on 99.6-99.8% of
-  6,000 days (pass mark 99%). Getting there exposed a Datastream error: three 2007
-  contracts carry last trading dates a month early, so expiries come from the CME
-  rule.
-- The roll-scheduled series tracks the S&P GSCI Crude Oil index with a daily
-  correlation of 0.9992 and 1.4% a year tracking error over 2016-2026, outside April
-  2020, when S&P changed the index roll by hand (pass marks 0.98 and 2%).
-
-From that panel the code builds a constant-maturity curve (log-linear interpolation
-at fixed days to expiry), rolls on the GSCI schedule (one fifth a day on business
-days 5 to 9 of each month), and holds whole 1,000-barrel contracts. Every trade
-executes at the next day's settlement and pays a tick, exchange and clearing fees and
-half a tick to trade at settlement. Every roll is charged as a calendar spread.
-
-### The pre-registered study
-
-The protocol ([PROTOCOL.md](research/carry_momentum/PROTOCOL.md)) was committed
-before any data was pulled. It fixed the signal (carry = ln(F1m/F13m), signal =
-sign of carry minus its 21-day average), two instruments, the cost model, a trial
-count and seven kill criteria. Every later change is logged with its reason in
-[DEVIATIONS.md](research/carry_momentum/DEVIATIONS.md). The two instruments, both on a
-$10m book at 15% volatility:
-
-- H1, a calendar spread: long the 2nd listed contract, short the 7th.
-- H2, an outright: long or short the 2nd listed contract.
-
-| | H1 spread | H2 outright |
-|---|---|---|
-| Net Sharpe, 1990-2026 | −0.18 | 0.44 |
-| Net Sharpe, 2003-2026 | −0.14 | 0.48 |
-| Before costs, 1990-2026 | 0.36 | 0.54 |
-| Costs, % of capital a year | 8.6 | 1.6 |
-| 90% bootstrap interval for Sharpe | −0.50 to 0.15 | 0.15 to 0.72 |
-| Deflated Sharpe (198 trials) | 0.00 | 0.37 |
-| Probability of backtest overfitting, 24 variants | 0.14 | 0.49 |
-| Alpha after WTI and AQR factors (t) | −4.8% (−1.77) | 4.8% (1.91) |
-| Return from spot moves / from the curve | 0 / 5.8% | 6.7% / 1.8% |
-| Capacity, worst day / 95th percentile day | $0.1m / $1.0m | $3.7m / $25m |
-
-The curve signal in the spread is real, but the spread cannot pay for it. Before
-costs it earns 5.8% a year with a 0.36 Sharpe, all from the curve. A 21-day carry
-signal flips about 26 times a year, and a spread has so little dollar volatility that
-a 15% target means 400-500 spreads. With rolls that is 75,000 contracts a year, and
-costs take 8.6 points.
-
-![Spread costs](research/carry_momentum/results/h1_costs.png)
-
-The outright works, mostly as a price bet. 6.7 of its 8.4 points of gross return come
-from spot moves. It replicates the Part 3 result (0.53 on the same window) and holds
-up before 2008 (0.43). It fails three of the kill criteria. The deflated Sharpe counts
-every configuration ever run in this repository, and the alpha t-stat of 1.91 falls
-just short of 2 after controlling for plain carry, to which it loads 0.26. The third
-is capacity on the worst 1990s day. Started in 2003, after the thin pit-traded years,
-the outright's Sharpe rises to 0.48 and its worst-day capacity to $15m.
-
-Bouchouev's storage-hedger mechanism does not show up in the data. If hedgers drive
-the curve, a rise in producers' and merchants' net short should deepen contango the
-next week. The coefficient has the wrong sign (+0.05, t = 0.30, 1,032 weeks).
-
-An independent audit of the code found no look-ahead and six issues, all fixed and
-listed in DEVIATIONS.md. The one that mattered: the factors in the alpha test had
-been built net of costs, which flattered the alpha. Built gross, the t-stat fell from
-2.06 to 1.91. The rules are frozen at commit `dd460df`. The full note is
-[NOTE.md](research/carry_momentum/NOTE.md).
-
-## Part 5. The WTI curve strategy book
-
-The study tested one signal under strict rules. Part 5 asks what a trading desk
-would actually run. It changes three things:
-
-- It starts in 2003, after the thin pit-traded market of the 1990s.
-- Positions rebalance only when the target drifts more than 25% from the current
-  holding, or when the signal flips, which cuts costs.
-- The outright carry-momentum signal is combined with curve carry and trend in one
-  risk-balanced book.
-
-Everything else is the Part 4 machinery: whole contracts, next-day settlement, the
-same costs and rolls. January 2003 to April 2026:
-
-| Combined book | 15% vol target | 10% vol target |
-|---|---|---|
-| Annual return | **8.0%** | **5.7%** |
-| Sharpe / Sortino | **0.56 / 0.74** | 0.57 / 0.76 |
-| Growth of $1 | **$5.99** | $3.63 |
-| Positive calendar years | **17 of 24** | 17 of 24 |
-| Correlation to WTI | **−0.07** | −0.06 |
-| Max drawdown | −53% | −39% |
-| Best / worst month | +31% / −16% | +20% / −11% |
-
-### The three strategies
-
-| | Carry-momentum | Curve carry | Trend |
-|---|---|---|---|
-| Signal | Is backwardation getting steeper or flatter? | Is the curve backwardated or in contango? | 1, 3 and 12-month price direction |
-| Annual return (net) | 6.6% | 6.2% | 2.6% |
-| Sharpe | 0.49 | 0.46 | 0.27 |
-| Max drawdown | −47% | −33% | −46% |
-| Positive years | 16/24 | 15/24 | 13/24 |
-| Costs a year | 0.9% | 0.2% | 0.5% |
-| Position flips a year | 28 | 0.8 | 17 |
-| Capacity, worst day / busy day | $15M / $85M | $51M / $112M | $42M / $180M |
-
-Carry-momentum trades the change in the curve. When the 1-to-13-month spread steepens
-into backwardation, prompt barrels are getting scarcer than the market had priced,
-so it goes long. When the curve flattens toward contango, it goes short. It reacts
-within days and tends to turn first in a crash, which is why it made +44% through
-2014-16.
-
-Curve carry trades the level of the curve. In backwardation a long position rolls up
-the curve and earns the roll yield, and in contango a short does. A no-trade band
-keeps it from flipping on noise, so it changes sides less than once a year and is
-the cheapest strategy to run. Its best year was 2008 (+74%), short into the contango
-after the crash.
-
-![Curve carry positioning](research/carry_momentum/results/book/positioning.png)
-
-Trend is the standard CTA signal. It earns least alone but pays off in long moves,
-with +51% through 2014-16 and +20% through COVID, when curve carry was flat.
-
-Carry-momentum and curve carry are correlated 0.03, and carry-momentum and trend 0.29.
-Weighting the three equally lifts the Sharpe from 0.46-0.49 for the best single
-strategy to 0.56 for the book.
-
-![Calendar-year returns](research/carry_momentum/results/book/annual.png)
-
-### Crashes and grinds
-
-The book makes money when oil crashes and loses when oil grinds lower in steps.
-
-![Oil declines](research/carry_momentum/results/book/oil_drops.png)
-
-| Oil decline | WTI | Book | Carry-momentum | Curve carry | Trend |
-|---|---|---|---|---|---|
-| 2008 crash | −72% | **+22%** | +23% | +33% | +5% |
-| 2014-16 collapse | −80% | **+54%** | +48% | −3% | +56% |
-| Q4 2018 | −45% | **+18%** | +35% | +3% | +7% |
-| 2020 COVID | −85% | **+16%** | +16% | −1% | +23% |
-| 2022-23 slide | −41% | −14% | −14% | −15% | −9% |
-| Late 2023 | −25% | −16% | −2% | −11% | −9% |
-| 2024-25 slide | −27% | −28% | −15% | −16% | −16% |
-
-It also made money in the two big rallies: +18% in the 2022 Ukraine spike and +33%
-in the March 2026 supply shock. Averaged by month, the book earns +3.5% when WTI falls
-more than 10% and +4.2% when WTI rises more than 10%, and gives a little back in
-between. That is a long-volatility payoff, and it is why the book holds up in oil
-shocks.
-
-The 2022-25 declines were different from the crashes. OPEC+ cuts kept prompt barrels
-tight while WTI fell from $120 to $60, so the curve stayed backwardated and curve
-carry was long 99% of the time, collecting roll yield while losing more on price. The
-fall came in steps with sharp rebounds, and each rebound caught trend and
-carry-momentum short. The deepest drawdown ran from March 2022 to December 2025: −53%
-at a 15% vol target and −39% at 10%. The book then made +42% in the first three months
-of 2026.
-
-Two fixes for the grind made it worse. Taking carry flat whenever trend disagreed
-lost −40% over 2022-25 against −22% for plain carry. Dropping the 1-month part of
-trend lost −51% against −42%. Both are logged and left out of the book.
-
-### How it trades
-
-- NYMEX CL, the 2nd listed contract, rolled one fifth a day on business days 5 to 9.
-- Signals use day t's settlement. Trades go through at day t+1's settlement with
-  trade-at-settlement orders.
-- Each strategy targets 15% annual volatility on $10M, about 50-80 contracts. The
-  book rescales the equal-weight blend to target on trailing one-year volatility.
-- $16.50 per contract a side, and every roll charged as a calendar spread.
-
-The calendar-spread version of carry-momentum did not make the book. Even with a
-slower, banded signal it cost 2.8% a year against 1.2% gross, with $0.3M of capacity.
-Every configuration run anywhere in this repository is in a trial ledger.
-The full write-up with sizing, risk rules and capacity is
-[BOOK.md](research/carry_momentum/BOOK.md).
-
-## Part 6. The energy book: crude, gas and products
-
-The WTI book's weak spot was one market grinding lower. Part 6 runs the same three
-strategies, with the same engine, sizing, buffer and costs, on two layers of
-markets:
-
-- Core: WTI, ICE Brent and Henry Hub natural gas, the primaries.
-- Downstream: NYMEX heating oil (ULSD), NYMEX gasoline (unleaded until 2006, then
-  RBOB), ICE low-sulphur gasoil, Rotterdam 3.5% fuel oil and Mont Belvieu propane.
-  These are traded outright first, then as spreads against crude
-  ([below](#spreads-cracks-brent-wti-and-the-diesel-arb)).
-
-All contracts come from Datastream through WRDS, like WTI: about 720,000
-contract-days across 13 contract families, cut to the contracts within 15 months of
-delivery (16 for Brent). NYMEX
-expiries come from the exchange rules (they match Datastream on 97-99% of
-contracts) and ICE expiries from Datastream. The ICE rows start in September 2003,
-and the book stops on 2 April 2026, when the NYMEX rows end. On a day one exchange
-is shut, that market counts as zero P&L.
-
-Several products on WRDS barely trade, so I left them out: European jet kerosene
-(median daily volume 0), Mont Belvieu physical ethane (one contract listed a day),
-and the Mont Belvieu ethane, butane and natural gasoline swaps, which stop in 2015.
-Fuel oil and propane are cleared monthly swaps, so I costed them at a realistic half
-spread ($0.25 a tonne and 0.17 cents a gallon) instead of the exchange's minimum
-tick.
-
-A market joins the tradeable books only if all three of its strategies could run a
-$10M book on a typical busy day since 2010 (5% of volume, 2% of open interest). I
-added this rule after the first run showed that fuel oil and propane had almost no
-capacity. It looks at capacity only: fuel oil, which made money, fails it along with
-propane, which did not. Both are reported but kept out of the tradeable books.
-
-### Each market
-
-| Market | Data from | Annual return | Sharpe | Max drawdown | Positive years | Costs a year | Capacity, busy day since 2010 |
-|---|---|---|---|---|---|---|---|
-| WTI | 1983 | 8.0% | 0.56 | −54% | 17/24 | 0.6% | $199M |
-| Brent | 2003 | 7.7% | 0.54 | −61% | 13/24 | 0.5% | $221M |
-| Natural gas | 2000 | 4.6% | 0.36 | −51% | 16/24 | 0.7% | $55M |
-| Heating oil | 2000 | 10.5% | 0.70 | −34% | 15/24 | 0.2% | $55M |
-| Gasoline | 2000 | 5.1% | 0.40 | −44% | 15/24 | 0.2% | $63M |
-| Gasoil | 2003 | 10.7% | 0.70 | −51% | 16/24 | 1.3% | $121M |
-| Fuel oil (thin) | 2005 | 5.1% | 0.39 | −42% | 13/22 | 2.0% | $0M |
-| Propane (thin) | 2009 | −1.7% | −0.01 | −69% | 8/18 | 4.8% | $0M |
-
-![Sharpe by market and strategy](research/carry_momentum/results/multi/sharpe_grid.png)
-
-The distillates are the best markets in the project. Heating oil and gasoil each make
-a 0.70 Sharpe, and all three strategies work on both, between 0.45 and 0.58. Diesel
-inventories have a strong seasonal cycle and draw down hard in shortages, which gives
-the curve strategies more to read. Brent's trend strategy (0.56) is twice as good as
-WTI's (0.27).
-
-### The books
-
-| | WTI only | Core book | Downstream book | All markets |
-|---|---|---|---|---|
-| Markets | WTI | WTI, Brent, natural gas | Heating oil, gasoline, gasoil | All six |
-| Annual return | 8.0% | 9.9% | 10.6% | **11.4%** |
-| Sharpe / Sortino | 0.56 / 0.74 | 0.67 / 0.90 | 0.71 / 0.93 | **0.76 / 1.02** |
-| Growth of $1 | $5.99 | $9.36 | $11.06 | **$13.03** |
-| Max drawdown | −54% | −46% | −38% | −41% |
-| Longest drawdown | 1,023 days | 987 days | 1,529 days | **658 days** |
-| Positive years | 17/24 | 16/24 | 16/24 | 15/24 |
-| Correlation to WTI | −0.06 | −0.04 | 0.06 | 0.02 |
-| June 2022 to December 2025 | −50% | −44% | −23% | −37% |
-
-Each book weights every market and strategy equally and targets 15% volatility. The
-all-markets book makes 3.4 points a year more than the WTI book, with a drawdown 12
-points smaller and less than two thirds as long. Adding fuel oil and propane would
-lower its Sharpe to 0.74 and deepen its drawdown to −50%.
-
-![Market correlations](research/carry_momentum/results/multi/correlation.png)
-
-Natural gas is the real diversifier. Its book is correlated 0.02 to 0.08 with every
-oil market. The tradeable oil markets are correlated with each other at 0.42 to 0.76, so the
-products add less than their number suggests.
-
-### Did more markets fix the grind?
-
-Partly. Over June 2022 to December 2025 the all-markets book lost 37% against 50% for
-WTI alone.
-
-![2022-25 by market](research/carry_momentum/results/multi/grind.png)
-
-The loss was spread across the whole crude complex: Brent −57%, gasoline −36%. The
-distillates held close to flat (heating oil −12%, gasoil −4%). Their curve and trend
-moved more cleanly through the 2022 diesel shortage and its unwinding than crude's. Natural gas made +28%,
-mostly from carry-momentum (+31%), as gas fell from about $9 to about $2.
-One gas market against five oil markets was not enough to offset the oil losses.
-
-![WTI declines](research/carry_momentum/results/multi/oil_drops.png)
-
-In the crashes, more markets made the book stronger. Through 2014-16 the
-all-markets book made +111% against +54% for WTI alone, through 2008 +33% against
-+22%, and through COVID +23% against +16%.
-
-### Spreads: cracks, Brent-WTI and the diesel arb
+### Crack and arb spreads run mechanically
 
 An outright heating oil position is mostly a bet on crude, because diesel and crude
 move together. What a refiner or a products desk trades is the margin between them.
@@ -720,7 +913,7 @@ the raw settlements to the dollar. What the results show:
   0.39 before any cost. A spread moves less than either leg, so the 15% target needs
   more contracts, and costs take most of what is left.
 - Carry-momentum fails on spreads (−0.43 across all six), for the same reason the WTI
-  calendar spread failed in Part 4: on a low-volatility spread it flips too often to
+  calendar spread failed in the carry-momentum study: on a low-volatility spread it flips too often to
   pay for itself.
 - Seasonal mean reversion fails too. Margins did not return to their same-month
   norms over 2003-2026. A likely reason is that they shifted for years at a time, as
@@ -731,120 +924,26 @@ the raw settlements to the dollar. What the results show:
   to help. Adding it lowers the core book's Sharpe from 0.67 to 0.34 legged, or 0.56
   listed, and makes 2022-25 worse (−54% to −60% against −44%).
 
-So the outright product books in the tables above make money mostly because they
+So the outright product books in [the markets section](#the-markets) make money mostly because they
 carry crude's direction plus each product's own trend. The margin on its own is much
 harder to predict from prices alone. The natural next test for the cracks is
 fundamental: EIA's weekly distillate and gasoline stocks against their seasonal norm,
-the same inventory-cycle idea that made a 0.60 Sharpe on WTI in Part 3.
+the same inventory-cycle idea that made a 0.60 Sharpe on WTI in the Virtual Barrels
+work. That test is in [seasonal crack strips](#seasonal-crack-strips).
 
-### Cracks traded like a products desk
+### Other things that did not make the book
 
-The spread test above applied the outright machinery mechanically. That is not how
-cracks are traded. So I rebuilt the three NYMEX cracks (heating oil, RBOB and 3-2-1)
-the way a products desk runs them, and committed the rules
-([CRACKS_PROTOCOL.md](research/carry_momentum/CRACKS_PROTOCOL.md)) before running
-anything:
-
-- Seasonal strips on a fixed calendar every year: long the December-February heating
-  oil crack from August to October, ahead of the heating season, and long the
-  May-August RBOB crack from January to March, ahead of the driving season. The
-  3-2-1 runs both.
-- An inventory signal on the prompt crack: long when US distillate or gasoline stocks
-  are more than half a standard deviation below their five-year average for that
-  week, short when above. Each EIA report is used on the Thursday after its
-  Wednesday release.
-- A risk budget set once a year (10% volatility on $10M from three years of
-  history) instead of a daily volatility target, and listed-spread costs.
-- 2006 to April 2026, NYMEX only, so every leg settles at the same time and RBOB is
-  used throughout.
-
-| | Seasonal strips | Inventories |
-|---|---|---|
-| Heating oil crack | 1.1% a year, Sharpe 0.20, 10 of 20 trades won | −0.9%, 0.01 |
-| RBOB crack | 2.4% a year, Sharpe 0.45, 15 of 21 trades won | −3.8%, −0.38 |
-| 3-2-1 crack | 3.3% a year, Sharpe 0.46, 23 of 41 trades won | −5.2%, −0.47 |
-| June 2022 to December 2025 | +21%, +9%, +17% | −6%, −12%, −6% |
-
-![Each seasonal trade](research/carry_momentum/results/cracks/seasonal_trades.png)
-
-The seasonal strips work, and they made money through 2022-25, the stretch that hurt
-every other book here. Their annual returns are small because they are in the market
-only a quarter of the year (half for the 3-2-1). The RBOB trade is the strongest: 15
-of 21 years were profitable, and the one large loss was 2020 (−18.5%), when COVID
-emptied the roads during the window.
-
-The inventory signal fails on all three. Low stocks did not lead to wider cracks a
-week later. One reading is that by the time EIA publishes, the curve has already
-moved.
-
-Cracks roughly tripled over 2006-2026, so a long-only trade could be riding that
-drift. Two placebos, added after the first run and logged as
-trials, separate the two:
-
-| | Actual strips | Same strips, 3 months earlier | Long the prompt crack all year |
-|---|---|---|---|
-| Heating oil crack | 5.1% a year in the market | 2.8% | 4.1% |
-| RBOB crack | 10.1% | 0.1% | 5.1% |
-| 3-2-1 crack | 7.1% | 1.0% | 5.7% |
-
-Per year actually in the market, the RBOB window earns twice the passive drift, and
-the same trade three months earlier earns nothing. That is a real seasonal effect.
-The 3-2-1's edge over the drift is smaller, and the heating oil winter trade is
-mostly drift. Holding the prompt crack long all year would have had a Sharpe of 0.28
-to 0.49 by itself, which is the refiner's margin rising over these twenty years.
-
-As a book, the inventory losses outweigh the strips: −2.3% a year (Sharpe −0.14), and
-it lowers the core book when combined. The usable result is narrower. The summer
-RBOB and 3-2-1 strips earn a seasonal premium while in the market only part of the
-year, and they made money through 2022-25.
-
-### The final energy book
-
-So the strips go into the book. I committed the rule before running it (the addendum
-to the crack protocol): the three seasonal strip strategies, exactly as tested and
-with none dropped, join the 18 outright sleeves of the all-markets book. All 21 are
-weighted equally and the book is scaled to 15% volatility as before. The inventory
-strategy stays out.
-
-| | WTI only | All markets | All markets + crack strips |
-|---|---|---|---|
-| Annual return | 8.0% | 11.4% | **11.6%** |
-| Sharpe / Sortino | 0.56 / 0.74 | 0.76 / 1.02 | **0.79 / 1.06** |
-| Growth of $1 | $5.99 | $13.03 | **$13.68** |
-| Max drawdown | −54% | −41% | **−37%** |
-| Longest drawdown | 1,023 days | 658 days | 658 days |
-| Positive years | 17/24 | 15/24 | 16/24 |
-| June 2022 to December 2025 | −50% | −37% | **−31%** |
-| 2014-16 collapse | +54% | +111% | +104% |
-
-![The energy book](research/carry_momentum/results/energy/equity.png)
-
-The strips are correlated 0.08 with the rest of the book. Three sleeves out of 21,
-in the market for part of each year, move the totals a little: 0.2 points of return,
-0.03 of Sharpe. They do most of their work where the book was weakest, cutting the
-2022-25 loss by six points and the worst drawdown by five. They give up a little in
-the big trending crashes, where the outright sleeves were already doing the work.
-
-The inventory signal is the open item. EIA's weekly numbers are national totals from
-a survey, published with a lag. A desk would use regional and closer-to-real-time
-data (New York Harbor and Gulf Coast product stocks, ARA storage, tank and satellite
-counts), which is paid data I do not have here.
-
-Notes:
-
-- The outright run added 28 configurations to the trial ledger before running (24
-  market and strategy pairs and four books), the spreads added 52 (24 spread and
-  strategy pairs at each cost basis, and four books), and the crack rebuild added 17
-  (nine strategies, two books and six placebos), and the final book one more. The
-  ledger now holds 352.
-- The markets and strategies were fixed before any multi-market result was seen.
-  The liquidity rule came after the first run, as described above, and no market was
-  dropped for its returns.
-- Rerunning the WTI market through the multi-market code reproduces Part 5 exactly.
-
-Reproduce with `python multi.py`, `python spreads.py`, `python cracks.py` and
-`python energy_book.py` (one to three minutes each, writing to
-`research/carry_momentum/results/`).
+- The inventory signal for the cracks (under [seasonal crack strips](#seasonal-crack-strips)) lost on all
+  three cracks. EIA's weekly stocks are national survey totals published with a lag,
+  and a desk would use regional, near-real-time data that is paid.
+- Fuel oil and propane failed the liquidity rule. European jet kerosene, Mont Belvieu
+  physical ethane and the Mont Belvieu ethane, butane and natural gasoline swaps were
+  pulled and left out because they barely trade.
+- Carry-momentum as a WTI calendar spread (2nd vs 7th month) could not pay for its
+  own turnover, even with a slower, banded signal (2.8% a year in costs against 1.2%
+  gross).
+- Two fixes for the 2022-25 grind on WTI made it worse: taking carry flat whenever
+  trend disagreed, and dropping the 1-month part of trend.
 
 ## Decisions that run through the project
 
@@ -854,9 +953,9 @@ Reproduce with `python multi.py`, `python spreads.py`, `python cracks.py` and
   closed at −$37.63.
 - Roll dates come from exchange rules. Detecting jumps and calling them rolls
   would fit the diagnosis to the symptom.
-- Tests are written before results. Both forecasting holdouts and the
-  carry-momentum study were committed to GitHub before the data they score was
-  touched, and each was scored once.
+- Tests are written before results. Both forecasting holdouts, the carry-momentum
+  study, the crack study and the crack overlay were committed to GitHub before they
+  were run, and each was scored once.
 - Every configuration is counted. The trial ledger feeds the deflated Sharpe, so
   a good result found after many tries is discounted for the search.
 - Signals use only what was known at the previous close, checked by rerunning
@@ -870,21 +969,21 @@ pip install -r requirements-dev.txt
 pytest tests research/carry_momentum/tests -q   # 96 tests, no network
 ```
 
-| Part | Code | Run |
+| Component | Code | Run |
 |---|---|---|
-| 1. Forecasting | `data.py`, `models.py`, `forecast.py`, `metrics.py`, `roll.py` | `python run.py` (add `--holdout`, `--holdout2` or `--no-lstm`) |
-| 2. Trend, carry, vol | `strategies.py` | `python run_strategies.py` |
-| 3. Virtual Barrels | `virtual_barrels.py` | `python run_virtual_barrels.py` |
-| 4. Curve and study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python reconcile.py`, `python study.py` |
-| 5. Book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
-| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py`, `cracks.py`, `energy_book.py` | `python multi.py`, `python spreads.py`, `python cracks.py`, `python energy_book.py` |
+| Forecasting (research record) | `data.py`, `models.py`, `forecast.py`, `metrics.py`, `roll.py` | `python run.py` (add `--holdout`, `--holdout2` or `--no-lstm`) |
+| Continuous-futures rules (research record) | `strategies.py` | `python run_strategies.py` |
+| Virtual Barrels (research record) | `virtual_barrels.py` | `python run_virtual_barrels.py` |
+| Data, curve and the carry-momentum study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python reconcile.py`, `python study.py` |
+| WTI book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
+| Markets, spreads, crack strips and the energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py`, `cracks.py`, `energy_book.py` | `python multi.py`, `python spreads.py`, `python cracks.py`, `python energy_book.py` |
 
-- Parts 1-3 download from Yahoo, FRED, EIA and CFTC on the first run and cache
-  locally.
-- Parts 4-6 need the Datastream contract files, which are licensed through WRDS and
+- The research-record scripts download from Yahoo, FRED, EIA and CFTC on the first
+  run and cache locally.
+- The book needs the Datastream contract files, which are licensed through WRDS and
   not committed. [DATA.md](research/carry_momentum/DATA.md) says how to rebuild them.
-- `study.py` also needs the private capstone validation library. `book.py` and
-  `multi.py` run without it.
+- `study.py` also needs the private capstone validation library. Everything else
+  runs without it.
 - Two extra smoke tests run the LSTM and reservoir when TensorFlow and ReservoirPy are
   installed.
 

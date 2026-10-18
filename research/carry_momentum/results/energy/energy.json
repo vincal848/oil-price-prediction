@@ -197,5 +197,89 @@
       "All markets + crack strips": -0.2400544062419141
     }
   },
-  "strip_corr_to_all_markets": 0.08317325126218277
+  "strip_corr_to_all_markets": 0.08317325126218277,
+  "attribution": {
+    "check_max_abs_diff": 2.7755575615628914e-17,
+    "by_component": {
+      "WTI": {
+        "return_contribution": 0.019995043738656088,
+        "risk_share": 0.18403565108635986,
+        "grind_contribution": -0.1408471540023907
+      },
+      "Brent": {
+        "return_contribution": 0.021015436378491275,
+        "risk_share": 0.1996888348803294,
+        "grind_contribution": -0.1649333902493286
+      },
+      "Natural gas": {
+        "return_contribution": 0.012449758330556254,
+        "risk_share": 0.08546091449643531,
+        "grind_contribution": 0.03546324893611011
+      },
+      "Products, outright": {
+        "return_contribution": 0.06220031346588791,
+        "risk_share": 0.5126764212466363,
+        "grind_contribution": -0.11445518404574068
+      },
+      "Crack strips": {
+        "return_contribution": 0.006039481458560076,
+        "risk_share": 0.018138178290239355,
+        "grind_contribution": 0.0399335583735713
+      }
+    },
+    "by_strategy": {
+      "Carry-momentum": {
+        "return_contribution": 0.03959222991691077,
+        "risk_share": 0.2820446008651053,
+        "grind_contribution": -0.14077346434021892
+      },
+      "Curve carry": {
+        "return_contribution": 0.043256704991540836,
+        "risk_share": 0.3576372060010013,
+        "grind_contribution": -0.0517789961366755
+      },
+      "Trend": {
+        "return_contribution": 0.032811617005139924,
+        "risk_share": 0.3421800148436541,
+        "grind_contribution": -0.1922200188844555
+      },
+      "Seasonal strips": {
+        "return_contribution": 0.006039481458560076,
+        "risk_share": 0.018138178290239355,
+        "grind_contribution": 0.0399335583735713
+      }
+    },
+    "leave_one_out": {
+      "WTI": {
+        "cagr": 0.1163570499310167,
+        "sharpe": 0.8011847761048364,
+        "max_drawdown": -0.3219595229707384,
+        "grind": -0.24044474576795338
+      },
+      "Brent": {
+        "cagr": 0.11680392284863084,
+        "sharpe": 0.8123796712205875,
+        "max_drawdown": -0.313581753551193,
+        "grind": -0.21848473208230768
+      },
+      "Natural gas": {
+        "cagr": 0.11042181306391452,
+        "sharpe": 0.7414639437450189,
+        "max_drawdown": -0.42354311966777614,
+        "grind": -0.3663208594133499
+      },
+      "Products, outright": {
+        "cagr": 0.10282143209008732,
+        "sharpe": 0.7245704039374623,
+        "max_drawdown": -0.3869407789066547,
+        "grind": -0.365273996879686
+      },
+      "Crack strips": {
+        "cagr": 0.11387512165876768,
+        "sharpe": 0.7592588339748435,
+        "max_drawdown": -0.4122697426336578,
+        "grind": -0.365990224262415
+      }
+    }
+  }
 }

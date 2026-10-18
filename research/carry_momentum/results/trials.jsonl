@@ -635,3 +635,49 @@
 {"time": "2026-10-18T19:56:52.200777+00:00", "name": "crack RBOB crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
 {"time": "2026-10-18T19:56:53.524773+00:00", "name": "crack 3-2-1 crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
 {"time": "2026-10-18T19:56:54.247564+00:00", "name": "energy All markets + crack strips", "params": {"protocol": "CRACKS_PROTOCOL.md addendum", "outright_sleeves": 18, "strip_sleeves": 3, "weights": "equal", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:22.078129+00:00", "name": "multi WTI Carry-momentum", "params": {"market": "WTI", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:22.741738+00:00", "name": "multi WTI Curve carry", "params": {"market": "WTI", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:23.382919+00:00", "name": "multi WTI Trend", "params": {"market": "WTI", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:33.670540+00:00", "name": "multi Brent Carry-momentum", "params": {"market": "Brent", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:33.861457+00:00", "name": "multi Brent Curve carry", "params": {"market": "Brent", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:34.063665+00:00", "name": "multi Brent Trend", "params": {"market": "Brent", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:45.212179+00:00", "name": "multi Natural gas Carry-momentum", "params": {"market": "Natural gas", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:45.483660+00:00", "name": "multi Natural gas Curve carry", "params": {"market": "Natural gas", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:45.712898+00:00", "name": "multi Natural gas Trend", "params": {"market": "Natural gas", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:56.830014+00:00", "name": "multi Heating oil Carry-momentum", "params": {"market": "Heating oil", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:57.046509+00:00", "name": "multi Heating oil Curve carry", "params": {"market": "Heating oil", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:56:57.262617+00:00", "name": "multi Heating oil Trend", "params": {"market": "Heating oil", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:08.120017+00:00", "name": "multi Gasoline Carry-momentum", "params": {"market": "Gasoline", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:08.338848+00:00", "name": "multi Gasoline Curve carry", "params": {"market": "Gasoline", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:08.582048+00:00", "name": "multi Gasoline Trend", "params": {"market": "Gasoline", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:18.855038+00:00", "name": "multi Gasoil Carry-momentum", "params": {"market": "Gasoil", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:19.030631+00:00", "name": "multi Gasoil Curve carry", "params": {"market": "Gasoil", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:19.206250+00:00", "name": "multi Gasoil Trend", "params": {"market": "Gasoil", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:40.045958+00:00", "name": "crack Heating oil crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T20:57:40.893522+00:00", "name": "crack RBOB crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T20:57:42.290727+00:00", "name": "crack 3-2-1 crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T20:57:43.070765+00:00", "name": "energy All markets + crack strips", "params": {"protocol": "CRACKS_PROTOCOL.md addendum", "outright_sleeves": 18, "strip_sleeves": 3, "weights": "equal", "vol_target": 0.15}}
+{"time": "2026-10-18T20:57:52.683703+00:00", "name": "energy leave-one-out decomposition", "params": {"diagnostic": true}}
+{"time": "2026-10-18T20:58:34.088383+00:00", "name": "multi WTI Carry-momentum", "params": {"market": "WTI", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:34.815381+00:00", "name": "multi WTI Curve carry", "params": {"market": "WTI", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:35.601124+00:00", "name": "multi WTI Trend", "params": {"market": "WTI", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:46.497065+00:00", "name": "multi Brent Carry-momentum", "params": {"market": "Brent", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:46.672721+00:00", "name": "multi Brent Curve carry", "params": {"market": "Brent", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:46.840992+00:00", "name": "multi Brent Trend", "params": {"market": "Brent", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:58.046271+00:00", "name": "multi Natural gas Carry-momentum", "params": {"market": "Natural gas", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:58.278540+00:00", "name": "multi Natural gas Curve carry", "params": {"market": "Natural gas", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:58:58.496939+00:00", "name": "multi Natural gas Trend", "params": {"market": "Natural gas", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:09.538546+00:00", "name": "multi Heating oil Carry-momentum", "params": {"market": "Heating oil", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:09.759817+00:00", "name": "multi Heating oil Curve carry", "params": {"market": "Heating oil", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:09.992399+00:00", "name": "multi Heating oil Trend", "params": {"market": "Heating oil", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:21.034856+00:00", "name": "multi Gasoline Carry-momentum", "params": {"market": "Gasoline", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:21.251126+00:00", "name": "multi Gasoline Curve carry", "params": {"market": "Gasoline", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:21.501253+00:00", "name": "multi Gasoline Trend", "params": {"market": "Gasoline", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:32.016521+00:00", "name": "multi Gasoil Carry-momentum", "params": {"market": "Gasoil", "sleeve": "Carry-momentum", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:32.192457+00:00", "name": "multi Gasoil Curve carry", "params": {"market": "Gasoil", "sleeve": "Curve carry", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:32.371189+00:00", "name": "multi Gasoil Trend", "params": {"market": "Gasoil", "sleeve": "Trend", "buffer": 0.25, "start": "2003-01-02", "vol_target": 0.15}}
+{"time": "2026-10-18T20:59:53.430009+00:00", "name": "crack Heating oil crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "Heating oil crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T20:59:54.201150+00:00", "name": "crack RBOB crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "RBOB crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T20:59:55.512306+00:00", "name": "crack 3-2-1 crack Seasonal strips", "params": {"protocol": "CRACKS_PROTOCOL.md", "spread": "3-2-1 crack", "strategy": "Seasonal strips", "risk": 0.1, "start": "2006-01-03"}}
+{"time": "2026-10-18T20:59:56.109749+00:00", "name": "energy All markets + crack strips", "params": {"protocol": "CRACKS_PROTOCOL.md addendum", "outright_sleeves": 18, "strip_sleeves": 3, "weights": "equal", "vol_target": 0.15}}
+{"time": "2026-10-18T21:00:05.956834+00:00", "name": "energy leave-one-out decomposition", "params": {"diagnostic": true}}
