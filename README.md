@@ -26,7 +26,7 @@ one raised:
 6. **[The energy book.](#part-6-the-energy-book-crude-gas-and-products)** The same
    three strategies on WTI, Brent, natural gas, heating oil, gasoline and gasoil:
    11.4% a year after costs and a 0.76 Sharpe, with the worst drawdown cut from −54%
-   to −41%.
+   to −41%. Six crack and arb spreads were tested alongside and do not add to it.
 
 ![The energy books against the WTI-only book, 2003-2026, net of costs](research/carry_momentum/results/multi/equity.png)
 
@@ -576,6 +576,8 @@ markets:
 - Core: WTI, ICE Brent and Henry Hub natural gas, the primaries.
 - Downstream: NYMEX heating oil (ULSD), NYMEX gasoline (unleaded until 2006, then
   RBOB), ICE low-sulphur gasoil, Rotterdam 3.5% fuel oil and Mont Belvieu propane.
+  These are traded outright first, then as spreads against crude
+  ([below](#spreads-cracks-brent-wti-and-the-diesel-arb)).
 
 All contracts come from Datastream through WRDS, like WTI: about 720,000
 contract-days across 13 contract families, cut to the contracts within 15 months of
@@ -663,17 +665,88 @@ In the crashes, more markets made the book stronger. Through 2014-16 the
 all-markets book made +111% against +54% for WTI alone, through 2008 +33% against
 +22%, and through COVID +23% against +16%.
 
+### Spreads: cracks, Brent-WTI and the diesel arb
+
+An outright heating oil position is mostly a bet on crude, because diesel and crude
+move together. What a refiner or a products desk trades is the margin between them.
+So I built six spreads, each holding the same delivery month in every leg at
+exchange ratios:
+
+| Spread | Legs per unit |
+|---|---|
+| Heating oil crack | +1 heating oil, −1 WTI |
+| Gasoline crack | +1 RBOB (unleaded before 2006), −1 WTI |
+| 3-2-1 crack | +2 RBOB, +1 heating oil, −3 WTI |
+| Gasoil crack | +4 gasoil (about 2,980 bbl), −3 Brent |
+| Brent-WTI | +1 Brent, −1 WTI |
+| Diesel arb | +4 gasoil, −3 heating oil |
+
+Each spread runs four strategies. Three are the book's, applied to the spread itself:
+curve carry on the spread's own curve, carry-momentum, and trend on the spread's P&L.
+The fourth is seasonal mean reversion, which fades the margin when it is far from its
+average for that calendar month over the previous five years.
+
+I costed them two ways. Legged, each leg pays its full outright cost, which is
+conservative. Listed, the spread trades as one exchange instrument at one $0.01/bbl
+tick plus fees on every lot. I added the listed version after seeing the legged
+results, so both are logged as separate trials.
+
+| Spread | Annual return, legged | Sharpe, legged | Best strategy before costs | June 2022 to December 2025 |
+|---|---|---|---|---|
+| Heating oil crack | −0.3% | 0.06 | trend, 0.33 | −36% |
+| Gasoline crack | −2.5% | −0.09 | curve carry and trend, 0.28 | −30% |
+| 3-2-1 crack | −0.4% | 0.05 | trend, 0.39 | −6% |
+| Gasoil crack | −3.5% | −0.16 | carry-momentum, 0.33 | −17% |
+| Brent-WTI | −5.6% | −0.27 | trend, 0.30 | −63% |
+| Diesel arb | −10.4% | −0.64 | none above 0.05 | −38% |
+
+![Spread Sharpe ratios](research/carry_momentum/results/spreads/sharpe_grid.png)
+
+| | Core outright book | Spread book, legged | Spread book, listed | Core + spreads, legged | Core + spreads, listed |
+|---|---|---|---|---|---|
+| Annual return | 9.9% | −3.5% | 0.8% | 4.2% | 7.9% |
+| Sharpe | 0.67 | −0.24 | 0.13 | 0.34 | 0.56 |
+| Max drawdown | −46% | −71% | −53% | −61% | −56% |
+| June 2022 to December 2025 | −44% | −37% | −27% | −60% | −54% |
+
+The spreads do not work with these signals. The checks behind that: every leg holds
+the same delivery month, and the engine's daily P&L matches a hand calculation from
+the raw settlements to the dollar. What the results show:
+
+- The edge before costs is small. The best strategies are trend and curve carry on
+  the gasoline and 3-2-1 cracks, and trend on Brent-WTI, at Sharpe ratios of 0.28 to
+  0.39 before any cost. A spread moves less than either leg, so the 15% target needs
+  more contracts, and costs take most of what is left.
+- Carry-momentum fails on spreads (−0.43 across all six), for the same reason the WTI
+  calendar spread failed in Part 4: on a low-volatility spread it flips too often to
+  pay for itself.
+- Seasonal mean reversion fails too. Margins did not return to their same-month
+  norms over 2003-2026. A likely reason is that they shifted for years at a time, as
+  with the WTI discount after the shale boom from 2011 and the diesel shortage of
+  2022.
+- The diesel arb between New York and Europe has no edge at all.
+- The spread book is uncorrelated with the outright core (0.02), but it is too weak
+  to help. Adding it lowers the core book's Sharpe from 0.67 to 0.34 legged, or 0.56
+  listed, and makes 2022-25 worse (−54% to −60% against −44%).
+
+So the outright product books in the tables above make money mostly because they
+carry crude's direction plus each product's own trend. The margin on its own is much
+harder to predict from prices alone. The natural next test for the cracks is
+fundamental: EIA's weekly distillate and gasoline stocks against their seasonal norm,
+the same inventory-cycle idea that made a 0.60 Sharpe on WTI in Part 3.
+
 Notes:
 
-- 28 configurations were added to the trial ledger before running: 24 market and
-  strategy pairs and four books. The ledger now holds 282.
+- The outright run added 28 configurations to the trial ledger before running (24
+  market and strategy pairs and four books), and the spreads added 52 (24 spread and
+  strategy pairs at each cost basis, and four books). The ledger now holds 334.
 - The markets and strategies were fixed before any multi-market result was seen.
   The liquidity rule came after the first run, as described above, and no market was
   dropped for its returns.
 - Rerunning the WTI market through the multi-market code reproduces Part 5 exactly.
 
-Reproduce with `python multi.py` (about three minutes, writes
-`research/carry_momentum/results/multi/`).
+Reproduce with `python multi.py` and `python spreads.py` (about three minutes each,
+writing `research/carry_momentum/results/multi/` and `results/spreads/`).
 
 ## Decisions that run through the project
 
@@ -696,7 +769,7 @@ Reproduce with `python multi.py` (about three minutes, writes
 
 ```bash
 pip install -r requirements-dev.txt
-pytest tests research/carry_momentum/tests -q   # 91 tests, no network
+pytest tests research/carry_momentum/tests -q   # 93 tests, no network
 ```
 
 | Part | Code | Run |
@@ -706,7 +779,7 @@ pytest tests research/carry_momentum/tests -q   # 91 tests, no network
 | 3. Virtual Barrels | `virtual_barrels.py` | `python run_virtual_barrels.py` |
 | 4. Curve and study | `research/carry_momentum/curve.py`, `reconcile.py`, `engine.py`, `study.py` | `python reconcile.py`, `python study.py` |
 | 5. Book | `research/carry_momentum/book.py` | `python book.py` (about a minute) |
-| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py` | `python multi.py` (about three minutes) |
+| 6. Energy book | `research/carry_momentum/markets.py`, `multi.py`, `spreads.py` | `python multi.py`, `python spreads.py` (about three minutes each) |
 
 - Parts 1-3 download from Yahoo, FRED, EIA and CFTC on the first run and cache
   locally.

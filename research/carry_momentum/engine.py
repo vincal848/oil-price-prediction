@@ -266,3 +266,109 @@ def capacity(
             np.isinf((trade / adv).where(trade > 0).max(axis=1)).sum()
         ),
     }
+
+
+# ---------------------------------------------------------------------------
+# Inter-market spreads (cracks, Brent-WTI, ...): legs in different markets
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Leg:
+    """One leg of an inter-market spread.
+
+    weights: dates x contracts, share of one contract held in each (as from
+    leg_weights). prices: that market's settlements. qty: signed whole contracts
+    per spread unit (+2 RBOB, -3 WTI for a 3-2-1 crack). multiplier: price units
+    per contract. costs: that market's per-contract costs.
+    """
+
+    weights: pd.DataFrame
+    prices: pd.DataFrame
+    qty: int
+    multiplier: float
+    costs: Costs
+
+
+def map_contracts(weights: pd.DataFrame, prefix) -> pd.DataFrame:
+    """Same delivery months in another market: NCL0324 -> NHO0324.
+
+    prefix: a string, or a callable date -> string for markets whose mnemonic
+    changes (unleaded gasoline to RBOB)."""
+    s = weights.stack()
+    s = s[s != 0]
+    dates = s.index.get_level_values(0)
+    months = s.index.get_level_values(1).str[-4:]
+    pre = [prefix] * len(s) if isinstance(prefix, str) else [prefix(d) for d in dates]
+    new = [p + m for p, m in zip(pre, months)]
+    out = pd.Series(s.values, index=pd.MultiIndex.from_arrays([dates, new]))
+    return out.groupby(level=[0, 1]).sum().unstack(fill_value=0.0)
+
+
+def legs_unit_pnl(legs: list[Leg], idx: pd.DatetimeIndex) -> pd.Series:
+    """$ P&L of one spread unit, on a common calendar (prices carried over
+    the other exchange's holidays)."""
+    total = pd.Series(0.0, index=idx)
+    for leg in legs:
+        px = leg.prices.reindex(idx).ffill(limit=5)
+        w = leg.weights.reindex(idx).ffill(limit=5).fillna(0.0)
+        total += leg.qty * unit_dollar_pnl(px, w, leg.multiplier)
+    return total
+
+
+def run_legs(
+    signal: pd.Series,
+    legs: list[Leg],
+    idx: pd.DatetimeIndex,
+    *,
+    capital: float = 10e6,
+    target_vol: float = 0.15,
+    vol_com: float = 60.0,
+    buffer: float = 0.0,
+    unit_cost: float | None = None,
+) -> Book:
+    """Simulate an inter-market spread in whole contracts, like run().
+
+    One unit holds |qty| contracts in each leg. Changes in units pay each leg's
+    outright cost, and each leg's rolls pay that market's calendar-spread cost,
+    which is conservative: exchanges list most cracks as single instruments.
+    unit_cost: $ per unit changed when the spread trades as one listed
+    instrument, replacing the legged outright costs (rolls are unchanged).
+    """
+    unit_pnl = legs_unit_pnl(legs, idx)
+    vol = np.sqrt((unit_pnl**2).ewm(com=vol_com, min_periods=20).mean() * 252)
+    size = (target_vol * capital / vol).replace([np.inf, -np.inf], np.nan)
+    target = buffered((signal.reindex(idx).fillna(0.0) * size).fillna(0.0), buffer)
+    units = target.shift(1).fillna(0.0)
+    d_units = units.diff().abs().fillna(units.abs())
+
+    gross = pd.Series(0.0, index=idx)
+    cost = pd.Series(0.0, index=idx)
+    hold = []
+    for leg in legs:
+        w = leg.weights.reindex(idx).ffill(limit=5).fillna(0.0)
+        n = units * leg.qty
+        h = w.mul(n, axis=0).round()
+        resid = n - h.sum(axis=1)
+        first = w.idxmax(axis=1)
+        for d in resid.index[resid != 0]:
+            h.at[d, first.at[d]] += resid.at[d]
+        px = leg.prices.reindex(index=idx, columns=h.columns).ffill(limit=5)
+        dp = px.diff().fillna(0.0)
+        gross += (h.shift(1).fillna(0.0) * dp).sum(axis=1) * leg.multiplier
+        traded = h.diff().abs().fillna(h.abs()).sum(axis=1)
+        moved = d_units * abs(leg.qty)
+        rolled = ((traded - moved) / 2).clip(lower=0)
+        trade_cost = 0.0 if unit_cost is not None else moved * leg.costs.outright
+        cost += trade_cost + rolled * leg.costs.spread
+        hold.append(h)
+    if unit_cost is not None:
+        cost += d_units * unit_cost
+    holdings = pd.concat(hold, axis=1).T.groupby(level=0).sum().T.fillna(0.0)
+    return Book(
+        returns=(gross - cost) / capital,
+        gross=gross / capital,
+        holdings=holdings,
+        units=units,
+        cost=cost,
+    )

@@ -176,3 +176,33 @@ def test_buffer_cuts_turnover_on_a_real_book():
     plain = engine.run(sig, {"leg": (1.0, w)}, px, spread_trade=False)
     buf = engine.run(sig, {"leg": (1.0, w)}, px, spread_trade=False, buffer=0.25)
     assert buf.units.diff().abs().sum() < plain.units.diff().abs().sum()
+
+
+def test_map_contracts_keeps_delivery_months():
+    idx = pd.bdate_range("2024-01-02", periods=2)
+    w = pd.DataFrame({"NCL0324": [1.0, 0.6], "NCL0424": [0.0, 0.4]}, index=idx)
+    m = engine.map_contracts(w, "NHO")
+    assert list(m.columns) == ["NHO0324", "NHO0424"]
+    assert m.loc[idx[1], "NHO0424"] == 0.4
+    switch = engine.map_contracts(w, lambda d: "NHU" if d < idx[1] else "NRB")
+    assert set(switch.columns) == {"NHU0324", "NRB0324", "NRB0424"}
+
+
+def test_two_leg_spread_pnl_is_product_minus_crude():
+    p, _ = synthetic_panel(n_days=300)
+    px = p.pivot(index="date", columns="contract", values="settle")
+    w = engine.leg_weights(p, 1)
+    # A "product" priced at crude + $5 earns exactly what crude earns, so the
+    # spread's P&L before costs is zero every day.
+    prod_px = (px + 5.0).rename(columns=lambda c: "NHO" + c[3:])
+    prod_w = engine.map_contracts(w, "NHO")
+    zero = engine.Costs(0.0, 0.0)
+    legs = [
+        engine.Leg(prod_w, prod_px, 1, 1000, zero),
+        engine.Leg(w, px, -1, 1000, zero),
+    ]
+    assert engine.legs_unit_pnl(legs, px.index).abs().max() < 1e-6
+    sig = pd.Series(1.0, index=px.index)
+    long_crude = engine.run_legs(sig, legs[1:], px.index)
+    plain = engine.run(sig, {"leg": (-1.0, w)}, px, spread_trade=False, costs=zero)
+    assert np.allclose(long_crude.gross.values, plain.gross.values)
